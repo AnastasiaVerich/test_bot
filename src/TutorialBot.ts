@@ -106,7 +106,7 @@ bot.on("message", async (ctx) => {
         }`,
     );
 
-    if (screaming && ctx.message.text) {
+  /*  if (screaming && ctx.message.text) {
         //Scream the message
         await ctx.reply(ctx.message.text.toUpperCase(), {
             entities: ctx.message.entities,
@@ -114,7 +114,7 @@ bot.on("message", async (ctx) => {
     } else {
         //This is equivalent to forwarding, without the sender's name
         await ctx.copyMessage(ctx.message.chat.id);
-    }
+    }*/
 });
 
 //Start the Bot

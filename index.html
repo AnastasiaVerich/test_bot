@@ -7,11 +7,51 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-<h1>Привет, это мой мини-приложение!</h1>
-<p>Это пример мини-приложения в Telegram.</p>
-<button id="sendDataBtn">Отправить данные в Telegram</button>
+<h1>Загрузить изображение</h1>
 
+<!-- Кнопка для загрузки изображения -->
+<input type="file" id="fileInput" accept="image/*" onchange="previewImage(event)">
+<!-- Место для предварительного просмотра выбранного изображения -->
+<img id="preview" style="display:none; width: 200px; margin-top: 20px;"/>
+
+
+<!-- Кнопка для съемки изображения -->
+<input type="file" id="cameraInput" accept="image/*" capture="camera" onchange="previewCameraImage(event)">
+<!-- Место для отображения сделанного фото -->
+<img id="cameraPreview" style="display:none; width: 200px; margin-top: 20px;"/>
+
+
+
+<button id="sendDataBtn">Отправить данные в Telegram</button>
 <script>
+    function previewCameraImage(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const img = document.getElementById('cameraPreview');
+            img.src = e.target.result;
+            img.style.display = 'block'; // Показываем изображение
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
+    function previewImage(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const img = document.getElementById('preview');
+            img.src = e.target.result;
+            img.style.display = 'block'; // Показываем изображение
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
     // Получаем объект Telegram Web App API
     const tg = window.Telegram.WebApp;
 
