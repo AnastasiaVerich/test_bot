@@ -21,6 +21,7 @@
 <script>
     let file = null
     window.file = file
+    window.formData = null
     function previewImage(event) {
         file = event.target.files[0];
         const reader = new FileReader();
@@ -42,6 +43,7 @@
     document.getElementById('sendDataBtn').addEventListener('click', () => {
         const formData = new FormData();
         formData.append("image", file);
+        window.formData = formData
         tg.sendData(formData);
         tg.close();
     });
