@@ -15,13 +15,13 @@
 <!-- Место для отображения изображения -->
 <img id="imagePreview" style="display:none; width: 200px; margin-top: 20px;"/>
 
-
-
 <button id="sendDataBtn">Отправить данные в Telegram</button>
+
 <script>
-    let file = null
-    window.file = file
-    window.formData = null
+    let file = null;  // Переменная для хранения файла
+    let base64Image = '';  // Строка для хранения Base64 изображения
+
+    // Функция для предварительного просмотра изображения
     function previewImage(event) {
         file = event.target.files[0];
         const reader = new FileReader();
@@ -30,22 +30,25 @@
             const img = document.getElementById('imagePreview');
             img.src = e.target.result;
             img.style.display = 'block'; // Показываем изображение
+            base64Image = e.target.result; // Сохраняем изображение как строку Base64
         };
 
         if (file) {
             reader.readAsDataURL(file);
         }
     }
+
     // Получаем объект Telegram Web App API
     const tg = window.Telegram.WebApp;
 
-    // Действие при клике на кнопку
+    // Действие при клике на кнопку отправки данных
     document.getElementById('sendDataBtn').addEventListener('click', () => {
-        const formData = new FormData();
-        formData.append("image", file);
-        window.formData = formData
-        tg.sendData(file);
-        tg.close();
+        if (base64Image) {
+            // Отправляем изображение в бота через WebApp API
+            tg.sendData(base64Image);
+        } else {
+            alert('Пожалуйста, выберите или сделайте фото.');
+        }
     });
 
     // Инициализация Web App
