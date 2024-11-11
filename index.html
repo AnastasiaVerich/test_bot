@@ -40,7 +40,9 @@
 
     // Действие при клике на кнопку
     document.getElementById('sendDataBtn').addEventListener('click', () => {
-        tg.sendData("Данные от мини-приложения");
+        const formData = new FormData();
+        formData.append("image", file);
+        tg.sendData(formData);
         tg.close();
     });
 
