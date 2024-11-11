@@ -7,43 +7,26 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-<h1>Загрузить изображение</h1>
+<h1>Выберите или сделайте фото</h1>
 
-<!-- Кнопка для загрузки изображения -->
-<input type="file" id="fileInput" accept="image/*" onchange="previewImage(event)">
-<!-- Место для предварительного просмотра выбранного изображения -->
-<img id="preview" style="display:none; width: 200px; margin-top: 20px;"/>
+<!-- Кнопка для выбора или съемки фото -->
+<input type="file" id="photoInput" accept="image/*" capture="camera" onchange="previewImage(event)">
 
-
-<!-- Кнопка для съемки изображения -->
-<input type="file" id="cameraInput" accept="image/*" capture="camera" onchange="previewCameraImage(event)">
-<!-- Место для отображения сделанного фото -->
-<img id="cameraPreview" style="display:none; width: 200px; margin-top: 20px;"/>
+<!-- Место для отображения изображения -->
+<img id="imagePreview" style="display:none; width: 200px; margin-top: 20px;"/>
 
 
 
 <button id="sendDataBtn">Отправить данные в Telegram</button>
 <script>
-    function previewCameraImage(event) {
-        const file = event.target.files[0];
-        const reader = new FileReader();
-
-        reader.onload = function(e) {
-            const img = document.getElementById('cameraPreview');
-            img.src = e.target.result;
-            img.style.display = 'block'; // Показываем изображение
-        };
-
-        if (file) {
-            reader.readAsDataURL(file);
-        }
-    }
+    let file = null
+    window.file = file
     function previewImage(event) {
-        const file = event.target.files[0];
+        file = event.target.files[0];
         const reader = new FileReader();
 
         reader.onload = function(e) {
-            const img = document.getElementById('preview');
+            const img = document.getElementById('imagePreview');
             img.src = e.target.result;
             img.style.display = 'block'; // Показываем изображение
         };
