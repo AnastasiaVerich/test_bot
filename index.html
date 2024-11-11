@@ -44,7 +44,7 @@
         const formData = new FormData();
         formData.append("image", file);
         window.formData = formData
-        tg.sendData(formData);
+        tg.sendData(file);
         tg.close();
     });
 
