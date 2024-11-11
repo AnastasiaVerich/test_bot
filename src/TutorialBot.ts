@@ -86,7 +86,7 @@ bot.callbackQuery(PhotoVideoButton, async (ctx) => {
     await ctx.reply("ляля три рубля.", {
         reply_markup: {
             keyboard: [
-                [{ text: "Открыть апп", web_app: {url:'https://www.google.com/'} }],  // Кнопка, которая вызывает галерею
+                [{ text: "Открыть апп", web_app: {url:'https://anastasiaverich.github.io/test_bot/'} }],  // Кнопка, которая вызывает галерею
             ],
             one_time_keyboard: true,
             resize_keyboard: true,
