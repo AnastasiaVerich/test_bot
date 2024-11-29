@@ -32,7 +32,7 @@ registerScenes(bot)
 // Регистрация обработчиков
 registerCommands(bot);
 registerCallbackQueries(bot);
-registerMessageHandler(bot);
+//registerMessageHandler(bot);
 
 
 // Запуск бота

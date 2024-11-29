@@ -18,17 +18,18 @@ export async function registrationScene(conversation: Conversation<MyContext>, c
     await ctx.reply(SCENES_REGISTRATION.InterPhoto, {
         reply_markup: OpenWebAppKeyboard,
     });
-    const message = await conversation.waitFor("message");
+    const message = await conversation.waitFor("message:web_app_data");
     if (message.message?.web_app_data) {
+
         const data = JSON.parse(message.message.web_app_data.data);
-        await ctx.reply(`Получены данные: ${JSON.stringify(data)}`);
+        //await ctx.reply(`Получены данные: ${JSON.stringify(data)}`);
 
         if (data.result === "new_face") {
             await ctx.reply("Фото принято!");
             // Переход к следующему шагу
         } else if(data.result === "user_exist") {
             await ctx.reply("Пользователь существует.");
-            // Завершение сценария
+            return
         }
     } else {
         await ctx.reply("Ожидались данные из Web App, но пришло что-то другое.");
