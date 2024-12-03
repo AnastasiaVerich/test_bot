@@ -1,7 +1,10 @@
 import {Keyboard} from "grammy";
-import {BUTTONS} from "../../config/constants";
+import {BUTTONS} from "../../constants/constants";
 import {WEB_APP_URL} from "../../config/config";
-export const OpenWebAppKeyboard = new Keyboard()
-    .webApp(BUTTONS.OpenAppButtonText, `${WEB_APP_URL}`)
+import {ParamsType} from "../../types/type";
+export const OpenWebAppKeyboard=(params:ParamsType)=> (
+    new Keyboard()
+    .webApp(BUTTONS.OpenAppButtonText, `${WEB_APP_URL}?data=${encodeURIComponent(JSON.stringify(params))}`)
     .resized()
-    .oneTime();
+    .oneTime()
+)

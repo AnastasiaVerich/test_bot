@@ -1,7 +1,8 @@
 import {Context} from "grammy";
-import {MESSAGES} from "../../config/constants";
+import {MESSAGES} from "../../constants/constants";
 import {welcomeKeyboard} from "../../keyboards/inline/welcome";
-import {MyContext} from "../../index";
+
+import {MyContext} from "../../types/type";
 
 export async function handleMenuCommand(ctx: MyContext) {
     await ctx.reply(

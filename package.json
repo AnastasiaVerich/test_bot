@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@grammyjs/conversations": "^1.2.0",
+    "axios": "^1.7.8",
     "dotenv": "^16.4.5",
     "grammy": "^1.11.2",
     "node-cache": "^5.1.2"

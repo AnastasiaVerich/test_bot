@@ -1,7 +1,8 @@
 import {Context} from "grammy";
-import {MESSAGES} from "../../config/constants";
+import {MESSAGES} from "../../constants/constants";
 import {FAQMenuKeyboard} from "../../keyboards/inline/faq";
-import {MyContext} from "../../index";
+
+import {MyContext} from "../../types/type";
 
 export async function handleFaq(ctx: MyContext) {
     await ctx.editMessageText(MESSAGES.secondMenu, {

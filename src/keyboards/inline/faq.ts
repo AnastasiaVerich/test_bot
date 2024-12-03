@@ -1,5 +1,5 @@
 import {InlineKeyboard} from "grammy";
-import {BUTTONS} from "../../config/constants";
+import {BUTTONS} from "../../constants/constants";
 
 export const FAQMenuKeyboard = new InlineKeyboard()
     .text(BUTTONS.BackButtonText, BUTTONS.BackButton)
