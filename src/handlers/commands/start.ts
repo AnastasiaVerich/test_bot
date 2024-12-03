@@ -10,7 +10,8 @@ export async function handleStartCommand(ctx: MyContext) {
     const userId = ctx?.from?.id.toString() ?? '';
 
     //Проверяем, зарегистрирован ли уже наш юзер
-    api.check_exist_by_id(userId).then(res => {
+    api.check_exist_by_id(userId)
+        .then(res => {
         if (res.status === 1) {
             ctx.reply(
                 MESSAGES.welcome_old_user,
@@ -28,11 +29,7 @@ export async function handleStartCommand(ctx: MyContext) {
             );
         } else if (res.status === 2) {
             ctx.reply(
-                MESSAGES.welcome_new_user,
-                {
-                    parse_mode: "HTML",
-                    reply_markup: welcomeKeyboard
-                }
+                MESSAGES.server_error,
             );
         }
     })

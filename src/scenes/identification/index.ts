@@ -10,6 +10,7 @@ export async function identificationScene(conversation: Conversation<MyContext>,
     const userId =  ctx.from?.id?? ''
     // Шаг 1
     const photoAccepted = await stepPhoto(conversation, ctx,userId.toString());
+
     if (!photoAccepted) {
         await ctx.reply(MESSAGES.identification_error);
         return;  // Завершаем сценарий

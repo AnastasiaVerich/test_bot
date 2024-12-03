@@ -3,7 +3,7 @@ import {MESSAGES} from "../../../constants/constants";
 import {OpenWebAppKeyboard} from "../../../keyboards/reply/openWebApp";
 import {MyContext} from "../../../types/type";
 
-type resultType = 'user_exist_number'|'user_exist_id'|'user_exist_face'|'success'
+type resultType = 'user_exist_number'|'user_exist_id'|'user_exist_face'|'success'|'server_error'
 export async function stepPhoto(conversation: Conversation<MyContext>, ctx: MyContext, userPhone: string, userId: string) {
     await ctx.reply(MESSAGES.registration_photo, {
         reply_markup: OpenWebAppKeyboard({userPhone, userId, type: 'registration', isSavePhoto: '0'}),
@@ -20,6 +20,10 @@ export async function stepPhoto(conversation: Conversation<MyContext>, ctx: MyCo
         switch (result) {
             case'user_exist_number': {
                 console.log("Пользователь существует (номер).");
+            }
+                break
+            case'server_error': {
+                await ctx.reply(MESSAGES.server_error);
             }
                 break
             case'user_exist_id': {
