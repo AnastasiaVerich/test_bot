@@ -2,12 +2,12 @@ import {Bot, session} from "grammy";
 import * as dotenv from 'dotenv';
 
 dotenv.config(); // Загрузка переменных окружения
-import {registerCallbackQueries, registerCommands} from "./handlers";
-import {registerScenes} from "./scenes";
 import {conversations} from "@grammyjs/conversations";
 import {token} from "./config/config";
 import {MyContext, SessionData} from "./types/type";
-import {registerMessageHandler} from "./handlers/callbackQueries/messages";
+import {registerScenes} from "./bot/scenes";
+import {registerCallbackQueries} from "./bot/handlers/callbackQueries";
+import {registerCommands} from "./bot/handlers/commands";
 
 
 // Конфигурация сессий
@@ -27,8 +27,8 @@ registerScenes(bot)
 
 // Регистрация команд обработчиков
 registerCommands(bot);
-registerCallbackQueries(bot);
-registerMessageHandler(bot);
+registerCallbackQueries(bot);/*
+registerMessageHandler(bot);*/
 
 // Запуск бота
 bot.start();

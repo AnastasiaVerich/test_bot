@@ -12,11 +12,27 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "-": "^0.0.1",
     "@grammyjs/conversations": "^1.2.0",
+    "@scure/bip32": "^1.6.0",
+    "@scure/bip39": "^1.5.0",
+    "@ton/core": "^0.59.0",
+    "@ton/crypto": "^3.3.0",
+    "@ton/ton": "^15.1.0",
+    "@turf/turf": "^7.1.0",
+    "@types/pg": "^8.11.10",
+    "@types/qrcode": "^1.5.5",
     "axios": "^1.7.8",
+    "bip39": "^3.1.0",
+    "buffer": "^6.0.3",
+    "d": "^1.0.2",
     "dotenv": "^16.4.5",
     "grammy": "^1.11.2",
-    "node-cache": "^5.1.2"
+    "node-cache": "^5.1.2",
+    "pg": "^8.13.1",
+    "qrcode": "^1.5.4",
+    "ton-mnemonic": "^0.0.14",
+    "tonweb": "^0.0.66"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",
