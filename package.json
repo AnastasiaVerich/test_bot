@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+
     "build:bot": "tsc",
     "start:bot": "ts-node src/bot/index.ts",
     "dev:bot": "ts-node-dev src/bot/index.ts",
