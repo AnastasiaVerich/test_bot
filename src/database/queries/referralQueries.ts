@@ -19,7 +19,7 @@ export async function addReferral(userId: number, referredId: number):Promise<Re
                         ON CONFLICT (tg_user_id) DO NOTHING
                         RETURNING *`;
 
-        const result: QueryResult<ReferralBotStart> = await db.query(query, [referredId]);
+        const result: QueryResult<ReferralBotStart> = await db.query(query, [userId,referredId]);
 
         return result.rows[0];
     } catch (error) {

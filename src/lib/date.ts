@@ -1,4 +1,4 @@
-function formatTimestamp(timestamp: number): string {
+export function formatTimestamp(timestamp: number): string {
     // Создаем объект Date из метки времени
     const date = new Date(timestamp);
 

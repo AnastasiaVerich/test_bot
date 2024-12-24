@@ -17,6 +17,8 @@ type SurveyStatus = 'reserved' | 'available' | 'in_progress';
 interface Survey {
     survey_id: number;
     region_id: number;
+    reserved_by_user_id: number;
+    reserved_by_operator_id: number;
     survey_type: SurveyType;
     topic: string;
     status: SurveyStatus;
@@ -30,7 +32,7 @@ export const getRecentSurveyTypesForUser = async (userId: number, querySimilarTo
     try {
         const query = `
             SELECT DISTINCT s.survey_type
-            FROM user_survey_tasks ust
+            FROM survey_task_user ust
             JOIN surveys s ON ust.survey_id = s.survey_id
             WHERE ust.user_id = $1 AND ust.started_at >= NOW() - $2 * INTERVAL '1 day'
         `;
@@ -46,9 +48,23 @@ export const getRecentSurveyTypesForUser = async (userId: number, querySimilarTo
 export const checkAndUpdateSurveyStatus = async (): Promise<{ success: boolean }> => {
     try {
         const query = `
-            UPDATE surveys
-            SET status = 'available'
-            WHERE status = 'reserved' AND reserved_until <= NOW();`;
+            WITH updated_surveys AS (
+                UPDATE surveys
+                SET status = 'available',
+                    reserved_by_user_id = NULL,
+                    reserved_by_operator_id = NULL
+                WHERE status = 'reserved' AND reserved_until <= NOW()
+                RETURNING reserved_by_user_id, reserved_by_operator_id
+            ),
+            updated_users AS (
+                UPDATE users
+                SET status = 'free'
+                WHERE user_id IN (SELECT reserved_by_user_id FROM updated_surveys WHERE reserved_by_user_id IS NOT NULL)
+            )
+            UPDATE operators
+            SET status = 'free'
+            WHERE operator_id IN (SELECT reserved_by_operator_id FROM updated_surveys WHERE reserved_by_operator_id IS NOT NULL);
+        `;
         const result = await db.query(query);
         if (result.rowCount === 0) {
             return {success: false};
@@ -69,7 +85,7 @@ export const findAvailableSurvey = async (
         let query = `
             SELECT s.*
             FROM surveys s
-            LEFT JOIN user_survey_tasks ust
+            LEFT JOIN survey_task_user ust
                 ON s.survey_id = ust.survey_id
                 AND ust.user_id = $1
             WHERE s.region_id = $2
@@ -90,5 +106,23 @@ export const findAvailableSurvey = async (
     } catch (error) {
         console.error('Error finding available survey:', error);
         throw new Error('Error finding available survey');
+    }
+};
+
+export const reserveSurvey = async (surveyId: number, userId: number, operatorId: number, reservationMinutes: number): Promise<void> => {
+    try {
+    const query = `
+        UPDATE surveys
+        SET status = 'reserved',
+            reserved_by_user_id = $1,
+            reserved_by_operator_id = $2,
+            reserved_until = NOW() + INTERVAL '${reservationMinutes} minutes',
+            updated_at = NOW()
+        WHERE survey_id = $3;
+    `;
+    await db.query(query, [userId, operatorId, surveyId]);
+    } catch (error) {
+        console.error('Error reserveSurvey', error);
+        throw new Error('Error reserveSurvey');
     }
 };

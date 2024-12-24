@@ -24,3 +24,25 @@ export async function checkBalance(userId: number):Promise<UserBalance | null> {
     }
 }
 
+export async function  addUserBalance(
+    userId: number,
+    balance: number,
+    totalEarned: number,
+    totalWithdrawn: number
+): Promise<void> {
+    try {
+        const query = `
+            INSERT INTO user_balance (user_id, balance, total_earned, total_withdrawn)
+            VALUES ($1, $2, $3, $4)
+            RETURNING *`;
+        await db.query(query, [
+            userId,
+            balance,
+            totalEarned,
+            totalWithdrawn,
+        ]);
+    } catch (error) {
+        console.error('Error adding user balance:', error);
+        throw new Error('Error adding user balance to the database');
+    }
+};

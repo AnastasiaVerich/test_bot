@@ -1,6 +1,6 @@
 import {db} from "../dbClient";
 import {QueryResult} from "pg";
-import {LocationType} from "../../types/type";
+import {LocationType} from "../../bot/types/type";
 import * as turf from '@turf/turf';
 
 interface RegionSettings {
