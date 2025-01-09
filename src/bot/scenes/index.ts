@@ -6,7 +6,6 @@ import {identificationScene} from "./identificationScene";
 import {surveyScene} from "./surveyScene";
 import {inviteScene} from "./inviteScene";
 import {withdrawalScene} from "./withdrawalScene";
-import {authMiddleware} from "../middleware/authMiddleware";
 
 export enum Scenes {
     RegisterScene = "RegisterScene",

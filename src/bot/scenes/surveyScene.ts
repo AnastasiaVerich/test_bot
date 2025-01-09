@@ -6,27 +6,39 @@ import {findRegionByLocation} from "../../database/queries/regionQueries";
 import {
     checkAndUpdateSurveyStatus,
     findAvailableSurvey,
-    getRecentSurveyTypesForUser, reserveSurvey
+    getRecentSurveyTypesForUser,
+    reserveSurvey
 } from "../../database/queries/surveyQueries";
 import {findUserByTelegramId, updateUserStatus} from "../../database/queries/userQueries";
 import {getOperatorsByRegionAndStatus, updateOperatorStatus} from "../../database/queries/operatorQueries";
 import {AuthUserKeyboard} from "../keyboards/AuthUserKeyboard";
 import {SURVEY_SCENE} from "../constants/scenes";
 import {BUTTONS_KEYBOARD} from "../constants/button";
-import {formatTimestamp} from "../../lib/date";
+import {formatTimestamp, isDateDifferenceAtLeast} from "../../lib/date";
+import {Scenes} from "./index";
 
 
 export async function surveyScene(conversation: Conversation<MyContext>, ctx: MyContext) {
 
     const userId = ctx.from?.id
-
+    const nowDateTime = new Date()
     if (!userId) {
         return ctx.reply("Ошибка: не удалось получить информацию о пользователе.");
     }
 
-    // Шаг 1: Проверка, может ли пользователь проходит опрос
     const user = await findUserByTelegramId(userId)
 
+
+
+    // Шаг 0: Проверяем, нужно ли пользователя перебросить  на инициализаицю
+
+    if(isDateDifferenceAtLeast(nowDateTime.toString(),user.last_init, 7 )){
+        await ctx.conversation.enter(Scenes.IdentificationScene);
+        return
+    }
+
+
+    // Шаг 1: Проверка, может ли пользователь проходит опрос
     if (user.status ==='busy') {
         await ctx.reply(SURVEY_SCENE.USER_BUSY, {
             reply_markup:  AuthUserKeyboard(),
@@ -34,7 +46,7 @@ export async function surveyScene(conversation: Conversation<MyContext>, ctx: My
         return
     }
 
-    if (user.survey_lock_until && Number(new Date(user.survey_lock_until)) > Number(new Date())) {
+    if (user.survey_lock_until && Number(new Date(user.survey_lock_until)) > Number(nowDateTime)) {
         await ctx.reply(`${SURVEY_SCENE.USER_CANT_SURVEY} ${formatTimestamp(Number(user.survey_lock_until))}`, {
             reply_markup:  AuthUserKeyboard(),
         });

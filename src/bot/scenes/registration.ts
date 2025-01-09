@@ -47,19 +47,11 @@ export async function registrationScene(conversation: Conversation<MyContext>, c
         console.log(data)
 
         switch (text) {
-            case'user_exist_number': {
-                await ctx.reply(REGISTRATION_SCENE.USER_EXIST);
-                console.log("Пользователь существует (номер).");
-            }
-                break
-            case'user_exist_id': {
-                await ctx.reply(REGISTRATION_SCENE.USER_EXIST);
-                console.log("Пользователь существует (id).");
-            }
-                break
+            case'user_exist_number':
+            case'user_exist_id':
             case'user_exist_face': {
                 await ctx.reply(REGISTRATION_SCENE.USER_EXIST);
-                console.log("Пользователь существует (лицо).");
+                console.log("Пользователь существует (номер)." + text);
             }
                 break
             case'user_is_block': {

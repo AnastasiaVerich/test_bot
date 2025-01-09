@@ -8,7 +8,7 @@ interface User {
     survey_lock_until: string | null;  // Возможно, в ISO строке
     status: UserStatus;
     created_at: string;  // Дата и время в ISO формате
-    last_init_date: string;  // Дата и время в ISO формате
+    last_init: string;  // Дата и время в ISO формате
     updated_at: string;  // Дата и время в ISO формате
 }
 
@@ -66,5 +66,19 @@ export async function updateUserStatus (userId: number, status: UserStatus): Pro
     } catch (error) {
         console.error('Error updateUserStatus:', error);
         throw new Error('Error updateUserStatus');
+    }
+}
+
+export async function updateUserLastInit (userId: number): Promise<void>{
+    try {
+        const query = `
+        UPDATE users
+        SET last_init = NOW(), updated_at = NOW()
+        WHERE user_id = $1;
+    `;
+        await db.query(query, [userId]);
+    } catch (error) {
+        console.error('Error updateUserLastInit:', error);
+        throw new Error('Error updateUserLastInit');
     }
 };

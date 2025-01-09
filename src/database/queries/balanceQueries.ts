@@ -46,3 +46,20 @@ export async function  addUserBalance(
         throw new Error('Error adding user balance to the database');
     }
 };
+
+
+export async function  updateUserBalance(
+    userId: number,
+    amount: number,
+): Promise<void> {
+    try {
+        const query = `UPDATE user_balance SET balance = balance - $1 WHERE userId = $2`;
+        await db.query(query, [
+            amount,
+            userId
+        ]);
+    } catch (error) {
+        console.error('Error updateUserBalance:', error);
+        throw new Error('Error updateUserBalance');
+    }
+};

@@ -5,6 +5,7 @@ import {InterfaceResponse} from "../../types/type";
 import {checkExistInBlockUser} from "../../../database/queries/blacklistUsersQueries";
 import {findOperatorByTelegramId} from "../../../database/queries/operatorQueries";
 import {getFaceEmbeddingByUserId} from "../../../database/queries/faceEmbeddingsQueries";
+import {IdentificationResponseText} from "../../../config/common_types";
 
 // Интерфейс для тела запроса
 interface IdentificationRequestBody extends Request {
@@ -13,24 +14,14 @@ interface IdentificationRequestBody extends Request {
 }
 
 // Тип, который перечисляет все возможные значения для поля text
-type IdentificationResponseText =
-    | "missing_photo" //2, 400 // Ошибка: нет фото
-    | "missing_user_id"//2, 400  // Ошибка: нет userId
 
-    | "user_is_block"//0, 200
-    | "embedding_not_found"//0, 200  // Ошибка: эмбеддинг не найден в базе
-    | "similarity_not_confirmed" //0, 200 // Ошибка: сходство не подтверждено
-    | "success" //1, 200 // Успех: верификация прошла успешно
-    | "face_not_found" //2, 200 // Ошибка: лицо не найдено на изображении
-
-    | "server_error"; //2, 500 // Ошибка сервера
 
 // Интерфейс для ответа от сервера
 type IdentificationResponse = InterfaceResponse<IdentificationResponseText>;
 
 // Верификации фото пользователя с уже добавленным фото в БД
 export const identification = async (
-    req: Request<{}, {}, IdentificationRequestBody>,
+    req: Request<object, object, IdentificationRequestBody>,
     res: Response<IdentificationResponse>
 ): Promise<any> => {
     try {

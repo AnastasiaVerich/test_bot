@@ -24,7 +24,7 @@ type RegistrationResponse = InterfaceResponse<RegistrationResponseText>;
 
 // Регистрация нового пользователя
 export const registration = async (
-    req: Request<{}, {}, RegistrationRequestBody>,
+    req: Request<object, object, RegistrationRequestBody>,
     res: Response<RegistrationResponse>
 ): Promise<any> => {
     const client = await db.connect(); // Получение соединения с базой данных

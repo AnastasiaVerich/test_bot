@@ -27,4 +27,8 @@ export const BUTTONS_KEYBOARD = {
     OpenAppButton: "Пройти фотоконтроль",
 
     ShareButton: "Поделиться",
+
+    ConfirmButton: "Подтвердить",
+
+    CancelButton: "Отмена",
 };

@@ -1,78 +1,111 @@
 import {Conversation} from "@grammyjs/conversations";
 import {MyContext} from "../types/type";
 import {seed_phrase} from "../../config/env";
-import {TonClient, WalletContractV4} from "@ton/ton";
-import {mnemonicToPrivateKey} from "@ton/crypto";
 import {MESSAGES} from "../constants/messages";
+import {checkBalance, updateUserBalance} from "../../database/queries/balanceQueries";
+import {WITHDRAWAL_SCENE} from "../constants/scenes";
+import {Keyboard} from "grammy";
+import {EmptyKeyboard} from "../keyboards/EmptyKeyboard";
+import {AuthUserKeyboard} from "../keyboards/AuthUserKeyboard";
+import {BUTTONS_KEYBOARD} from "../constants/button";
+import {addPendingPayment, findPendingPaymentByUserId} from "../../database/queries/pendingPaymentsQueries";
 
-const seedPhraseArr =  seed_phrase.split(' ')
+
+
+//'UQClrpElCar-II5uBTIWjY5dBjYcbenGc3DhKDKjr4p-Skhm'; // Адрес получателя( Я я кошелек)
+// const amountTON = 0.05; // Количество TON для отправки
+
 
 export async function withdrawalScene(conversation: Conversation<MyContext>, ctx: MyContext) {
-
     const userId = ctx.from?.id;
 
+    // Проверка наличия userId
     if (!userId) {
         return ctx.reply(MESSAGES.USER_ID_UNDEFINED);
     }
 
-    const recipientAddress = 'UQClrpElCar-II5uBTIWjY5dBjYcbenGc3DhKDKjr4p-Skhm'; // Адрес получателя( Я я кошелек)
-    const amountTON = 0.05; // Количество TON для отправки
-
-
-
-
-
-
-    // Create Client
-    const client = new TonClient({
-        endpoint: 'https://toncenter.com/api/v2/jsonRPC',
-        apiKey: "57f8d70c69075c12c5cb3699ea0c82168028f50609b485ae84c41b59884e97cf",
-    });
-
-    let keyPair = await mnemonicToPrivateKey(seedPhraseArr);
-
-
-    // Create wallet contract
-    let workchain = 0; // Usually you need a workchain 0
-    let wallet = WalletContractV4.create({ workchain:workchain, publicKey: keyPair.publicKey });
-    const friendlyAddress = wallet.address.toString({ testOnly: false,  bounceable: false    });
-    console.log("Friendly Address (UQ):", friendlyAddress);
-    console.log("Friendly Address (UQ):", wallet.address.toString());
-
-    let contract = client.open(wallet);
-
-    const balanceNano = await client.getBalance(wallet.address);
-    const balanceTON = Number(balanceNano) / 1e9; // Преобразуем в number и делим
-    console.log("Баланс в TON:", balanceTON);
-    const estimatedFeeTON = 0.01; // Примерная комиссия за транзакцию
-    if (balanceTON < amountTON + estimatedFeeTON) {
-        await ctx.reply("Недостаточно средств для перевода и оплаты комиссии.");
-        return;
+    // Проверка на наличие ожидающего платежа
+    const pendingPayment = await findPendingPaymentByUserId(userId);
+    if (pendingPayment.length > 0) {
+        return ctx.reply(WITHDRAWAL_SCENE.HAS_PENDING_PAYMENT);
     }
 
-    let seqno: number = await contract.getSeqno();
-    console.log("Current seqno:", seqno);
-    // try {
-    //     await contract.sendTransfer({
-    //         seqno,
-    //         secretKey: keyPair.secretKey,
-    //         keyboard_messages: [
-    //             internal({
-    //                 to: recipientAddress,
-    //                 value: BigInt(amountTON * 1e9), // Сумма перевода в нанотонах
-    //                 bounce: false,
-    //             }),
-    //         ],
-    //     });
-    //
-    //     console.log(`Транзакция на ${amountTON} TON успешно отправлена.`);
-    //     await ctx.reply(`Транзакция на ${amountTON} TON успешно отправлена.`);
-    // } catch (error) {
-    //
-    //     console.error("Общая ошибка:", error);
-    //
-    //     await ctx.reply("Ошибка при отправке транзакции. Попробуйте позже.");
-    // }
+    // Проверка баланса пользователя
+    const balance = await checkBalance(userId);
+    if (!balance) {
+        return ctx.reply(MESSAGES.USER_ID_UNDEFINED);
+    }
 
-    await ctx.reply(MESSAGES.none);
+    const userBalance = balance?.balance ?? 0;
+    if (Number(userBalance) === 0) {
+        return ctx.reply(WITHDRAWAL_SCENE.INVALID_BALANCE);
+    }
+
+    // Шаг 1: Ожидаем ввода суммы для вывода
+    await ctx.reply(WITHDRAWAL_SCENE.INPUT_AMOUNT, {
+        parse_mode: "HTML",
+        reply_markup: EmptyKeyboard(),
+    });
+
+    const amountMessage = await conversation.waitFor("message:text");
+    const amountText = amountMessage.message?.text;
+    const amountTON = parseFloat(amountText ?? "0");
+
+    // Проверка валидности суммы
+    if (isNaN(amountTON) || amountTON <= 0 || amountTON > userBalance) {
+        return ctx.reply(
+            WITHDRAWAL_SCENE.INVALID_AMOUNT.replace("{balance}", userBalance.toString()),
+            { reply_markup: AuthUserKeyboard() }
+        );
+    }
+
+    // Шаг 2: Ожидаем ввода адреса для перевода
+    await ctx.reply(WITHDRAWAL_SCENE.INPUT_ADDRESS, {
+        parse_mode: "HTML",
+        reply_markup: EmptyKeyboard(),
+    });
+
+    const addressMessage = await conversation.waitFor("message:text");
+    const recipientAddress = addressMessage.message?.text;
+
+    // Проверка адреса получателя
+    if (!recipientAddress || recipientAddress.trim().length === 0) {
+        return ctx.reply(WITHDRAWAL_SCENE.INVALID_ADDRESS);
+    }
+
+    // Подтверждение вывода средств
+    await ctx.reply(
+        WITHDRAWAL_SCENE.CONFIRMATION
+            .replace("{amount}", amountTON.toString())
+            .replace("{address}", recipientAddress),
+        {
+            reply_markup: new Keyboard()
+                .text(BUTTONS_KEYBOARD.ConfirmButton)
+                .text(BUTTONS_KEYBOARD.CancelButton)
+                .resized()
+                .oneTime(),
+        }
+    );
+
+    const confirmationMessage = await conversation.waitFor("message:text");
+    const confirmation = confirmationMessage.message?.text;
+
+
+    if (confirmation === BUTTONS_KEYBOARD.ConfirmButton) {
+        // Добавляем платеж в список ожидающих
+        await addPendingPayment(userId, amountTON, recipientAddress);
+        await updateUserBalance(amountTON, userId)
+
+        await ctx.reply(WITHDRAWAL_SCENE.SUCCESS, {
+            reply_markup: AuthUserKeyboard(),
+        });
+        console.log(`Пользователь ${userId} инициировал вывод ${amountTON} TON на адрес ${recipientAddress}`);
+
+
+    } else {
+        await ctx.reply(WITHDRAWAL_SCENE.CANCELLED, {
+            reply_markup: AuthUserKeyboard(),
+        });
+        console.log(`Пользователь ${userId} отменил снятие средств.`);
+    }
 }

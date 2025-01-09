@@ -20,8 +20,9 @@ export const handleStartCommand = async (ctx: MyContext) => {
     const user = await findUserByTelegramId(userId);
 
     if (!user) {
+
         if (referral) {
-            // Сохраняем реферальный код, если еще нет тзаписи по текущему юзеру
+            // Сохраняем реферальный код, если еще нет записи по текущему юзеру
             await addReferral(userId, Number(referral));
         }
         return ctx.reply(MESSAGES.WELCOME_MENU_USER, {

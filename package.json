@@ -4,50 +4,61 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-
     "build:bot": "tsc",
     "start:bot": "ts-node src/bot/index.ts",
     "dev:bot": "ts-node-dev src/bot/index.ts",
     "test:bot": "echo \"Error: no test specified\" && exit 1",
     "start:server": "ts-node src/server/index.ts",
     "build:server": "tsc",
-    "start:server:prod": "node dist/index.js"
+    "start:server:prod": "node dist/index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --ext .ts,.js --fix"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@grammyjs/conversations": "^1.2.0",
+    "@tensorflow/tfjs-node": "^4.22.0",
+    "@ton/core": "^0.59.1",
     "@ton/crypto": "^3.3.0",
     "@ton/ton": "^15.1.0",
     "@turf/turf": "^7.1.0",
+    "@types/node-schedule": "^2.1.7",
     "@types/pg": "^8.11.10",
     "@types/qrcode": "^1.5.5",
+    "@vladmandic/face-api": "^1.7.14",
     "axios": "^1.7.8",
     "buffer": "^6.0.3",
-    "dotenv": "^16.4.5",
-    "grammy": "^1.11.2",
-    "node-cache": "^5.1.2",
-    "pg": "^8.13.1",
-    "qrcode": "^1.5.4",
-
-    "@tensorflow/tfjs-node": "^4.22.0",
-    "@types/node-schedule": "^2.1.7",
-    "@vladmandic/face-api": "^1.7.14",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.21.1",
+    "grammy": "^1.11.2",
     "multer": "^1.4.5-lts.1",
-    "node-schedule": "^2.1.1"
+    "node-cache": "^5.1.2",
+    "node-schedule": "^2.1.1",
+    "pg": "^8.13.1",
+    "qrcode": "^1.5.4"
   },
   "devDependencies": {
-    "@types/node": "^22.10.1",
-    "ts-node": "^10.9.1",
-    "ts-node-dev": "^2.0.0",
-
+    "@eslint/js": "^9.17.0",
     "@types/cors": "^2.8.17",
     "@types/dotenv": "^8.2.3",
     "@types/express": "^5.0.0",
     "@types/multer": "^1.4.12",
+    "@types/node": "^22.10.1",
     "@types/pg": "^8.11.10",
-    "typescript": "^5.7.2"
+    "@typescript-eslint/eslint-plugin": "^8.19.1",
+    "@typescript-eslint/parser": "^8.19.1",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.19.1"
   }
 }

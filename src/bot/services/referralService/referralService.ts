@@ -17,7 +17,7 @@ export class ReferralService {
         try {
             return await QRCode.toBuffer(link);
         } catch (error) {
-            throw new Error('Ошибка при генерации QR-кода: ');
+            throw new Error('Ошибка при генерации QR-кода: '+error);
         }
     }
 }

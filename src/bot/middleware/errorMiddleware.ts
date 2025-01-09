@@ -1,4 +1,4 @@
-import { BotError, Middleware } from "grammy";
+import { Middleware } from "grammy";
 
 export const errorMiddleware: Middleware = async (ctx, next) => {
     try {

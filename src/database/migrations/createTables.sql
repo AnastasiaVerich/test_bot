@@ -12,6 +12,7 @@ CREATE TABLE users (
     phone VARCHAR(15) NOT NULL,
     survey_lock_until TIMESTAMP WITH TIME ZONE DEFAULT NULL,  --Дата после которой можно проходить опрос
     status user_status_enum DEFAULT 'free' NOT NULL,
+    last_init TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -50,7 +51,6 @@ CREATE TABLE referral_bot_starts (
 );
 
 GRANT ALL PRIVILEGES ON TABLE referral_bot_starts TO admin_vadim;
-GRANT USAGE, SELECT, UPDATE ON SEQUENCE referral_bot_starts_referral_bot_start_id_seq TO admin_vadim;
 
 -- Таблица операторов
 CREATE TABLE operators (
@@ -102,8 +102,8 @@ CREATE TABLE surveys (
     reserved_until TIMESTAMP WITH TIME ZONE DEFAULT NULL,           -- до какого времени задание может находится в резервации
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (region_id) REFERENCES region_settings(region_id) ON DELETE CASCADE
-    FOREIGN KEY (reserved_by_user_id) REFERENCES users(user_id) ON DELETE SET NULL
+    FOREIGN KEY (region_id) REFERENCES region_settings(region_id) ON DELETE SET NULL,
+    FOREIGN KEY (reserved_by_user_id) REFERENCES users(user_id) ON DELETE SET NULL,
     FOREIGN KEY (reserved_by_operator_id) REFERENCES operators(operator_id) ON DELETE SET NULL
 );
 
@@ -177,3 +177,13 @@ CREATE TABLE blacklist_users (
 );
 
 GRANT ALL PRIVILEGES ON TABLE blacklist_users TO admin_vadim;
+
+CREATE TABLE pending_payments (
+    user_id BIGINT PRIMARY KEY,
+    amount DECIMAL(10, 2) NOT NULL,               -- Сумма платежа
+    attempts INT DEFAULT 0 NOT NULL,              -- Количество попыток проведения платежа
+    address TEXT NOT NULL,                        -- Адрес для платежа
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Дата создания записи
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+GRANT ALL PRIVILEGES ON TABLE pending_payments TO admin_vadim;
