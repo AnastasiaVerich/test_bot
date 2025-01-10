@@ -10,7 +10,7 @@
     "typeRoots": ["./node_modules/@types",
       "./src/bot/types"
     ],
-    "types": ["node"],
+    "types": ["node", "jest"],
     "outDir": "./dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -18,7 +18,9 @@
     "skipLibCheck": true
   },
   "include": [
-    "src/**/*", "eslint.config.mjs"
+    "src/**/*",
+    "eslint.config.mjs",
+    "jest.config.ts"
   ],
   "exclude": [
     "node_modules"

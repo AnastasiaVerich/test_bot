@@ -6,6 +6,7 @@ export interface LocationType {
 export interface InterfaceResponse<T> {
   status: 0 | 1 | 2; // Статус выполнения запроса
   text: T; // Сообщение, которое передается в ответе
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   [key: string]: any; // Дополнительные данные, которые могут быть в ответе
 }
 // 400 не верные параметры запроса пришли

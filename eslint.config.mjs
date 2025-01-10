@@ -19,7 +19,10 @@ export default [
         sourceType: "module",
         project: "./tsconfig.json", // Укажите путь к вашему tsconfig.json
       },
-      globals: globals.node, // Для работы с Node.js
+      globals: {
+        ...globals.node, // Для работы с Node.js
+        ...globals.jest, // Для поддержки глобальных переменных Jest
+      },
     },
     plugins: {
       "@typescript-eslint": tsPlugin, // Подключаем TypeScript-плагин
@@ -42,7 +45,7 @@ export default [
       ],
 
       // === Работа с Node.js ===
-      "no-process-env": "warn", // Рекомендуем избегать прямого использования process.env (например, обернуть в config)
+      "no-process-env": ["warn"], // Рекомендуем избегать прямого использования process.env (например, обернуть в config)
       "global-require": "error", // Требуем использовать `import` вместо `require`, кроме случаев, где это невозможно
       "no-path-concat": "error", // Предотвращаем некорректное соединение путей; используйте path.join()
 
@@ -65,7 +68,7 @@ export default [
         "warn",
         { "max": 50 }, // Ограничиваем длину функций до 50 строк для лучшей читаемости
       ],
-      'max-len': ['error', { ignoreComments: true, code: 50 }],
+      'max-len': ['error', { ignoreComments: true, code: 120 }],
 
 
       // === Пробелы и отступы ===

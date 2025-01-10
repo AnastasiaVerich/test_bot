@@ -1,7 +1,3 @@
-import {Keyboard} from "grammy";
+import { Keyboard } from "grammy";
 
-export const EmptyKeyboard=()=> (
-
-    new Keyboard().resized().oneTime()
-
-)
+export const EmptyKeyboard = (): Keyboard => new Keyboard().resized().oneTime();

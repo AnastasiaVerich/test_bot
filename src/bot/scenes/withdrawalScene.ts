@@ -1,50 +1,55 @@
-import {Conversation} from "@grammyjs/conversations";
-import {MyContext} from "../types/type";
-import {seed_phrase} from "../../config/env";
-import {MESSAGES} from "../constants/messages";
-import {checkBalance, updateUserBalance} from "../../database/queries/balanceQueries";
-import {WITHDRAWAL_SCENE} from "../constants/scenes";
-import {Keyboard} from "grammy";
-import {EmptyKeyboard} from "../keyboards/EmptyKeyboard";
-import {AuthUserKeyboard} from "../keyboards/AuthUserKeyboard";
-import {BUTTONS_KEYBOARD} from "../constants/button";
-import {addPendingPayment, findPendingPaymentByUserId} from "../../database/queries/pendingPaymentsQueries";
-
-
+import { Conversation } from "@grammyjs/conversations";
+import { Keyboard } from "grammy";
+import { Message } from "grammy/types";
+import { MyContext } from "../types/type";
+import { MESSAGES } from "../constants/messages";
+import {
+  checkBalance,
+  updateUserBalance,
+} from "../../database/queries/balanceQueries";
+import { WITHDRAWAL_SCENE } from "../constants/scenes";
+import { EmptyKeyboard } from "../keyboards/EmptyKeyboard";
+import { AuthUserKeyboard } from "../keyboards/AuthUserKeyboard";
+import { BUTTONS_KEYBOARD } from "../constants/button";
+import {
+  addPendingPayment,
+  findPendingPaymentByUserId,
+} from "../../database/queries/pendingPaymentsQueries";
+import logger from "../../lib/logger";
+import { getUserId } from "../utils/getUserId";
 
 //'UQClrpElCar-II5uBTIWjY5dBjYcbenGc3DhKDKjr4p-Skhm'; // Адрес получателя( Я я кошелек)
 // const amountTON = 0.05; // Количество TON для отправки
 
-
-export async function withdrawalScene(conversation: Conversation<MyContext>, ctx: MyContext) {
-    const userId = ctx.from?.id;
-
-    // Проверка наличия userId
-    if (!userId) {
-        return ctx.reply(MESSAGES.USER_ID_UNDEFINED);
-    }
+export async function withdrawalScene(
+  conversation: Conversation<MyContext>,
+  ctx: MyContext,
+): Promise<Message.TextMessage | void> {
+  try {
+    const userId = await getUserId(ctx);
+    if (!userId) return;
 
     // Проверка на наличие ожидающего платежа
     const pendingPayment = await findPendingPaymentByUserId(userId);
     if (pendingPayment.length > 0) {
-        return ctx.reply(WITHDRAWAL_SCENE.HAS_PENDING_PAYMENT);
+      return ctx.reply(WITHDRAWAL_SCENE.HAS_PENDING_PAYMENT);
     }
 
     // Проверка баланса пользователя
     const balance = await checkBalance(userId);
     if (!balance) {
-        return ctx.reply(MESSAGES.USER_ID_UNDEFINED);
+      return ctx.reply(MESSAGES.USER_ID_UNDEFINED);
     }
 
     const userBalance = balance?.balance ?? 0;
     if (Number(userBalance) === 0) {
-        return ctx.reply(WITHDRAWAL_SCENE.INVALID_BALANCE);
+      return ctx.reply(WITHDRAWAL_SCENE.INVALID_BALANCE);
     }
 
     // Шаг 1: Ожидаем ввода суммы для вывода
     await ctx.reply(WITHDRAWAL_SCENE.INPUT_AMOUNT, {
-        parse_mode: "HTML",
-        reply_markup: EmptyKeyboard(),
+      parse_mode: "HTML",
+      reply_markup: EmptyKeyboard(),
     });
 
     const amountMessage = await conversation.waitFor("message:text");
@@ -53,16 +58,19 @@ export async function withdrawalScene(conversation: Conversation<MyContext>, ctx
 
     // Проверка валидности суммы
     if (isNaN(amountTON) || amountTON <= 0 || amountTON > userBalance) {
-        return ctx.reply(
-            WITHDRAWAL_SCENE.INVALID_AMOUNT.replace("{balance}", userBalance.toString()),
-            { reply_markup: AuthUserKeyboard() }
-        );
+      return ctx.reply(
+        WITHDRAWAL_SCENE.INVALID_AMOUNT.replace(
+          "{balance}",
+          userBalance.toString(),
+        ),
+        { reply_markup: AuthUserKeyboard() },
+      );
     }
 
     // Шаг 2: Ожидаем ввода адреса для перевода
     await ctx.reply(WITHDRAWAL_SCENE.INPUT_ADDRESS, {
-        parse_mode: "HTML",
-        reply_markup: EmptyKeyboard(),
+      parse_mode: "HTML",
+      reply_markup: EmptyKeyboard(),
     });
 
     const addressMessage = await conversation.waitFor("message:text");
@@ -70,42 +78,46 @@ export async function withdrawalScene(conversation: Conversation<MyContext>, ctx
 
     // Проверка адреса получателя
     if (!recipientAddress || recipientAddress.trim().length === 0) {
-        return ctx.reply(WITHDRAWAL_SCENE.INVALID_ADDRESS);
+      return ctx.reply(WITHDRAWAL_SCENE.INVALID_ADDRESS);
     }
 
     // Подтверждение вывода средств
     await ctx.reply(
-        WITHDRAWAL_SCENE.CONFIRMATION
-            .replace("{amount}", amountTON.toString())
-            .replace("{address}", recipientAddress),
-        {
-            reply_markup: new Keyboard()
-                .text(BUTTONS_KEYBOARD.ConfirmButton)
-                .text(BUTTONS_KEYBOARD.CancelButton)
-                .resized()
-                .oneTime(),
-        }
+      WITHDRAWAL_SCENE.CONFIRMATION.replace(
+        "{amount}",
+        amountTON.toString(),
+      ).replace("{address}", recipientAddress),
+      {
+        reply_markup: new Keyboard()
+          .text(BUTTONS_KEYBOARD.ConfirmButton)
+          .text(BUTTONS_KEYBOARD.CancelButton)
+          .resized()
+          .oneTime(),
+      },
     );
 
     const confirmationMessage = await conversation.waitFor("message:text");
     const confirmation = confirmationMessage.message?.text;
 
-
     if (confirmation === BUTTONS_KEYBOARD.ConfirmButton) {
-        // Добавляем платеж в список ожидающих
-        await addPendingPayment(userId, amountTON, recipientAddress);
-        await updateUserBalance(amountTON, userId)
+      // Добавляем платеж в список ожидающих
+      await addPendingPayment(userId, amountTON, recipientAddress);
+      await updateUserBalance(amountTON, userId);
 
-        await ctx.reply(WITHDRAWAL_SCENE.SUCCESS, {
-            reply_markup: AuthUserKeyboard(),
-        });
-        console.log(`Пользователь ${userId} инициировал вывод ${amountTON} TON на адрес ${recipientAddress}`);
-
-
+      logger.info(
+        `Пользователь ${userId} инициировал вывод ${amountTON} TON на адрес ${recipientAddress}`,
+      );
+      return ctx.reply(WITHDRAWAL_SCENE.SUCCESS, {
+        reply_markup: AuthUserKeyboard(),
+      });
     } else {
-        await ctx.reply(WITHDRAWAL_SCENE.CANCELLED, {
-            reply_markup: AuthUserKeyboard(),
-        });
-        console.log(`Пользователь ${userId} отменил снятие средств.`);
+      logger.info(`Пользователь ${userId} отменил снятие средств.`);
+      return ctx.reply(WITHDRAWAL_SCENE.CANCELLED, {
+        reply_markup: AuthUserKeyboard(),
+      });
     }
+  } catch (error) {
+    logger.error("Error in withdrawalScene:", error);
+    await ctx.reply(MESSAGES.SOME_ERROR);
+  }
 }

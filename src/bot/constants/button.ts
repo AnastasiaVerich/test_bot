@@ -1,34 +1,33 @@
 export const BUTTONS_CALLBACK_QUERIES = {
+  RegistrationButton: "REGISTRATION",
+  RegistrationButtonText: "Регистрация",
 
-    RegistrationButton: "REGISTRATION",
-    RegistrationButtonText: "Регистрация",
+  IdentificationButton: "IDENTIFICATION",
+  IdentificationButtonText: "Идентификация",
 
-    IdentificationButton: "IDENTIFICATION",
-    IdentificationButtonText: "Идентификация",
+  BalanceButton: "BALANCE",
+  BalanceButtonText: "Баланс",
 
-    BalanceButton: "BALANCE",
-    BalanceButtonText: "Баланс",
-
-    WithdrawalOfMoneyButton: "WITHDRAWAL_OF_MONEY",
-    WithdrawalOfMoneyButtonText: "Вывод средств",
+  WithdrawalOfMoneyButton: "WITHDRAWAL_OF_MONEY",
+  WithdrawalOfMoneyButtonText: "Вывод средств",
 };
 
 export const BUTTONS_KEYBOARD = {
-    SurveyButton: "Пройти опрос",
+  SurveyButton: "Пройти опрос",
 
-    InviteButton: "Пригласить друга",
+  InviteButton: "Пригласить друга",
 
-    BalanceButton: "Баланс",
+  BalanceButton: "Баланс",
 
-    GeolocationButton: "Геолокация",
+  GeolocationButton: "Геолокация",
 
-    SendNumberButton: "Отправить номер",
+  SendNumberButton: "Отправить номер",
 
-    OpenAppButton: "Пройти фотоконтроль",
+  OpenAppButton: "Пройти фотоконтроль",
 
-    ShareButton: "Поделиться",
+  ShareButton: "Поделиться",
 
-    ConfirmButton: "Подтвердить",
+  ConfirmButton: "Подтвердить",
 
-    CancelButton: "Отмена",
+  CancelButton: "Отмена",
 };
