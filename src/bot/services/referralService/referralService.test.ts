@@ -39,7 +39,7 @@ describe("ReferralService", () => {
     //проверяем, что метод выбрасывает ошибку с правильным сообщением
     it("should throw an error if QR code generation fails", async () => {
       const link = "https://t.me/test_bot?start=12345";
-      const errorMessage = "Ошибка при генерации QR-кода: Error: Some error";
+      const errorMessage = "Ошибка при генерации QR-кода: Some error";
 
       // Мокаем ошибку при генерации QR-кода
       (QRCode.toBuffer as jest.Mock).mockRejectedValue(new Error("Some error"));

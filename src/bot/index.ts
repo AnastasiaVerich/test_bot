@@ -39,6 +39,12 @@ bot
   .then((res) => {
     logger.info(res);
   })
-  .catch((err) => {
-    logger.error(err);
+  .catch((error) => {
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    logger.error(shortError);
   });

@@ -10,7 +10,7 @@ interface ReferralBotStart {
 export async function addReferral(
   userId: number,
   referredId: number,
-): Promise<ReferralBotStart> {
+): Promise<ReferralBotStart | undefined> {
   // Проверка типа
   if (typeof userId !== "number" || typeof referredId !== "number") {
     throw new Error("Invalid type provided");
@@ -26,9 +26,14 @@ export async function addReferral(
       userId,
       referredId,
     ]);
-
     return result.rows[0];
   } catch (error) {
-    throw new Error("Error addReferral: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error addReferral: " + shortError);
   }
 }

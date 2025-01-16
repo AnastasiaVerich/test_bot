@@ -1,22 +1,22 @@
 import { Conversation } from "@grammyjs/conversations";
 import { Keyboard } from "grammy";
 import { Message } from "grammy/types";
-import { MyContext } from "../types/type";
-import { MESSAGES } from "../constants/messages";
+import { MyContext } from "../../types/type";
+import { MESSAGES } from "../../constants/messages";
 import {
   checkBalance,
   updateUserBalance,
-} from "../../database/queries/balanceQueries";
-import { WITHDRAWAL_SCENE } from "../constants/scenes";
-import { EmptyKeyboard } from "../keyboards/EmptyKeyboard";
-import { AuthUserKeyboard } from "../keyboards/AuthUserKeyboard";
-import { BUTTONS_KEYBOARD } from "../constants/button";
+} from "../../../database/queries/balanceQueries";
+import { WITHDRAWAL_SCENE } from "../../constants/scenes";
+import { EmptyKeyboard } from "../../keyboards/EmptyKeyboard";
+import { AuthUserKeyboard } from "../../keyboards/AuthUserKeyboard";
+import { BUTTONS_KEYBOARD } from "../../constants/button";
 import {
   addPendingPayment,
   findPendingPaymentByUserId,
-} from "../../database/queries/pendingPaymentsQueries";
-import logger from "../../lib/logger";
-import { getUserId } from "../utils/getUserId";
+} from "../../../database/queries/pendingPaymentsQueries";
+import logger from "../../../lib/logger";
+import { getUserId } from "../../utils/getUserId";
 
 //'UQClrpElCar-II5uBTIWjY5dBjYcbenGc3DhKDKjr4p-Skhm'; // Адрес получателя( Я я кошелек)
 // const amountTON = 0.05; // Количество TON для отправки
@@ -117,7 +117,13 @@ export async function withdrawalScene(
       });
     }
   } catch (error) {
-    logger.error("Error in withdrawalScene:", error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    logger.error("Error in withdrawalScene: " + shortError);
     await ctx.reply(MESSAGES.SOME_ERROR);
   }
 }

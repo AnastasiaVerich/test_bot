@@ -1,38 +1,33 @@
 import { Conversation } from "@grammyjs/conversations";
 import { Keyboard } from "grammy";
 import { Message } from "grammy/types";
-import { LocationType, MyContext } from "../types/type";
+import { LocationType, MyContext } from "../../types/type";
 
-import {
-  findRegionByLocation,
-  RegionSettings,
-} from "../../database/queries/regionQueries";
+import { RegionSettings } from "../../../database/queries/regionQueries";
 import {
   checkAndUpdateSurveyStatus,
   findAvailableSurvey,
   getRecentSurveyTypesForUser,
   reserveSurvey,
   Survey,
-} from "../../database/queries/surveyQueries";
-import {
-  findUserByTelegramId,
-  updateUserStatus,
-  User,
-} from "../../database/queries/userQueries";
+} from "../../../database/queries/surveyQueries";
+import { updateUserStatus, User } from "../../../database/queries/userQueries";
 import {
   getOperatorsByRegionAndStatus,
   Operator,
   updateOperatorStatus,
-} from "../../database/queries/operatorQueries";
-import { AuthUserKeyboard } from "../keyboards/AuthUserKeyboard";
-import { SURVEY_SCENE } from "../constants/scenes";
-import { BUTTONS_KEYBOARD } from "../constants/button";
-import { formatTimestamp, isDateDifferenceAtLeast } from "../../lib/date";
-import { Scenes } from "./index";
-import { MESSAGES } from "../constants/messages";
-import { db } from "../../database/dbClient";
-import logger from "../../lib/logger";
-import { getUserId } from "../utils/getUserId";
+} from "../../../database/queries/operatorQueries";
+import { AuthUserKeyboard } from "../../keyboards/AuthUserKeyboard";
+import { SURVEY_SCENE } from "../../constants/scenes";
+import { BUTTONS_KEYBOARD } from "../../constants/button";
+import { formatTimestamp, isDateDifferenceAtLeast } from "../../../lib/date";
+import { Scenes } from "../index";
+import { MESSAGES } from "../../constants/messages";
+import { db } from "../../../database/dbClient";
+import logger from "../../../lib/logger";
+import { getUserId } from "../../utils/getUserId";
+import { findRegionByLocation } from "../../../utils/regionUtils";
+import { findUser } from "../../utils/findUser";
 
 export async function surveyScene(
   conversation: Conversation<MyContext>,
@@ -42,23 +37,18 @@ export async function surveyScene(
     const userId = await getUserId(ctx);
     if (!userId) return;
 
-    const user = await findUserByTelegramId(userId);
+    const user = await findUser(userId, ctx);
+    if (!user) return;
+
     const nowDateTime = new Date();
 
     // Шаг 0: Проверяем, нужно ли пользователя перебросить на инициализацию
-    if (isDateDifferenceAtLeast(nowDateTime.toString(), user.last_init, 7)) {
-      return ctx.conversation.enter(Scenes.IdentificationScene);
-    }
+    const isInit = await stepCheckLastInit(ctx, user);
+    if (!isInit) return;
 
     // Шаг 1: Проверка, может ли пользователь проходит опрос
-    const canUserTakeSurvey = await stepCanUserTakeSurvey(
-      ctx,
-      nowDateTime,
-      user,
-    );
-    if (!canUserTakeSurvey) {
-      return;
-    }
+    const isAllowed = await canTakeSurvey(ctx, nowDateTime, user);
+    if (!isAllowed) return;
 
     // Шаг 2: Ожидаем локацию
     const region = await stepRegionLocation(conversation, ctx);
@@ -77,9 +67,7 @@ export async function surveyScene(
     if (isSuccess) {
       return ctx.reply(
         `Оператор @${operator.tg_account} ${SURVEY_SCENE.SUCCESS}`,
-        {
-          reply_markup: AuthUserKeyboard(),
-        },
+        { reply_markup: AuthUserKeyboard() },
       );
     } else {
       return ctx.reply(SURVEY_SCENE.FAILED, {
@@ -87,22 +75,28 @@ export async function surveyScene(
       });
     }
   } catch (error) {
-    logger.error("Error in surveyScene:", error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    logger.error("Error in surveyScene: " + shortError);
     await ctx.reply(MESSAGES.SOME_ERROR);
   }
 }
 
-async function stepCanUserTakeSurvey(
+async function canTakeSurvey(
   ctx: MyContext,
   nowDateTime: Date,
   user: User,
 ): Promise<boolean> {
-  let canUserTakeSurvey = true;
+  let isAllowed = true;
   if (user.status === "busy") {
     await ctx.reply(SURVEY_SCENE.USER_BUSY, {
       reply_markup: AuthUserKeyboard(),
     });
-    canUserTakeSurvey = false;
+    isAllowed = false;
   }
 
   if (
@@ -116,9 +110,20 @@ async function stepCanUserTakeSurvey(
       },
     );
 
-    canUserTakeSurvey = false;
+    isAllowed = false;
   }
-  return canUserTakeSurvey;
+  return isAllowed;
+}
+
+async function stepCheckLastInit(ctx: MyContext, user: User): Promise<boolean> {
+  let isInit = true;
+  const nowDateTime = new Date();
+
+  if (isDateDifferenceAtLeast(nowDateTime.toString(), user.last_init, 7)) {
+    await ctx.conversation.enter(Scenes.IdentificationScene);
+    isInit = false;
+  }
+  return isInit;
 }
 
 async function stepRegionLocation(

@@ -1,7 +1,10 @@
 import { handleStartCommand } from "./command_start";
 import { MyContext } from "../../types/type";
 import { MESSAGES } from "../../constants/messages";
-import { findUserByTelegramId } from "../../../database/queries/userQueries";
+import {
+  findUserByTelegramId,
+  User,
+} from "../../../database/queries/userQueries";
 import { addReferral } from "../../../database/queries/referralQueries";
 
 jest.mock("../../../database/queries/userQueries");
@@ -9,6 +12,7 @@ jest.mock("../../../database/queries/referralQueries");
 
 describe("Test handleStartCommand", () => {
   let ctx: Partial<MyContext>;
+  let user: Partial<User>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -22,14 +26,17 @@ describe("Test handleStartCommand", () => {
       match: undefined,
       reply: jest.fn(),
     };
+    user = {
+      user_id: 1234,
+    };
   });
 
-  // Должна для нового юезра добавить реферальный код и отправить приветственное меню.
+  // Должна для нового юзера добавить реферальный код и отправить приветственное меню.
   it("New user with referral code: should add referral and show welcome menu.", async () => {
-    (findUserByTelegramId as jest.Mock).mockResolvedValueOnce(null);
+    (findUserByTelegramId as jest.Mock).mockResolvedValueOnce(undefined);
     (addReferral as jest.Mock).mockResolvedValueOnce({});
 
-    ctx.match = "67890"; // Referral code
+    ctx.match = "67890";
 
     await handleStartCommand(ctx as MyContext);
 
@@ -40,9 +47,9 @@ describe("Test handleStartCommand", () => {
     });
   });
 
-  // Должна для нового юезра  отправить приветственное меню без добавления реферального кода
+  // Должна для нового юзера отправить приветственное меню без добавления реферального кода
   it("New user without referral code: should show welcome menu.", async () => {
-    (findUserByTelegramId as jest.Mock).mockResolvedValueOnce(null);
+    (findUserByTelegramId as jest.Mock).mockResolvedValueOnce(undefined);
 
     await handleStartCommand(ctx as MyContext);
 
@@ -55,9 +62,7 @@ describe("Test handleStartCommand", () => {
 
   // Должна отправить меню для старого пользователя
   it("Existing user: should show welcome back menu.", async () => {
-    (findUserByTelegramId as jest.Mock).mockResolvedValueOnce({
-      user_id: 12345,
-    });
+    (findUserByTelegramId as jest.Mock).mockResolvedValueOnce(user);
 
     await handleStartCommand(ctx as MyContext);
 

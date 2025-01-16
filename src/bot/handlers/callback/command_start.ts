@@ -5,7 +5,7 @@ import { addReferral } from "../../../database/queries/referralQueries";
 import { MyContext } from "../../types/type";
 import { MESSAGES } from "../../constants/messages";
 import { BUTTONS_CALLBACK_QUERIES } from "../../constants/button";
-import { getUserId } from "../../utils/getUserId";
+import { getUserId, returnUserId } from "../../utils/getUserId";
 import logger from "../../../lib/logger";
 
 export const handleStartCommand = async (
@@ -22,11 +22,19 @@ export const handleStartCommand = async (
     // Проверяем, существует ли пользователь в базе данных
     const user = await findUserByTelegramId(userId);
 
-    if (!user) {
+    if (user) {
+      return ctx.reply(MESSAGES.WELCOME_OLD_USER, {
+        reply_markup: new InlineKeyboard().text(
+          BUTTONS_CALLBACK_QUERIES.IdentificationButtonText,
+          BUTTONS_CALLBACK_QUERIES.IdentificationButton,
+        ),
+      });
+    } else {
       if (referral) {
         // Сохраняем реферальный код, если еще нет записи по текущему юзеру
         await addReferral(userId, Number(referral));
       }
+
       return ctx.reply(MESSAGES.WELCOME_MENU_USER, {
         parse_mode: "HTML", // Указываем, что текст содержит HTML
         reply_markup: new InlineKeyboard().text(
@@ -35,16 +43,17 @@ export const handleStartCommand = async (
         ),
       });
     }
-
-    return ctx.reply(MESSAGES.WELCOME_OLD_USER, {
-      reply_markup: new InlineKeyboard().text(
-        BUTTONS_CALLBACK_QUERIES.IdentificationButtonText,
-        BUTTONS_CALLBACK_QUERIES.IdentificationButton,
-      ),
-    });
   } catch (error) {
-    logger.error("Error in command /start:", error);
-    await ctx.reply(MESSAGES.SOME_ERROR, {
+    const userId = await returnUserId(ctx);
+
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    logger.error(userId + ": Error in command /start: " + shortError);
+    return ctx.reply(MESSAGES.SOME_ERROR, {
       reply_markup: { remove_keyboard: true },
     });
   }

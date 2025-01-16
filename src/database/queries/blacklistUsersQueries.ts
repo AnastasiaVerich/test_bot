@@ -12,7 +12,7 @@ interface BlacklistUser {
 export async function checkExistInBlockUser(
   accountId: number | null,
   phoneNumber: string | null,
-): Promise<BlacklistUser> {
+): Promise<BlacklistUser | undefined> {
   // Проверка, что хотя бы одно из значений передано
   if (!accountId && !phoneNumber) {
     throw new Error(
@@ -30,6 +30,12 @@ export async function checkExistInBlockUser(
     ]);
     return result.rows[0];
   } catch (error) {
-    throw new Error("Error checkExistInBlockUser: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error checkExistInBlockUser: " + shortError);
   }
 }

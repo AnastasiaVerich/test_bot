@@ -99,5 +99,12 @@ export default [
     },
   },
 
+  {
+    files: ["**/*.test.{js,ts}"],
+    rules: {
+      "max-lines-per-function": "off", // Отключаем правило для тестовых файлов
+      "@typescript-eslint/no-explicit-any": "off", // Отключаем правило для тестовых файлов
+    },
+  },
   prettier, // Интеграция с Prettier для форматирования кода
 ];

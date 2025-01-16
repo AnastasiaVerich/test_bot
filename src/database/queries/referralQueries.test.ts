@@ -31,7 +31,7 @@ describe("addReferral", () => {
     (db.query as jest.Mock).mockRejectedValueOnce(error);
 
     await expect(addReferral(12345, 67890)).rejects.toThrow(
-      "Error addReferral: Error: Database error",
+      "Error addReferral: Database error",
     );
   });
 

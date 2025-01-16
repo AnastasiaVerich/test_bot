@@ -14,7 +14,13 @@ export const getAllFaceEmbeddings = async (): Promise<FaceEmbedding[]> => {
     const result: QueryResult<FaceEmbedding> = await db.query(query);
     return result.rows;
   } catch (error) {
-    throw new Error("Error getAllFaceEmbeddings: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error getAllFaceEmbeddings: " + shortError);
   }
 };
 
@@ -27,7 +33,13 @@ export const getFaceEmbeddingByUserId = async (
     const result: QueryResult<FaceEmbedding> = await db.query(query, [userId]);
     return result.rows[0] ?? null;
   } catch (error) {
-    throw new Error("Error getFaceEmbeddingByUserId: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error getFaceEmbeddingByUserId: " + shortError);
   }
 };
 
@@ -41,6 +53,12 @@ export const addFaceEmbedding = async (
       "INSERT INTO face_embeddings (user_id, embedding, created_at) VALUES ($1, $2, CURRENT_TIMESTAMP)";
     await db.query(query, [userId, JSON.stringify(embedding)]);
   } catch (error) {
-    throw new Error("Error addFaceEmbedding: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error addFaceEmbedding: " + shortError);
   }
 };

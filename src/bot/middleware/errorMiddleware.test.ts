@@ -25,13 +25,16 @@ describe("Test errorMiddleware", () => {
 
   // Проверка, что логируется ошибка, если она возникает
   it("should log the error and send a message if an error occurs", async () => {
-    const error = new Error("Test error");
+    const error_text = "Test error";
+    const error = new Error(error_text);
 
     next.mockRejectedValueOnce(error);
 
     await errorMiddleware(ctx as MyContext, next);
 
-    expect(logger.error).toHaveBeenCalledWith("Произошла ошибка:", error);
+    expect(logger.error).toHaveBeenCalledWith(
+      "Произошла ошибка: " + error_text,
+    );
     expect(ctx.reply).toHaveBeenCalledWith(
       "Произошла ошибка. Пожалуйста, попробуйте позже.",
     );

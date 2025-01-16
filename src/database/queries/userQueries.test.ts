@@ -32,13 +32,25 @@ describe("User Queries", () => {
       );
     });
 
+    // Проверяем, что возвращается нужный пользователь и вызывается корректный зарпос
+    it("Should return undefined if they not exist", async () => {
+      (db.query as jest.Mock).mockResolvedValueOnce({ rows: [] });
+
+      const user = await findUserByTelegramId(12345);
+      expect(user).toEqual(undefined);
+      expect(db.query).toHaveBeenCalledWith(
+        "SELECT * FROM users WHERE user_id = $1",
+        [12345],
+      );
+    });
+
     //Проверяем, что функция выбрасывает ошибку если запрос падает
     it("Should throw an error if query fails.", async () => {
       const error = new Error("Database error");
       (db.query as jest.Mock).mockRejectedValueOnce(error);
 
       await expect(findUserByTelegramId(12345)).rejects.toThrow(
-        "Error findUserByTelegramId: Error: Database error",
+        "Error findUserByTelegramId: Database error",
       );
     });
 
@@ -79,7 +91,7 @@ describe("User Queries", () => {
       (db.query as jest.Mock).mockRejectedValueOnce(error);
 
       await expect(findUserByPhone("1234567890")).rejects.toThrow(
-        "Error findUserByPhone: Error: Database error",
+        "Error findUserByPhone: Database error",
       );
     });
 
@@ -110,7 +122,7 @@ describe("User Queries", () => {
       (db.query as jest.Mock).mockRejectedValueOnce(error);
 
       await expect(addUser(12345, "1234567890")).rejects.toThrow(
-        "Error addUser: Error: Database error",
+        "Error addUser: Database error",
       );
     });
   });
@@ -134,7 +146,7 @@ describe("User Queries", () => {
       (db.query as jest.Mock).mockRejectedValueOnce(error);
 
       await expect(updateUserStatus(12345, "busy")).rejects.toThrow(
-        "Error updateUserStatus: Error: Database error",
+        "Error updateUserStatus: Database error",
       );
     });
   });
@@ -158,7 +170,7 @@ describe("User Queries", () => {
       (db.query as jest.Mock).mockRejectedValueOnce(error);
 
       await expect(updateUserLastInit(12345)).rejects.toThrow(
-        "Error updateUserLastInit: Error: Database error",
+        "Error updateUserLastInit: Database error",
       );
     });
   });

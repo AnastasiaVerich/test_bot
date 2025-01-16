@@ -1,11 +1,11 @@
 import { Bot } from "grammy";
 import { createConversation } from "@grammyjs/conversations";
-import { registrationScene } from "./registration";
+import { registrationScene } from "./registration/registration";
 import { MyContext } from "../types/type";
-import { identificationScene } from "./identificationScene";
-import { surveyScene } from "./surveyScene";
-import { inviteScene } from "./inviteScene";
-import { withdrawalScene } from "./withdrawalScene";
+import { identificationScene } from "./identificationScene/identificationScene";
+import { surveyScene } from "./surveyScene/surveyScene";
+import { inviteScene } from "./inviteScene/inviteScene";
+import { withdrawalScene } from "./withdrawalScene/withdrawalScene";
 
 export enum Scenes {
   RegisterScene = "RegisterScene", // eslint-disable-line no-unused-vars

@@ -45,7 +45,13 @@ export const getRecentSurveyTypesForUser = async (
     );
     return result.rows?.map((row) => row.survey_type) ?? [];
   } catch (error) {
-    throw new Error("Error getRecentSurveyTypesForUser: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error getRecentSurveyTypesForUser: " + shortError);
   }
 };
 
@@ -78,7 +84,13 @@ export const checkAndUpdateSurveyStatus = async (): Promise<{
     }
     return { success: true };
   } catch (error) {
-    throw new Error("Error checkAndUpdateSurveyStatus: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error checkAndUpdateSurveyStatus: " + shortError);
   }
 };
 
@@ -88,8 +100,7 @@ export const findAvailableSurvey = async (
   recentSurveyTypes: string[],
 ): Promise<Survey | null> => {
   try {
-    let query = `
-            SELECT s.*
+    let query = `SELECT s.*
             FROM surveys s
             LEFT JOIN survey_task_user ust
                 ON s.survey_id = ust.survey_id
@@ -115,7 +126,13 @@ export const findAvailableSurvey = async (
     // Если найден хотя бы один опрос, возвращаем его
     return result.rows.length > 0 ? result.rows[0] : null;
   } catch (error) {
-    throw new Error("Error findAvailableSurvey: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error findAvailableSurvey: " + shortError);
   }
 };
 
@@ -137,6 +154,12 @@ export const reserveSurvey = async (
     `;
     await db.query(query, [userId, operatorId, surveyId]);
   } catch (error) {
-    throw new Error("Error reserveSurvey: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error reserveSurvey: " + shortError);
   }
 };

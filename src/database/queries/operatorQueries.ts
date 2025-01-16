@@ -30,7 +30,13 @@ export const getOperatorsByRegionAndStatus = async (
 
     return result.rows;
   } catch (error) {
-    throw new Error("Error getOperatorByRegionAndStatus: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error getOperatorByRegionAndStatus: " + shortError);
   }
 };
 export const findOperatorByTelegramId = async (
@@ -58,7 +64,13 @@ export const findOperatorByTelegramId = async (
     ]);
     return result.rows[0];
   } catch (error) {
-    throw new Error("Error findOperatorByTelegramId: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error findOperatorByTelegramId: " + shortError);
   }
 };
 export const updateOperatorStatus = async (
@@ -73,6 +85,12 @@ export const updateOperatorStatus = async (
     `;
     await db.query(query, [status, operatorId]);
   } catch (error) {
-    throw new Error("Error findOperatorByTelegramId: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error findOperatorByTelegramId: " + shortError);
   }
 };

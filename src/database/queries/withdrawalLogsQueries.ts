@@ -23,20 +23,32 @@ export async function selectWithdrawalLogByUserId(
 
     return result.rows;
   } catch (error) {
-    throw new Error("Error selectWithdrawalLogByUserId: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error selectWithdrawalLogByUserId: " + shortError);
   }
 }
 
 export async function addWithdrawalLog(
   userId: number,
   amount: number,
-  wallet: number,
+  wallet: string,
 ): Promise<void> {
   try {
     const query =
       "INSERT INTO withdrawal_logs (user_id, amount, wallet, withdrawn_at) VALUES ($1, $2, $3, CURRENT_TIMESTAMP)";
     await db.query(query, [userId, amount, wallet]);
   } catch (error) {
-    throw new Error("Error addWithdrawalLog: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error addWithdrawalLog: " + shortError);
   }
 }

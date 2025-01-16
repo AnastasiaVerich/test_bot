@@ -39,7 +39,13 @@ export async function handleBalance(
       );
     }
   } catch (error) {
-    logger.error("Error in keyboard balance:", error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    logger.error("Error in keyboard balance: " + shortError);
     await ctx.reply(MESSAGES.SOME_ERROR);
   }
 }

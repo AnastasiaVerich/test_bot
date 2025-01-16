@@ -1,18 +1,14 @@
 import * as faceapi from "@vladmandic/face-api";
 import * as tf from "@tensorflow/tfjs-node";
-import {
-  ComputeAllFaceDescriptorsTask,
-  FaceDetection,
-  WithFaceLandmarks,
-} from "@vladmandic/face-api";
 
 // Функция для обнаружения лиц на изображении
 export async function detectFaces(imageBuffer: Buffer): Promise<
-  ComputeAllFaceDescriptorsTask<
-    WithFaceLandmarks<{
-      detection: FaceDetection;
-    }>
-  >
+  | faceapi.ComputeAllFaceDescriptorsTask<
+      faceapi.WithFaceLandmarks<{
+        detection: faceapi.FaceDetection;
+      }>
+    >
+  | []
 > {
   // Преобразуем изображение в тензор с помощью TensorFlow.js
   const tensor: tf.Tensor3D | tf.Tensor4D = tf.node.decodeImage(imageBuffer);
@@ -24,4 +20,11 @@ export async function detectFaces(imageBuffer: Buffer): Promise<
     .withFaceDescriptors();
 
   return detections;
+}
+
+export function findDistance(
+  faceEmbedding_first: Float32Array<ArrayBufferLike> | number[],
+  faceEmbedding_second: Float32Array<ArrayBufferLike> | number[],
+): number {
+  return faceapi.euclideanDistance(faceEmbedding_first, faceEmbedding_second);
 }

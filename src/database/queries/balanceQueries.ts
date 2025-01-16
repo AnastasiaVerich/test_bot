@@ -21,7 +21,13 @@ export async function checkBalance(
     const result: QueryResult<UserBalance> = await db.query(query, [userId]);
     return result.rows[0] ?? null;
   } catch (error) {
-    throw new Error("Error checkBalance: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error checkBalance: " + shortError);
   }
 }
 
@@ -38,7 +44,13 @@ export async function addUserBalance(
             RETURNING *`;
     await db.query(query, [userId, balance, totalEarned, totalWithdrawn]);
   } catch (error) {
-    throw new Error("Error addUserBalance: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error addUserBalance: " + shortError);
   }
 }
 
@@ -50,6 +62,12 @@ export async function updateUserBalance(
     const query = `UPDATE user_balance SET balance = balance - $1 WHERE userId = $2`;
     await db.query(query, [amount, userId]);
   } catch (error) {
-    throw new Error("Error updateUserBalance: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error updateUserBalance: " + shortError);
   }
 }

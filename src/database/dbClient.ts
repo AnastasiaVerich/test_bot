@@ -17,9 +17,16 @@ export const db = new Pool({
 });
 
 db.on("connect", () => {
-  logger.info("Подключение к базе данных установлено");
+  //logger.info("Подключение к базе данных установлено");
 });
 
-db.on("error", (err) => {
-  logger.error("Ошибка подключения к базе данных:", err);
+db.on("error", (error) => {
+  let shortError = "";
+  if (error instanceof Error) {
+    shortError = error.message.substring(0, 50);
+  } else {
+    shortError = String(error).substring(0, 50);
+  }
+
+  logger.error("Ошибка подключения к базе данных: " + shortError);
 });

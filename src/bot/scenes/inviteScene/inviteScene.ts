@@ -1,13 +1,13 @@
 import { Conversation } from "@grammyjs/conversations";
 import { InlineKeyboard, InputFile } from "grammy";
 import { Message } from "grammy/types";
-import { MyContext } from "../types/type";
-import { ReferralService } from "../services/referralService/referralService";
-import { INVITE_SCENE } from "../constants/scenes";
-import { BUTTONS_KEYBOARD } from "../constants/button";
-import { MESSAGES } from "../constants/messages";
-import logger from "../../lib/logger";
-import { getUserId } from "../utils/getUserId";
+import { MyContext } from "../../types/type";
+import { ReferralService } from "../../services/referralService/referralService";
+import { INVITE_SCENE } from "../../constants/scenes";
+import { BUTTONS_KEYBOARD } from "../../constants/button";
+import { MESSAGES } from "../../constants/messages";
+import logger from "../../../lib/logger";
+import { getUserId } from "../../utils/getUserId";
 
 export async function inviteScene(
   conversation: Conversation<MyContext>,
@@ -43,7 +43,13 @@ export async function inviteScene(
       ),
     });
   } catch (error) {
-    logger.error("Error in inviteScene:", error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    logger.error("Error in inviteScene: " + shortError);
     await ctx.reply(MESSAGES.SOME_ERROR);
     return;
   }

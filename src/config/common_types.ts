@@ -19,3 +19,7 @@ export type IdentificationResponseText =
   | "success" //1, 200 // Успех: верификация прошла успешно
   | "face_not_found" //2, 200 // Ошибка: лицо не найдено на изображении
   | "server_error"; //2, 500 // Ошибка сервера
+
+export type FaceCheckStepResponseText =
+  | IdentificationResponseText
+  | "some_error";

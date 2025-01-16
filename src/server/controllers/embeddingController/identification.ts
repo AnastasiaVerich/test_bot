@@ -1,6 +1,5 @@
-import * as faceapi from "@vladmandic/face-api";
 import { Request, Response } from "express";
-import { detectFaces } from "../../services/embeddingService";
+import { detectFaces, findDistance } from "../../services/embeddingService";
 import { InterfaceResponse } from "../../types/type";
 import { checkExistInBlockUser } from "../../../database/queries/blacklistUsersQueries";
 import { findOperatorByTelegramId } from "../../../database/queries/operatorQueries";
@@ -66,7 +65,7 @@ export const identification = async (
     const faceEmbedding = detections[0].descriptor;
 
     // Рассчитываем расстояние между эмбеддингом с изображения и эмбеддингом из базы
-    const distance = faceapi.euclideanDistance(
+    const distance = findDistance(
       faceEmbedding,
       Object.values(JSON.parse(embeddingFromDB.embedding)),
     );
@@ -80,7 +79,13 @@ export const identification = async (
       .status(200)
       .send({ status: 0, text: "similarity_not_confirmed" });
   } catch (error) {
-    logger.error("Error Identification:", error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    logger.error("Error Identification: " + shortError);
     return res.status(500).send({ status: 2, text: "server_error" });
   }
 };

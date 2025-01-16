@@ -8,6 +8,7 @@ import { Scenes } from "../scenes";
 import { handleBalance } from "./callback/keyboard_balance";
 import { handleStartCommand } from "./callback/command_start";
 import { authMiddleware } from "../middleware/authMiddleware";
+import { blacklistMiddleware } from "../middleware/blacklistMiddleware";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.command("start", handleStartCommand);
@@ -37,7 +38,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
 }
 
 export function registerMessage(bot: Bot<MyContext>): void {
-  bot.on("message:text", authMiddleware, async (ctx) => {
+  bot.on("message:text", blacklistMiddleware, authMiddleware, async (ctx) => {
     if (ctx.message.text === BUTTONS_KEYBOARD.SurveyButton) {
       await ctx.conversation.enter(Scenes.SurveyScene);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.InviteButton) {

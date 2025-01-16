@@ -17,6 +17,12 @@ export const initializeModels = async (): Promise<void> => {
     await loadModels();
     logger.info("Модели успешно загружены");
   } catch (error) {
-    logger.error("Ошибка при загрузке моделей:", error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    logger.error("Ошибка при загрузке моделей: " + shortError);
   }
 };

@@ -187,3 +187,12 @@ CREATE TABLE pending_payments (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 GRANT ALL PRIVILEGES ON TABLE pending_payments TO admin_vadim;
+
+CREATE TABLE transactions (
+    user_id BIGINT PRIMARY KEY,
+    amount NUMERIC NOT NULL,
+    status TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Дата создания записи
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+GRANT ALL PRIVILEGES ON TABLE transactions TO admin_vadim;

@@ -17,7 +17,13 @@ export async function createTransaction(
     );
     return result.rows[0];
   } catch (error) {
-    throw new Error("Error createTransaction: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error createTransaction: " + shortError);
   }
 }
 
@@ -32,7 +38,13 @@ export async function updateTransactionStatus(
     );
     return result.rows[0];
   } catch (error) {
-    throw new Error("Error updateTransactionStatus: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error updateTransactionStatus: " + shortError);
   }
 }
 
@@ -43,6 +55,12 @@ export async function getPendingTransactions(): Promise<Transaction[]> {
     );
     return result.rows;
   } catch (error) {
-    throw new Error("Error getPendingTransactions: " + error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error getPendingTransactions: " + shortError);
   }
 }

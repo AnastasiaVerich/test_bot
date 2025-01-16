@@ -39,7 +39,9 @@ describe("Test authMiddleware", () => {
     await authMiddleware(ctx as MyContext, next);
 
     expect(next).not.toHaveBeenCalled();
-    expect(ctx.reply).toHaveBeenCalledWith(MESSAGES.YOU_NOT_AUTH);
+    expect(ctx.reply).toHaveBeenCalledWith(MESSAGES.YOU_NOT_AUTH, {
+      reply_markup: { remove_keyboard: true },
+    });
   });
 
   // Проверяет, что выполнение останавливается, если userId отсутствует
@@ -54,7 +56,8 @@ describe("Test authMiddleware", () => {
 
   // Проверяет, что сообщение об ошибке отправляется и ошибка логируется
   it("should handle errors and send error message", async () => {
-    const error = new Error("Some error");
+    const error_text = "Some error";
+    const error = new Error(error_text);
     (getUserId as jest.Mock).mockRejectedValue(error);
 
     await authMiddleware(ctx as MyContext, next);
@@ -63,6 +66,9 @@ describe("Test authMiddleware", () => {
     expect(ctx.reply).toHaveBeenCalledWith(MESSAGES.SOME_ERROR, {
       reply_markup: { remove_keyboard: true },
     });
-    expect(logger.error).toHaveBeenCalledWith("Error authMiddleware:", error);
+
+    expect(logger.error).toHaveBeenCalledWith(
+      "Error authMiddleware: " + error_text,
+    );
   });
 });
