@@ -55,34 +55,14 @@ export const getRecentSurveyTypesForUser = async (
   }
 };
 
-//метод сброса истекших брони при запросах к серверу
-export const checkAndUpdateSurveyStatus = async (): Promise<{
-  success: boolean;
-}> => {
+export const getExpiredReservedSurveys = async (): Promise<Survey[]> => {
   try {
     const query = `
-            WITH updated_surveys AS (
-                UPDATE surveys
-                SET status = 'available',
-                    reserved_by_user_id = NULL,
-                    reserved_by_operator_id = NULL
-                WHERE status = 'reserved' AND reserved_until <= NOW()
-                RETURNING reserved_by_user_id, reserved_by_operator_id
-            ),
-            updated_users AS (
-                UPDATE users
-                SET status = 'free'
-                WHERE user_id IN (SELECT reserved_by_user_id FROM updated_surveys WHERE reserved_by_user_id IS NOT NULL)
-            )
-            UPDATE operators
-            SET status = 'free'
-            WHERE operator_id IN (SELECT reserved_by_operator_id FROM updated_surveys WHERE reserved_by_operator_id IS NOT NULL);
-        `;
-    const result = await db.query(query);
-    if (result.rowCount === 0) {
-      return { success: false };
-    }
-    return { success: true };
+            SELECT * FROM  surveys 
+            WHERE status = 'reserved' AND reserved_until <= NOW();`;
+    const result: QueryResult<Survey> = await db.query(query);
+
+    return result.rows;
   } catch (error) {
     let shortError = "";
     if (error instanceof Error) {
@@ -90,7 +70,7 @@ export const checkAndUpdateSurveyStatus = async (): Promise<{
     } else {
       shortError = String(error).substring(0, 50);
     }
-    throw new Error("Error checkAndUpdateSurveyStatus: " + shortError);
+    throw new Error("Error getExpiredReservedSurveys: " + shortError);
   }
 };
 
@@ -161,5 +141,49 @@ export const reserveSurvey = async (
       shortError = String(error).substring(0, 50);
     }
     throw new Error("Error reserveSurvey: " + shortError);
+  }
+};
+
+export const resetReserveSurvey = async (surveyId: number): Promise<void> => {
+  try {
+    const query = `
+        UPDATE surveys
+        SET status = 'available',
+            reserved_by_user_id = NULL,
+            reserved_by_operator_id = NULL,
+            reserved_until = NULL,
+            updated_at = NOW()
+        WHERE survey_id = $1;
+    `;
+    await db.query(query, [surveyId]);
+  } catch (error) {
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error resetReserveSurvey: " + shortError);
+  }
+};
+
+export const inProgressSurvey = async (surveyId: number): Promise<void> => {
+  try {
+    const query = `
+        UPDATE surveys
+        SET status = 'in_progress',
+            reserved_until = NULL,
+            updated_at = NOW()
+        WHERE survey_id = $1;
+    `;
+    await db.query(query, [surveyId]);
+  } catch (error) {
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error inProgressSurvey: " + shortError);
   }
 };

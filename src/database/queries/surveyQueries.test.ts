@@ -1,9 +1,10 @@
 import { db } from "../dbClient";
 import {
   getRecentSurveyTypesForUser,
-  checkAndUpdateSurveyStatus,
   findAvailableSurvey,
   reserveSurvey,
+  resetReserveSurvey,
+  inProgressSurvey,
 } from "./surveyQueries";
 
 jest.mock("../dbClient");
@@ -34,34 +35,6 @@ describe("Survey Queries", () => {
 
       await expect(getRecentSurveyTypesForUser(1, 7)).rejects.toThrow(
         "Error getRecentSurveyTypesForUser: DB Error",
-      );
-    });
-  });
-
-  describe("checkAndUpdateSurveyStatus", () => {
-    // Проверяем успешное обновление истекших бронирований
-    it("Should return success true if expired reservations are updated", async () => {
-      (db.query as jest.Mock).mockResolvedValueOnce({ rowCount: 1 });
-
-      const result = await checkAndUpdateSurveyStatus();
-      expect(result).toEqual({ success: true });
-      expect(db.query).toHaveBeenCalled();
-    });
-
-    // Проверяем отсутствие изменений, если истекших бронирований нет
-    it("Should return success false if no reservations are updated", async () => {
-      (db.query as jest.Mock).mockResolvedValueOnce({ rowCount: 0 });
-
-      const result = await checkAndUpdateSurveyStatus();
-      expect(result).toEqual({ success: false });
-    });
-
-    // Проверяем обработку ошибки при сбое запроса
-    it("Should throw an error if query fails", async () => {
-      (db.query as jest.Mock).mockRejectedValueOnce(new Error("DB Error"));
-
-      await expect(checkAndUpdateSurveyStatus()).rejects.toThrow(
-        "Error checkAndUpdateSurveyStatus: DB Error",
       );
     });
   });
@@ -143,6 +116,66 @@ describe("Survey Queries", () => {
 
       await expect(reserveSurvey(1, 2, 3, 30)).rejects.toThrow(
         "Error reserveSurvey: DB Error",
+      );
+    });
+  });
+
+  describe("resetReserveSurvey", () => {
+    // Проверяем успешное освобождение опроса
+    it("Should successfully reset reserve a survey", async () => {
+      (db.query as jest.Mock).mockResolvedValueOnce({});
+
+      await resetReserveSurvey(1);
+
+      expect(db.query).toHaveBeenCalledWith(
+        `
+        UPDATE surveys
+        SET status = 'available',
+            reserved_by_user_id = NULL,
+            reserved_by_operator_id = NULL,
+            reserved_until = NULL,
+            updated_at = NOW()
+        WHERE survey_id = $1;
+    `,
+        [1],
+      );
+    });
+
+    // Проверяем обработку ошибки при сбое запроса
+    it("Should throw an error if query fails", async () => {
+      (db.query as jest.Mock).mockRejectedValueOnce(new Error("DB Error"));
+
+      await expect(resetReserveSurvey(1)).rejects.toThrow(
+        "Error resetReserveSurvey: DB Error",
+      );
+    });
+  });
+
+  describe("inProgressSurvey", () => {
+    // Проверяем успешное освобождение опроса
+    it("Should successfully change status for survey", async () => {
+      (db.query as jest.Mock).mockResolvedValueOnce({});
+
+      await inProgressSurvey(1);
+
+      expect(db.query).toHaveBeenCalledWith(
+        `
+        UPDATE surveys
+        SET status = 'in_progress',
+            reserved_until = NULL,
+            updated_at = NOW()
+        WHERE survey_id = $1;
+    `,
+        [1],
+      );
+    });
+
+    // Проверяем обработку ошибки при сбое запроса
+    it("Should throw an error if query fails", async () => {
+      (db.query as jest.Mock).mockRejectedValueOnce(new Error("DB Error"));
+
+      await expect(inProgressSurvey(1)).rejects.toThrow(
+        "Error inProgressSurvey: DB Error",
       );
     });
   });

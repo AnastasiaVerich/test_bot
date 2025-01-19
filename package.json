@@ -11,6 +11,7 @@
     "start:server": "ts-node src/server/index.ts",
     "build:server": "tsc",
     "start:server:prod": "node dist/index.js",
+    "start:scheduler": "ts-node src/jobs/index.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "jest"

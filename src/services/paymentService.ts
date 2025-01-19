@@ -4,9 +4,9 @@ import {
   deletePendingPayment,
   getAllPendingPayment,
   updateAttemptPendingPayment,
-} from "../../database/queries/pendingPaymentsQueries";
-import { seed_phrase } from "../../config/env";
-import logger from "../../lib/logger";
+} from "../database/queries/pendingPaymentsQueries";
+import { seed_phrase } from "../config/env";
+import logger from "../lib/logger";
 
 export async function executePendingPayments(): Promise<void> {
   logger.info("Запуск задачи проверки ожидающих платежей");
