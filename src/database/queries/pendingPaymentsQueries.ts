@@ -46,7 +46,7 @@ export async function addPendingPayment(
 
 export async function deletePendingPayment(userId: number): Promise<void> {
   try {
-    const query = "DELETE  FROM  pending_payments WHERE userId = $1;";
+    const query = "DELETE  FROM  pending_payments WHERE user_id = $1;";
     await db.query(query, [userId]);
   } catch (error) {
     let shortError = "";
