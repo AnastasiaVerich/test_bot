@@ -12,10 +12,10 @@ export async function executePendingPayments(): Promise<void> {
   logger.info("Запуск задачи проверки ожидающих платежей");
   let pass = false;
   try {
-    console.log(1)
+    logger.info(1)
     const pendingPayments = await getAllPendingPayment();
 
-    console.log(2)
+    logger.info(2)
     for (const payment of pendingPayments) {
       if (payment.attempts >= 3) {
         //0 1 2 3
@@ -24,15 +24,15 @@ export async function executePendingPayments(): Promise<void> {
         );
         continue;
       }
-      console.log(3)
+      logger.info(3)
       if (!pass) {
 
-        console.log(4)
+        logger.info(4)
         await updateAttemptPendingPayment(payment.userId, payment.attempts + 1);
 
-        console.log(5)
+        logger.info(5)
         const result = await make_payment(payment.amount, payment.address);
-        console.log(6)
+        logger.info(6)
         if (result.isSuccess) {
           await deletePendingPayment(payment.userId);
         } else {
