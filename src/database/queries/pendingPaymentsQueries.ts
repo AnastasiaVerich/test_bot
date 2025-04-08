@@ -91,7 +91,7 @@ export async function updateAttemptPendingPayment(
 
   try {
     const query = `UPDATE pending_payments SET attempts = $1 WHERE user_id = $2`;
-    await db.query(query, [userId, attempts]);
+    await db.query(query, [attempts, userId]);
   } catch (error) {
     let shortError = "";
     if (error instanceof Error) {
