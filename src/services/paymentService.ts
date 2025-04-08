@@ -20,7 +20,7 @@ export async function executePendingPayments(): Promise<void> {
       if (payment.attempts >= 3) {
         //0 1 2 3
         logger.info(
-          `Оператору: Все попытки отправки платежа для пользователя ${payment.userId} исчерпаны.`,
+          `Оператору: Все попытки отправки платежа для пользователя ${payment.user_id} исчерпаны.`,
         );
         continue;
       }
@@ -28,16 +28,16 @@ export async function executePendingPayments(): Promise<void> {
       if (!pass) {
 
         logger.info(4)
-        console.log(payment.userId)
+        console.log(payment.user_id)
         console.log(payment.attempts)
         console.log(payment.attempts + 1)
-        await updateAttemptPendingPayment(payment.userId, payment.attempts + 1);
+        await updateAttemptPendingPayment(payment.user_id, payment.attempts + 1);
 
         logger.info(5)
         const result = await make_payment(payment.amount, payment.address);
         logger.info(6)
         if (result.isSuccess) {
-          await deletePendingPayment(payment.userId);
+          await deletePendingPayment(payment.user_id);
         } else {
           switch (result.reason) {
             case "big gas":

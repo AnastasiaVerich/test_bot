@@ -2,7 +2,7 @@ import { QueryResult } from "pg";
 import { db } from "../dbClient";
 
 export type PendingPayment = {
-  userId: number; // Идентификатор пользователя (связан с users)
+  user_id: number; // Идентификатор пользователя (связан с users)
   amount: number; // Сумма платежа
   attempts: number; // Количество попыток проведения платежа
   address: string; // Адрес для платежа
