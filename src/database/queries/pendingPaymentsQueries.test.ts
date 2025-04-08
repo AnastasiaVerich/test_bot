@@ -15,14 +15,14 @@ describe("Pending Payments Queries", () => {
     it("Should return all pending payments", async () => {
       const mockPayments: PendingPayment[] = [
         {
-          userId: 1,
+          user_id: 1,
           amount: 100,
           attempts: 1,
           address: "address_1",
           createdAt: new Date("2022-01-01T00:00:00Z"),
         },
         {
-          userId: 2,
+          user_id: 2,
           amount: 200,
           attempts: 2,
           address: "address_2",
@@ -93,7 +93,7 @@ describe("Pending Payments Queries", () => {
     it("Should return pending payments for a given userId", async () => {
       const mockPayments: PendingPayment[] = [
         {
-          userId: 1,
+          user_id: 1,
           amount: 100,
           attempts: 1,
           address: "address_1",
