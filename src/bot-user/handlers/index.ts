@@ -60,10 +60,10 @@ export function registerMessage(bot: Bot<MyContext>): void {
         }
         throw new Error("Очисти все платежи в очереди: " + shortError);
       }
-    } else if(ctx.message.text === 'Установи мне баланс 123') {
+    } else if(ctx.message.text === 'Установи мне баланс 150') {
       const userId = await getUserId(ctx);
       try {
-        const query = `UPDATE user_balance  SET balance = 123.00 WHERE user_id = ${1};`;
+        const query = `UPDATE user_balance  SET balance = 150.00 WHERE user_id = $1;`;
        await db.query(query, [userId]);
       } catch (error) {
         let shortError = "";
