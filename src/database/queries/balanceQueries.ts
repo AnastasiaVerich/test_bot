@@ -9,10 +9,10 @@ interface UserBalance {
 }
 
 export async function checkBalance(
-  userId: number,
+  userId: number | string,
 ): Promise<UserBalance | null> {
   // Проверка типа
-  if (typeof userId !== "number") {
+  if (!(typeof userId === "number" || typeof userId === "string")) {
     throw new Error("Invalid type provided");
   }
 

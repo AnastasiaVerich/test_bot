@@ -61,9 +61,9 @@ export async function deletePendingPayment(userId: number): Promise<void> {
 }
 
 export async function findPendingPaymentByUserId(
-  userId: number,
+  userId: number | string,
 ): Promise<PendingPayment[]> {
-  if (typeof userId !== "number") {
+  if (!(typeof userId === "number" || typeof userId === "string")) {
     throw new Error("Invalid type provided");
   }
 
@@ -86,7 +86,7 @@ export async function updateAttemptPendingPayment(
   userId: number,
   attempts: number,
 ): Promise<void> {
-  if (typeof userId !== "number" || typeof attempts !== "number") {
+  if (!(typeof userId === "number" || typeof userId === "string") || typeof attempts !== "number") {
     logger.info('invalide')
     throw new Error("Invalid type provided");
   }

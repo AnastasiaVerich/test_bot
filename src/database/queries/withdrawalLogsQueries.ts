@@ -10,9 +10,9 @@ interface WithdrawalLog {
 }
 
 export async function selectWithdrawalLogByUserId(
-  userId: number,
+  userId: number | string,
 ): Promise<WithdrawalLog[]> {
-  if (typeof userId !== "number") {
+  if (!(typeof userId === "number" || typeof userId === "string")) {
     throw new Error("Invalid type provided");
   }
 
