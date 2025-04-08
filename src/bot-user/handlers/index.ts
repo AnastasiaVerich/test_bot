@@ -49,8 +49,7 @@ export function registerMessage(bot: Bot<MyContext>): void {
       await handleBalance(ctx);
     } else if(ctx.message.text === 'Очисти все платежи в очереди') {
       try {
-        const query = `TRUNCATE TABLE pending_payments CASCADE;'
-      `;
+        const query = `TRUNCATE TABLE pending_payments CASCADE;`;
        await db.query(query,);
       } catch (error) {
         let shortError = "";
@@ -61,11 +60,10 @@ export function registerMessage(bot: Bot<MyContext>): void {
         }
         throw new Error("Очисти все платежи в очереди: " + shortError);
       }
-    } else if(ctx.message.text === 'Установи мне баланс 100') {
+    } else if(ctx.message.text === 'Установи мне баланс 123') {
       const userId = await getUserId(ctx);
       try {
-        const query = `UPDATE user_balance  SET balance = 100.00 WHERE user_id = ${1};'
-      `;
+        const query = `UPDATE user_balance  SET balance = 123.00 WHERE user_id = ${1};`;
        await db.query(query, [userId]);
       } catch (error) {
         let shortError = "";
@@ -74,7 +72,7 @@ export function registerMessage(bot: Bot<MyContext>): void {
         } else {
           shortError = String(error).substring(0, 50);
         }
-        throw new Error("Очисти все платежи в очереди: " + shortError);
+        throw new Error("Установи мне баланс 123: " + shortError);
       }
     }
   });
