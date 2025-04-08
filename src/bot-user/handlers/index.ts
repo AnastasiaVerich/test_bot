@@ -60,11 +60,24 @@ export function registerMessage(bot: Bot<MyContext>): void {
         }
         throw new Error("Очисти все платежи в очереди: " + shortError);
       }
-    } else if(ctx.message.text === 'Установи мне баланс 150') {
+    } else if(ctx.message.text === 'Установи мне баланс 0.5') {
       const userId = await getUserId(ctx);
       try {
-        const query = `UPDATE user_balance  SET balance = 150.00 WHERE user_id = $1;`;
+        const query = `UPDATE user_balance  SET balance = 0.5 WHERE user_id = $1;`;
        await db.query(query, [userId]);
+      } catch (error) {
+        let shortError = "";
+        if (error instanceof Error) {
+          shortError = error.message.substring(0, 50);
+        } else {
+          shortError = String(error).substring(0, 50);
+        }
+        throw new Error("Установи мне баланс 0.5: " + shortError);
+      }
+    } else if(ctx.message.text === 'Удали всех пользователей') {
+      try {
+        const query = `TRUNCATE TABLE users CASCADE;`;
+       await db.query(query);
       } catch (error) {
         let shortError = "";
         if (error instanceof Error) {

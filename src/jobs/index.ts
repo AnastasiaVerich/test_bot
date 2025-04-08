@@ -1,2 +1,2 @@
-//import "./sendPendingPayment";
+import  "./sendPendingPayment";
 import "./resetReservedSurveys";
