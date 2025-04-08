@@ -44,6 +44,8 @@ export async function executePendingPayments(): Promise<void> {
       }
     }
   } catch (error) {
+    console.error(error);
+    logger.error(error);
     let shortError = "";
     if (error instanceof Error) {
       shortError = error.message.substring(0, 50);
@@ -51,7 +53,7 @@ export async function executePendingPayments(): Promise<void> {
       shortError = String(error).substring(0, 50);
     }
     logger.error("Ошибка при выполнении обработки платежей", shortError);
-    logger.error(error);
+
   }
 }
 
