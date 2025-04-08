@@ -51,6 +51,7 @@ export async function executePendingPayments(): Promise<void> {
       shortError = String(error).substring(0, 50);
     }
     logger.error("Ошибка при выполнении обработки платежей", shortError);
+    logger.error(error);
   }
 }
 
@@ -77,12 +78,6 @@ export async function make_payment(
     workchain: 0,
     publicKey: keyPair.publicKey,
   });
-
-  /*
-     const friendlyAddress = wallet.address.toString({ testOnly: false,  bounceable: false    });
-     logger.info("Friendly Address (UQ):", friendlyAddress);
-     logger.info("Friendly Address (UQ):", wallet.address.toString());
-    */
 
   let contract = client.open(wallet);
   let seqno: number = await contract.getSeqno();
