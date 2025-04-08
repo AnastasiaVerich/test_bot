@@ -5,6 +5,7 @@ dotenv.config();
 //экспортируем переменные окружения
 export const WEB_APP_URL = process.env.WEB_APP_URL ?? "";
 export const token = process.env.BOT_TOKEN ?? "";
+export const BOT_OPERATOR_TOKEN = process.env.BOT_OPERATOR_TOKEN ?? "";
 export const seed_phrase = process.env.SEED_PHRASE ?? "";
 
 export const DB_USER = process.env.DB_USER ?? "";

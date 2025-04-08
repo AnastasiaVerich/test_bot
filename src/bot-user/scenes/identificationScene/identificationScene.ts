@@ -1,6 +1,6 @@
 import { Conversation } from "@grammyjs/conversations";
 import { MyContext } from "../../types/type";
-import { AuthUserKeyboard } from "../../keyboards/AuthUserKeyboard";
+import { AuthUserKeyboard } from "../../../bot-user/keyboards/AuthUserKeyboard";
 import { faceCheckStep } from "./steps/faceCheckStep";
 import { IDENTIFICATION_SCENE } from "../../constants/scenes";
 import logger from "../../../lib/logger";

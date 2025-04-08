@@ -1,11 +1,11 @@
 import { faceCheckStep } from "./steps/faceCheckStep";
 import { identificationScene } from "./identificationScene";
 import { IDENTIFICATION_SCENE } from "../../constants/scenes";
-import { AuthUserKeyboard } from "../../keyboards/AuthUserKeyboard";
+import { AuthUserKeyboard } from "../../../bot-user/keyboards/AuthUserKeyboard";
 import { MESSAGES } from "../../constants/messages";
 
 jest.mock("./steps/faceCheckStep");
-jest.mock("../../keyboards/AuthUserKeyboard");
+jest.mock("../../../bot-user/keyboards/AuthUserKeyboard");
 jest.mock("../../../lib/logger");
 
 const mockCtx = {

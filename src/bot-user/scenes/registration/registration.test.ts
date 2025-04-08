@@ -1,12 +1,12 @@
 import { registrationScene } from "./registration";
-import { AuthUserKeyboard } from "../../keyboards/AuthUserKeyboard";
+import { AuthUserKeyboard } from "../../../bot-user/keyboards/AuthUserKeyboard";
 import { REGISTRATION_SCENE } from "../../constants/scenes";
 import { MESSAGES } from "../../constants/messages";
 import { getUserId } from "../../utils/getUserId";
 import logger from "../../../lib/logger";
 
 jest.mock("../../utils/getUserId");
-jest.mock("../../keyboards/AuthUserKeyboard");
+jest.mock("../../../bot-user/keyboards/AuthUserKeyboard");
 jest.mock("../../../lib/logger");
 
 const mockConversation = {

@@ -1,7 +1,7 @@
 import { MyContext } from "../../../types/type";
 import { User } from "../../../../database/queries/userQueries";
 import { SURVEY_SCENE } from "../../../constants/scenes";
-import { AuthUserKeyboard } from "../../../keyboards/AuthUserKeyboard";
+import { AuthUserKeyboard } from "../../../../bot-user/keyboards/AuthUserKeyboard";
 import { formatTimestamp } from "../../../../lib/date";
 
 export async function canTakeSurvey(

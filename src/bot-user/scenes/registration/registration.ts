@@ -1,6 +1,6 @@
 import { Conversation } from "@grammyjs/conversations";
 import { MyContext } from "../../types/type";
-import { AuthUserKeyboard } from "../../keyboards/AuthUserKeyboard";
+import { AuthUserKeyboard } from "../../../bot-user/keyboards/AuthUserKeyboard";
 import { REGISTRATION_SCENE } from "../../constants/scenes";
 import { MESSAGES } from "../../constants/messages";
 import logger from "../../../lib/logger";
@@ -26,6 +26,7 @@ export async function registrationScene(
       userPhone,
       userId,
     );
+
 
     switch (response_text) {
       case "user_exist_number":

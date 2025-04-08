@@ -2,7 +2,7 @@ import { Conversation } from "@grammyjs/conversations";
 import { Message } from "grammy/types";
 import { MyContext } from "../../types/type";
 
-import { AuthUserKeyboard } from "../../keyboards/AuthUserKeyboard";
+import { AuthUserKeyboard } from "../../../bot-user/keyboards/AuthUserKeyboard";
 import { SURVEY_SCENE } from "../../constants/scenes";
 import { MESSAGES } from "../../constants/messages";
 import logger from "../../../lib/logger";

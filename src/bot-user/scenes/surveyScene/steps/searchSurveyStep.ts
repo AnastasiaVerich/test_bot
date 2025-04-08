@@ -6,7 +6,7 @@ import {
   Survey,
 } from "../../../../database/queries/surveyQueries";
 import { SURVEY_SCENE } from "../../../constants/scenes";
-import { AuthUserKeyboard } from "../../../keyboards/AuthUserKeyboard";
+import { AuthUserKeyboard } from "../../../../bot-user/keyboards/AuthUserKeyboard";
 
 export async function searchSurveyStep(
   ctx: MyContext,

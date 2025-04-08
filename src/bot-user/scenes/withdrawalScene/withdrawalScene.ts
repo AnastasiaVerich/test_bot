@@ -8,8 +8,8 @@ import {
   updateUserBalance,
 } from "../../../database/queries/balanceQueries";
 import { WITHDRAWAL_SCENE } from "../../constants/scenes";
-import { EmptyKeyboard } from "../../keyboards/EmptyKeyboard";
-import { AuthUserKeyboard } from "../../keyboards/AuthUserKeyboard";
+import { EmptyKeyboard } from "../../../bot-user/keyboards/EmptyKeyboard";
+import { AuthUserKeyboard } from "../../../bot-user/keyboards/AuthUserKeyboard";
 import { BUTTONS_KEYBOARD } from "../../constants/button";
 import {
   addPendingPayment,
@@ -88,6 +88,7 @@ export async function withdrawalScene(
         amountTON.toString(),
       ).replace("{address}", recipientAddress),
       {
+        parse_mode: "HTML",
         reply_markup: new Keyboard()
           .text(BUTTONS_KEYBOARD.ConfirmButton)
           .text(BUTTONS_KEYBOARD.CancelButton)

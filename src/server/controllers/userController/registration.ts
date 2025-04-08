@@ -43,15 +43,18 @@ export const registration = async (
       const userId = Number(req.body.userId);
       // Проверка наличия обязательных полей
       if (!req.file || !req.file.mimetype.startsWith("image/")) {
+        console.log('missing_photo')
         return res.status(400).send({ status: 2, text: "missing_photo" });
       }
       if (!userId || typeof userId !== "number") {
+        console.log('missing_user_id')
         return res.status(400).send({
           status: 2,
           text: "missing_user_id",
         });
       }
       if (!userPhone || typeof userPhone !== "string") {
+        console.log('missing_user_phone')
         return res.status(400).send({
           status: 2,
           text: "missing_user_phone",

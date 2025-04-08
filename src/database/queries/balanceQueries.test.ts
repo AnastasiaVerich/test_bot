@@ -89,7 +89,7 @@ describe("Balance Queries", () => {
       await updateUserBalance(12345, 50);
 
       expect(db.query).toHaveBeenCalledWith(
-        `UPDATE user_balance SET balance = balance - $1 WHERE userId = $2`,
+        `UPDATE user_balance SET balance = balance - $1 WHERE user_id = $2`,
         [50, 12345],
       );
     });

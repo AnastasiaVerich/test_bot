@@ -1,5 +1,5 @@
 import { surveyScene } from "./surveyScene";
-import { AuthUserKeyboard } from "../../keyboards/AuthUserKeyboard";
+import { AuthUserKeyboard } from "../../../bot-user/keyboards/AuthUserKeyboard";
 import { SURVEY_SCENE } from "../../constants/scenes";
 import { MESSAGES } from "../../constants/messages";
 import { getUserId } from "../../utils/getUserId";

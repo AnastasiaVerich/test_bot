@@ -5,7 +5,7 @@ import { FaceCheckStepResponseText } from "../../../../config/common_types";
 import { updateUserLastInit } from "../../../../database/queries/userQueries";
 import { getUserId, returnUserId } from "../../../utils/getUserId";
 import logger from "../../../../lib/logger";
-import { WebAppKeyboard } from "../../../keyboards/WebAppKeyboard";
+import { WebAppKeyboard } from "../../../../bot-user/keyboards/WebAppKeyboard";
 
 export async function faceCheckStep(
   conversation: Conversation<MyContext>,

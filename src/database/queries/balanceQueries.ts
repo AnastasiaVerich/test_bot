@@ -59,7 +59,7 @@ export async function updateUserBalance(
   amount: number,
 ): Promise<void> {
   try {
-    const query = `UPDATE user_balance SET balance = balance - $1 WHERE userId = $2`;
+    const query = `UPDATE user_balance SET balance = balance - $1 WHERE user_id = $2`;
     await db.query(query, [amount, userId]);
   } catch (error) {
     let shortError = "";

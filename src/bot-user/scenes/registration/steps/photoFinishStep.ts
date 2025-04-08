@@ -2,7 +2,7 @@ import { Conversation } from "@grammyjs/conversations";
 import { MyContext } from "../../../types/type";
 import { RegistrationResponseText } from "../../../../config/common_types";
 import { REGISTRATION_SCENE } from "../../../constants/scenes";
-import { WebAppKeyboard } from "../../../keyboards/WebAppKeyboard";
+import { WebAppKeyboard } from "../../../../bot-user/keyboards/WebAppKeyboard";
 
 export async function photoFinishStep(
   conversation: Conversation<MyContext>,

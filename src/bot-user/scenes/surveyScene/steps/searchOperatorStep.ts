@@ -5,7 +5,7 @@ import {
   Operator,
 } from "../../../../database/queries/operatorQueries";
 import { SURVEY_SCENE } from "../../../constants/scenes";
-import { AuthUserKeyboard } from "../../../keyboards/AuthUserKeyboard";
+import { AuthUserKeyboard } from "../../../../bot-user/keyboards/AuthUserKeyboard";
 
 export async function searchOperatorStep(
   ctx: MyContext,

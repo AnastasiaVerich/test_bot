@@ -74,6 +74,27 @@ export const getExpiredReservedSurveys = async (): Promise<Survey[]> => {
   }
 };
 
+export const getSurveysTasks = async (
+  surveyId: number,
+): Promise<SurveyTask[]> => {
+  try {
+    const query = `
+            SELECT * FROM  survey_tasks 
+            WHERE survey_id = $1`;
+    const result: QueryResult<SurveyTask> = await db.query(query, [surveyId]);
+
+    return result.rows;
+  } catch (error) {
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error getSurveysTasks: " + shortError);
+  }
+};
+
 export const findAvailableSurvey = async (
   userId: number,
   regionId: number,

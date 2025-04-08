@@ -4,7 +4,7 @@ import { LocationType, MyContext } from "../../../types/type";
 import { RegionSettings } from "../../../../database/queries/regionQueries";
 import { SURVEY_SCENE } from "../../../constants/scenes";
 import { BUTTONS_KEYBOARD } from "../../../constants/button";
-import { AuthUserKeyboard } from "../../../keyboards/AuthUserKeyboard";
+import { AuthUserKeyboard } from "../../../../bot-user/keyboards/AuthUserKeyboard";
 import { findRegionByLocation } from "../../../../utils/regionUtils";
 
 export async function regionState(

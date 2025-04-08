@@ -1,5 +1,5 @@
 import { canTakeSurvey } from "./canUserTakeSurvey";
-import { AuthUserKeyboard } from "../../../keyboards/AuthUserKeyboard";
+import { AuthUserKeyboard } from "../../../../bot-user/keyboards/AuthUserKeyboard";
 import { MyContext } from "../../../types/type";
 import { User } from "../../../../database/queries/userQueries";
 import { SURVEY_SCENE } from "../../../constants/scenes";

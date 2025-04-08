@@ -1,9 +1,9 @@
 import * as turf from "@turf/turf";
-import { LocationType } from "../bot/types/type";
 import {
   getAllRegions,
   RegionSettings,
 } from "../database/queries/regionQueries";
+import {LocationType} from "../server/types/type";
 
 export async function findRegionByLocation(
   location_coordinate: LocationType,

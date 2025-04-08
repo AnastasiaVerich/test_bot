@@ -10,7 +10,7 @@ import {
   updateUserBalance,
 } from "../../../database/queries/balanceQueries";
 import { MESSAGES } from "../../constants/messages";
-import { AuthUserKeyboard } from "../../keyboards/AuthUserKeyboard";
+import { AuthUserKeyboard } from "../../../bot-user/keyboards/AuthUserKeyboard";
 import { BUTTONS_KEYBOARD } from "../../constants/button";
 import logger from "../../../lib/logger";
 
