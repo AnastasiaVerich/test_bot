@@ -28,9 +28,9 @@ export async function executePendingPayments(): Promise<void> {
       if (!pass) {
 
         logger.info(4)
-        console.log(payment.user_id)
-        console.log(payment.attempts)
-        console.log(payment.attempts + 1)
+        logger.info(payment.user_id)
+        logger.info(payment.attempts)
+        logger.info(payment.attempts + 1)
         await updateAttemptPendingPayment(payment.user_id, payment.attempts + 1);
 
         logger.info(5)
