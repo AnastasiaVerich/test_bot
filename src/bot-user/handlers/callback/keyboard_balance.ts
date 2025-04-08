@@ -29,7 +29,7 @@ export async function handleBalance(
       );
     } else {
       return ctx.reply(
-        `${MESSAGES.BALANCE} ${balance.balance}!\n\n${MESSAGES.BALANCE_HISTORY}\n${"1111"}`,
+          `${MESSAGES.BALANCE} ${balance.balance}!\n\n${MESSAGES.BALANCE_HISTORY}\n${logs.map((e) => `${e.amount} ${formatTimestamp(Number(e.withdrawn_at))}`)}`,
         {
           reply_markup: new InlineKeyboard().text(
             BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButtonText,
