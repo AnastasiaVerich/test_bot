@@ -1,5 +1,6 @@
 import { QueryResult } from "pg";
 import { db } from "../dbClient";
+import logger from "../../lib/logger";
 
 export type PendingPayment = {
   user_id: number; // Идентификатор пользователя (связан с users)
@@ -86,6 +87,7 @@ export async function updateAttemptPendingPayment(
   attempts: number,
 ): Promise<void> {
   if (typeof userId !== "number" || typeof attempts !== "number") {
+    logger.info('invalide')
     throw new Error("Invalid type provided");
   }
 
@@ -93,6 +95,7 @@ export async function updateAttemptPendingPayment(
     const query = `UPDATE pending_payments SET attempts = $1 WHERE user_id = $2`;
     await db.query(query, [attempts, userId]);
   } catch (error) {
+    logger.info(error)
     let shortError = "";
     if (error instanceof Error) {
       shortError = error.message.substring(0, 50);
