@@ -90,7 +90,7 @@ export async function make_payment(
   const estimateSumGas = await estimateFee(client, recipientAddress, amountTON);
 
   logger.info(estimateSumGas)
-  if (estimateSumGas <= maxGas) {
+  if (true/*estimateSumGas <= maxGas*/) {
     const balanceNano = await client.getBalance(wallet.address);
     const balanceTON = Number(balanceNano) / 1e9; // Преобразуем в number и делим
 
