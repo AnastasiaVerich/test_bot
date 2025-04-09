@@ -21,11 +21,9 @@ export async function handleBalance(
 
     const balance = await checkBalance(userId);
     const logs = await selectWithdrawalLogByUserId(userId);
-    const logs_show = `${logs.map((e) => `✅ ${e.amount} ${formatTimestamp(Number(e.withdrawn_at))} ${e.wallet}\n`)}`
+    const logs_show = logs.map((e) => `✅ ${e.amount} ${formatTimestamp(Number(e.withdrawn_at))} ${e.wallet}`).join('\n')
     const pendingPayment = await findPendingPaymentByUserId(userId);
-    const pendingPayment_show = `${pendingPayment.map((e) => `⏳${e.amount}  ${e.address}\n`)}`
-
-
+    const pendingPayment_show = pendingPayment.map((e) => `⏳${e.amount}  ${e.address}\n`).join('\n')
 
     if (!balance) {
       return ctx.reply(MESSAGES.USER_ID_UNDEFINED);
