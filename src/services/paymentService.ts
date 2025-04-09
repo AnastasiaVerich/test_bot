@@ -7,6 +7,7 @@ import {
 } from "../database/queries/pendingPaymentsQueries";
 import { seed_phrase } from "../config/env";
 import logger from "../lib/logger";
+import {addWithdrawalLog} from "../database/queries/withdrawalLogsQueries";
 
 export async function executePendingPayments(): Promise<void> {
   logger.info("Запуск задачи проверки ожидающих платежей");
@@ -29,6 +30,7 @@ export async function executePendingPayments(): Promise<void> {
         const result = await make_payment(payment.amount, payment.address);
         logger.info(result)
         if (result.isSuccess) {
+          await addWithdrawalLog(payment.user_id,payment.amount,payment.address);
           await deletePendingPayment(payment.user_id);
         } else {
           switch (result.reason) {

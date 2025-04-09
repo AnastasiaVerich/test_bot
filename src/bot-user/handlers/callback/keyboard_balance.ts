@@ -20,6 +20,9 @@ export async function handleBalance(
 
     const balance = await checkBalance(userId);
     const logs = await selectWithdrawalLogByUserId(userId);
+
+
+
     if (!balance) {
       return ctx.reply(MESSAGES.USER_ID_UNDEFINED);
     }
