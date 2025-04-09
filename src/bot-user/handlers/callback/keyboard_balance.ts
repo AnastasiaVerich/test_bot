@@ -23,7 +23,7 @@ export async function handleBalance(
     const logs = await selectWithdrawalLogByUserId(userId);
     const logs_show = `${logs.map((e) => `✅ ${e.amount} ${formatTimestamp(Number(e.withdrawn_at))} ${e.wallet}\n`)}`
     const pendingPayment = await findPendingPaymentByUserId(userId);
-    const pendingPayment_show = `${pendingPayment.map((e) => `⏳${e.amount} ${formatTimestamp(Number(e.createdAt))} ${e.address}\n`)}`
+    const pendingPayment_show = `${pendingPayment.map((e) => `⏳${e.amount}  ${e.address}\n`)}`
 
 
 
