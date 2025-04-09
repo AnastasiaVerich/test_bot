@@ -39,6 +39,7 @@ export async function addWithdrawalLog(
   amount: number,
   wallet: string,
 ): Promise<void> {
+
   try {
     const query =
       "INSERT INTO withdrawal_logs (user_id, amount, wallet, withdrawn_at) VALUES ($1, $2, $3, CURRENT_TIMESTAMP)";

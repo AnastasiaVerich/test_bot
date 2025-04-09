@@ -30,6 +30,7 @@ export async function executePendingPayments(): Promise<void> {
         const result = await make_payment(payment.amount, payment.address);
         logger.info(result)
         if (result.isSuccess) {
+          logger.info(payment)
           await deletePendingPayment(payment.user_id);
           await addWithdrawalLog(payment.user_id,payment.amount,payment.address);
 
