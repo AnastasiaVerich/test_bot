@@ -7,7 +7,7 @@ export type PendingPayment = {
   amount: number; // Сумма платежа
   attempts: number; // Количество попыток проведения платежа
   address: string; // Адрес для платежа
-  createdAt: Date; // Дата создания записи
+  createdAt: string; // Дата создания записи
 };
 
 export async function getAllPendingPayment(): Promise<PendingPayment[]> {
