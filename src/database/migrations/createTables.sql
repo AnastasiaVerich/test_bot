@@ -164,6 +164,7 @@ CREATE TABLE withdrawal_logs (
 );
 
 GRANT ALL PRIVILEGES ON TABLE withdrawal_logs TO admin_vadim;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE withdrawal_logs_withdrawal_id_seq TO admin_vadim;
 
 -- Таблица чёрного списка пользователей
 CREATE TABLE blacklist_users (
@@ -177,6 +178,8 @@ CREATE TABLE blacklist_users (
 );
 
 GRANT ALL PRIVILEGES ON TABLE blacklist_users TO admin_vadim;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE blacklist_users_blacklist_id_seq TO admin_vadim;
+
 
 CREATE TABLE pending_payments (
     user_id BIGINT PRIMARY KEY,

@@ -16,7 +16,7 @@ export async function executePendingPayments(): Promise<void> {
     const pendingPayments = await getAllPendingPayment();
 
     for (const payment of pendingPayments) {
-      if (payment.attempts >= 1) {
+      if (payment.attempts >= 3) {
         //0 1 2 3
         logger.info(
           `Оператору: Все попытки отправки платежа для пользователя ${payment.user_id} исчерпаны.`,
