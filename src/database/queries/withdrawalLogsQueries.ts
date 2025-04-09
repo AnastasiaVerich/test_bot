@@ -36,7 +36,7 @@ export async function selectWithdrawalLogByUserId(
 
 export async function addWithdrawalLog(
   userId: number | string,
-  amount: number,
+  amount: number | string,
   wallet: string,
 ): Promise<void> {
 
