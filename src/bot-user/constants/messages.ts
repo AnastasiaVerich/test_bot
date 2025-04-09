@@ -24,7 +24,7 @@ export const MESSAGES = {
 
   USER_ID_UNDEFINED: "Ошибка: не удалось получить информацию о пользователе.",
 
-  BALANCE: "На Вашем счету",
+  BALANCE: "На Вашем балансе",
   BALANCE_HISTORY: "История операций",
   BALANCE_PENDING: "Ожидающие платежи",
   BALANCE_HISTORY_PLUS: "История пополнений",
