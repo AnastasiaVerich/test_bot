@@ -23,6 +23,8 @@ export async function handleBalance(
         const logs = await selectWithdrawalLogByUserId(userId);
         const pendingPayment = await findPendingPaymentByUserId(userId);
 
+        logger.info(logs)
+        logger.info(pendingPayment)
         // Форматируем завершенные платежи
         const logs_show = logs.length > 0
             ? logs
