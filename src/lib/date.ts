@@ -2,15 +2,17 @@ export function formatTimestamp(timestamp: number): string {
   // Создаем объект Date из метки времени
   const date = new Date(timestamp);
 
+  const moscowDate = new Date(date.getTime() + 3 * 60 * 60 * 1000);
+
   // Получаем день, месяц, год, часы и минуты
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // месяцы начинаются с 0
-  const year = date.getFullYear();
-  const hours = date.getHours().toString().padStart(2, "0");
-  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const day = moscowDate.getDate().toString().padStart(2, "0");
+  const month = (moscowDate.getMonth() + 1).toString().padStart(2, "0"); // месяцы начинаются с 0
+  const year = moscowDate.getFullYear();
+  const hours = moscowDate.getHours().toString().padStart(2, "0");
+  const minutes = moscowDate.getMinutes().toString().padStart(2, "0");
 
   // Форматируем строку в нужном формате
-  return `${day}.${month}.${year} ${hours}:${minutes}`;
+  return `${day}.${month}.${year} ${hours}:${minutes} (MSK)`;
 }
 
 export function isDateDifferenceAtLeast(

@@ -8,6 +8,7 @@ import { selectWithdrawalLogByUserId } from "../../../database/queries/withdrawa
 import { formatTimestamp } from "../../../lib/date";
 import logger from "../../../lib/logger";
 import { getUserId } from "../../utils/getUserId";
+import {findPendingPaymentByUserId} from "../../../database/queries/pendingPaymentsQueries";
 
 export async function handleBalance(
   ctx: MyContext,
@@ -20,6 +21,9 @@ export async function handleBalance(
 
     const balance = await checkBalance(userId);
     const logs = await selectWithdrawalLogByUserId(userId);
+    const logs_show = `${logs.map((e) => `✅ ${e.amount} ${formatTimestamp(Number(e.withdrawn_at))} ${e.wallet}\n`)}`
+    const pendingPayment = await findPendingPaymentByUserId(userId);
+    const pendingPayment_show = `${pendingPayment.map((e) => `⏳${e.amount} ${formatTimestamp(Number(e.createdAt))} ${e.address}\n`)}`
 
 
 
@@ -28,11 +32,11 @@ export async function handleBalance(
     }
     if (Number(balance.balance) === 0) {
       return ctx.reply(
-        `${MESSAGES.BALANCE} ${balance.balance}!\n\n${MESSAGES.BALANCE_HISTORY}\n${logs.map((e) => `${e.amount} ${formatTimestamp(Number(e.withdrawn_at))}`)}`,
+        `${MESSAGES.BALANCE} ${balance.balance}!\n\n${MESSAGES.BALANCE_HISTORY}\n${logs_show}\n\n${pendingPayment_show}`,
       );
     } else {
       return ctx.reply(
-          `${MESSAGES.BALANCE} ${balance.balance}!\n\n${MESSAGES.BALANCE_HISTORY}\n${logs.map((e) => `${e.amount} ${formatTimestamp(Number(e.withdrawn_at))}`)}`,
+          `${MESSAGES.BALANCE} ${balance.balance}!\n\n${MESSAGES.BALANCE_HISTORY}\n${logs_show}\n\n${pendingPayment_show}`,
         {
           reply_markup: new InlineKeyboard().text(
             BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButtonText,
