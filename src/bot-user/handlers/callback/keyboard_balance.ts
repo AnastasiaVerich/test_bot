@@ -53,14 +53,15 @@ export async function handleBalance(
             return ctx.reply(MESSAGES.USER_ID_UNDEFINED);
         }
 
-        const message = `💰 \*${MESSAGES.BALANCE}\*: ${balance.balance} TON\n\n` +
-            `📜 \*${MESSAGES.BALANCE_HISTORY}\*\n${logs_show}\n\n` +
-            `🕒 \*${MESSAGES.BALANCE_PENDING}\*\n${pendingPayment_show}`
+        const message = `💰 *${MESSAGES.BALANCE}*: ${balance.balance} TON\n\n` +
+            `📜 *${MESSAGES.BALANCE_HISTORY}*\n${logs_show}\n\n` +
+            `🕒 *${MESSAGES.BALANCE_PENDING}*\n${pendingPayment_show}`
         if (Number(balance.balance) === 0) {
-            return ctx.reply(message);
+            return ctx.reply(message, { parse_mode: 'Markdown' });
         } else {
             return ctx.reply(message,
                 {
+                    parse_mode: 'Markdown',
                     reply_markup: new InlineKeyboard().text(
                         BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButtonText,
                         BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButton,
