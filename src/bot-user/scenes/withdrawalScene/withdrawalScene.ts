@@ -3,13 +3,9 @@ import { Keyboard } from "grammy";
 import { Message } from "grammy/types";
 import { MyContext } from "../../types/type";
 import { MESSAGES } from "../../constants/messages";
-import {
-  checkBalance,
-  updateUserBalance,
-} from "../../../database/queries/balanceQueries";
 import { WITHDRAWAL_SCENE } from "../../constants/scenes";
-import { EmptyKeyboard } from "../../../bot-user/keyboards/EmptyKeyboard";
-import { AuthUserKeyboard } from "../../../bot-user/keyboards/AuthUserKeyboard";
+import { EmptyKeyboard } from "../../keyboards/EmptyKeyboard";
+import { AuthUserKeyboard } from "../../keyboards/AuthUserKeyboard";
 import { BUTTONS_KEYBOARD } from "../../constants/button";
 import {
   addPendingPayment,
@@ -17,9 +13,7 @@ import {
 } from "../../../database/queries/pendingPaymentsQueries";
 import logger from "../../../lib/logger";
 import { getUserId } from "../../utils/getUserId";
-
-//'UQClrpElCar-II5uBTIWjY5dBjYcbenGc3DhKDKjr4p-Skhm'; // Адрес получателя( Я я кошелек)
-// const amountTON = 0.05; // Количество TON для отправки
+import {checkBalance, updateMinusUserBalance} from "../../../database/queries/userQueries";
 
 export async function withdrawalScene(
   conversation: Conversation<MyContext>,
@@ -37,11 +31,14 @@ export async function withdrawalScene(
 
     // Проверка баланса пользователя
     const balance = await checkBalance(userId);
+
     if (!balance) {
       return ctx.reply(MESSAGES.USER_ID_UNDEFINED);
     }
 
-    const userBalance = balance?.balance ?? 0;
+
+
+    const userBalance = Number((balance / 250).toFixed(2))
     if (Number(userBalance) === 0) {
       return ctx.reply(WITHDRAWAL_SCENE.INVALID_BALANCE);
     }
@@ -103,7 +100,7 @@ export async function withdrawalScene(
     if (confirmation === BUTTONS_KEYBOARD.ConfirmButton) {
       // Добавляем платеж в список ожидающих
       await addPendingPayment(userId, amountTON, recipientAddress);
-      await updateUserBalance(userId,amountTON );
+      await updateMinusUserBalance(userId,amountTON );
 
       logger.info(
         `Пользователь ${userId} инициировал вывод ${amountTON} TON на адрес ${recipientAddress}`,

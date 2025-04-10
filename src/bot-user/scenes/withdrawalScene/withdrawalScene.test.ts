@@ -5,18 +5,15 @@ import {
   findPendingPaymentByUserId,
 } from "../../../database/queries/pendingPaymentsQueries";
 import { WITHDRAWAL_SCENE } from "../../constants/scenes";
-import {
-  checkBalance,
-  updateUserBalance,
-} from "../../../database/queries/balanceQueries";
+
 import { MESSAGES } from "../../constants/messages";
 import { AuthUserKeyboard } from "../../../bot-user/keyboards/AuthUserKeyboard";
 import { BUTTONS_KEYBOARD } from "../../constants/button";
 import logger from "../../../lib/logger";
+import {checkBalance, updateMinusUserBalance} from "../../../database/queries/userQueries";
 
 jest.mock("../../utils/getUserId");
 jest.mock("../../../database/queries/pendingPaymentsQueries");
-jest.mock("../../../database/queries/balanceQueries");
 jest.mock("../../../lib/logger");
 
 const mockConversation = {
@@ -126,7 +123,7 @@ describe("withdrawalScene", () => {
     await withdrawalScene(mockConversation, mockCtx);
 
     expect(addPendingPayment).toHaveBeenCalledWith(123, 50, "valid-address");
-    expect(updateUserBalance).toHaveBeenCalledWith(50, 123);
+    expect(updateMinusUserBalance).toHaveBeenCalledWith(50, 123);
     expect(mockCtx.reply).toHaveBeenCalledWith(WITHDRAWAL_SCENE.SUCCESS, {
       reply_markup: AuthUserKeyboard(),
     });
@@ -148,7 +145,7 @@ describe("withdrawalScene", () => {
     await withdrawalScene(mockConversation, mockCtx);
 
     expect(addPendingPayment).not.toHaveBeenCalled();
-    expect(updateUserBalance).not.toHaveBeenCalled();
+    expect(updateMinusUserBalance).not.toHaveBeenCalled();
     expect(mockCtx.reply).toHaveBeenCalledWith(WITHDRAWAL_SCENE.CANCELLED, {
       reply_markup: AuthUserKeyboard(),
     });

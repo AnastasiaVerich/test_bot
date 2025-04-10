@@ -7,6 +7,7 @@ interface WithdrawalLog {
   user_id: number;
   amount: number;
   wallet: string;
+
   withdrawn_at: string;
 }
 

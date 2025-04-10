@@ -10,6 +10,15 @@ export const BUTTONS_CALLBACK_QUERIES = {
 
   WithdrawalOfMoneyButton: "WITHDRAWAL_OF_MONEY",
   WithdrawalOfMoneyButtonText: "Вывод средств",
+
+  HistoryMoneyInputButton: "HISTORY_MONEY_INPUT",
+  HistoryMoneyInputButtonText: "История зачисления",
+
+  HistoryWithdrawalOfMoneyButton: "HISTORY_WITHDRAWAL_OF_MONEY",
+  HistoryWithdrawalOfMoneyButtonText: "История снятия",
+
+  SourceTgWalletTonButton: "SOURCE_TG_WALLET_TON",
+  SourceTgWalletTonButtonText: "Кошелек телеграм / TON",
 };
 
 export const BUTTONS_KEYBOARD = {

@@ -28,6 +28,7 @@ export async function regionState(
     });
     return null;
   }
+
   const region = await findRegionByLocation(location);
 
   if (!region) {

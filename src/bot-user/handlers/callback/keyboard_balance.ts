@@ -1,7 +1,6 @@
 import {InlineKeyboard} from "grammy";
 import {Message} from "grammy/types";
 import {MyContext} from "../../types/type";
-import {checkBalance} from "../../../database/queries/balanceQueries";
 import {BUTTONS_CALLBACK_QUERIES} from "../../constants/button";
 import {MESSAGES} from "../../constants/messages";
 import {selectWithdrawalLogByUserId} from "../../../database/queries/withdrawalLogsQueries";
@@ -9,6 +8,7 @@ import {formatTimestamp} from "../../../lib/date";
 import logger from "../../../lib/logger";
 import {getUserId} from "../../utils/getUserId";
 import {findPendingPaymentByUserId} from "../../../database/queries/pendingPaymentsQueries";
+import {checkBalance} from "../../../database/queries/userQueries";
 
 export async function handleBalance(
     ctx: MyContext,
@@ -20,22 +20,12 @@ export async function handleBalance(
         if (!userId) return;
 
         const balance = await checkBalance(userId);
-        const logs = await selectWithdrawalLogByUserId(userId);
+        if (!balance) {
+            return ctx.reply(MESSAGES.USER_ID_UNDEFINED);
+        }
+        const balanceTon = Number((balance / 250).toFixed(2))
         const pendingPayment = await findPendingPaymentByUserId(userId);
 
-        logger.info(logs)
-        logger.info(pendingPayment)
-        // Форматируем завершенные платежи
-        const logs_show = logs.length > 0
-            ? logs
-                .slice(0, 5) // Ограничиваем до 5 последних операций
-                .map((e) => {
-                    const amount = e.amount
-                    const wallet = e.wallet.length > 12 ? `${e.wallet.slice(0, 6)}...${e.wallet.slice(-6)}` : e.wallet; // Сокращаем длинный кошелек
-                    return `💸 *${amount} TON* — ${formatTimestamp(Number(e.withdrawn_at))} — ${wallet}`;
-                })
-                .join('\n')
-            : 'Нет завершенных платежей';
 
         // Форматируем ожидающие платежи
         const pendingPayment_show = pendingPayment.length > 0
@@ -43,29 +33,39 @@ export async function handleBalance(
                 .map((e) => {
                     const amount = e.amount
                     const address = e.address.length > 12 ? `${e.address.slice(0, 6)}...${e.address.slice(-6)}` : e.address;
-                    return `⏳ *${amount} TON* — ${address}`;
+                    return `⏳ *${amount} РУБ* — ${address}`;
                 })
                 .join('\n')
             : 'Нет ожидающих платежей';
 
 
-        if (!balance) {
-            return ctx.reply(MESSAGES.USER_ID_UNDEFINED);
-        }
 
-        const message = `💰 *${MESSAGES.BALANCE}*: ${balance.balance} TON\n\n` +
-            `📜 *${MESSAGES.BALANCE_HISTORY}*\n${logs_show}\n\n` +
+
+
+        const message = `💰 *${MESSAGES.BALANCE}*:\n ${balance} Руб или ${balanceTon} TON\n\n` +
             `🕒 *${MESSAGES.BALANCE_PENDING}*\n${pendingPayment_show}`
-        if (Number(balance.balance) === 0) {
+        if (Number(balance) === 0) {
             return ctx.reply(message, { parse_mode: 'Markdown' });
         } else {
             return ctx.reply(message,
                 {
                     parse_mode: 'Markdown',
-                    reply_markup: new InlineKeyboard().text(
+                    reply_markup: new InlineKeyboard()
+                        .text(
                         BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButtonText,
-                        BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButton,
-                    ),
+                        BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButton
+                            )
+                        .row()
+                        .text(
+                        BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButtonText,
+                        BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButton
+                            )
+                        .row()
+                        .text(
+                        BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButtonText,
+                        BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButton
+                            )
+                    ,
                 },
             );
         }

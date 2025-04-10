@@ -27,7 +27,8 @@ export const MESSAGES = {
   BALANCE: "На Вашем балансе",
   BALANCE_HISTORY: "История операций",
   BALANCE_PENDING: "Ожидающие платежи",
-  BALANCE_HISTORY_PLUS: "История пополнений",
+  BALANCE_ACCRUAL_HISTORY: "История начислений",
+  BALANCE_ACCRUAL_REFERRAL_HISTORY: "История начислений по рефералкам",
 
   YOU_NOT_AUTH:
     "Вы не авторизованы. Пожалуйста, используйте /start для регистрации.",

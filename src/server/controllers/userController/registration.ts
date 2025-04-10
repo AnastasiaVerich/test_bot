@@ -12,7 +12,6 @@ import {
   addFaceEmbedding,
   getAllFaceEmbeddings,
 } from "../../../database/queries/faceEmbeddingsQueries";
-import { addUserBalance } from "../../../database/queries/balanceQueries";
 import { addPhoto } from "../../../database/queries/photoQueries";
 import { db } from "../../../database/dbClient";
 import { RegistrationResponseText } from "../../../config/common_types";
@@ -120,9 +119,6 @@ export const registration = async (
 
       // Добавляем нового пользователя в таблицу users
       await addUser(userId, userPhone);
-
-      // Добавляем баланс
-      await addUserBalance(userId, 0.0, 0.0, 0.0);
 
       // Сохраняем эмбеддинг лица в таблице face_embeddings
       await addFaceEmbedding(userId, JSON.stringify(currentEmbedding, null, 2));

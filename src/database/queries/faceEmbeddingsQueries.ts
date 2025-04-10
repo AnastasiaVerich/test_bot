@@ -5,6 +5,7 @@ interface FaceEmbedding {
   face_embedding_id: number;
   user_id: number;
   embedding: string; // Данные в формате JSONB
+
   created_at: string; // Дата и время в ISO формате
 }
 // Функция для получения всех эмбеддингов
@@ -50,7 +51,7 @@ export const addFaceEmbedding = async (
 ): Promise<void> => {
   try {
     const query =
-      "INSERT INTO face_embeddings (user_id, embedding, created_at) VALUES ($1, $2, CURRENT_TIMESTAMP)";
+      "INSERT INTO face_embeddings (user_id, embedding) VALUES ($1, $2)";
     await db.query(query, [userId, JSON.stringify(embedding)]);
   } catch (error) {
     let shortError = "";

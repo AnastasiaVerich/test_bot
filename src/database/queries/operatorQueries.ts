@@ -1,44 +1,22 @@
 import { QueryResult } from "pg";
 import { db } from "../dbClient";
 
-type OperatorStatus = "free" | "busy";
-
 export interface Operator {
   operator_id: number;
   tg_account: string;
   phone: string;
-  status: OperatorStatus;
+
   created_at: string; // Дата и время в ISO формате
 }
 
-// Функция для получения всех операторов по региону и статусу
-export const getOperatorsByRegionAndStatus = async (
-  regionId: number,
-  status: OperatorStatus,
-): Promise<Operator[]> => {
-  try {
-    const query = `
-          SELECT *
-            FROM operators o
-            JOIN operators_regions orr ON o.operator_id = orr.operator_id
-            WHERE orr.region_id = $1 AND o.status = $2;
-        `;
-    const result: QueryResult<Operator> = await db.query(query, [
-      regionId,
-      status,
-    ]);
+export interface OperatorRegions {
+  operator_region_id: number;
+  operator_id: number;
+  region_id: number;
 
-    return result.rows;
-  } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error getOperatorByRegionAndStatus: " + shortError);
-  }
-};
+  created_at: string; // Дата и время в ISO формате
+}
+
 export const findOperatorByTelegramId = async (
   operator_id: number | null,
   phone: string | null,
@@ -73,24 +51,4 @@ export const findOperatorByTelegramId = async (
     throw new Error("Error findOperatorByTelegramId: " + shortError);
   }
 };
-export const updateOperatorStatus = async (
-  operatorId: number,
-  status: OperatorStatus,
-): Promise<void> => {
-  try {
-    const query = `
-        UPDATE operators
-        SET status = $1
-        WHERE operator_id = $2;
-    `;
-    await db.query(query, [status, operatorId]);
-  } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error findOperatorByTelegramId: " + shortError);
-  }
-};
+

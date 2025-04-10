@@ -4,9 +4,10 @@ import { db } from "../dbClient";
 interface BlacklistUser {
   blacklist_id: number;
   account_id: number | null; // ID аккаунта пользователя, если есть
-  phone: string; // Номер телефона
-  reason: string; // Причина блокировки
-  added_at: string; // Дата добавления в блок-лист
+  phone: string | null; // Номер телефона
+  reason: string | null; // Причина блокировки
+
+  created_at: string; // Дата добавления в блок-лист
 }
 
 export async function checkExistInBlockUser(

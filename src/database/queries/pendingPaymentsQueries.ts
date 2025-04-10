@@ -7,7 +7,8 @@ export type PendingPayment = {
   amount: number; // Сумма платежа
   attempts: number; // Количество попыток проведения платежа
   address: string; // Адрес для платежа
-  createdAt: string; // Дата создания записи
+
+  created_at: string; // Дата создания записи
 };
 
 export async function getAllPendingPayment(): Promise<PendingPayment[]> {
@@ -32,7 +33,7 @@ export async function addPendingPayment(
 ): Promise<void> {
   try {
     const query =
-      "INSERT INTO pending_payments (user_id, amount, address, created_at) VALUES ($1, $2, $3, CURRENT_TIMESTAMP)";
+      "INSERT INTO pending_payments (user_id, amount, address,attempts, created_at) VALUES ($1, $2, $3,0, CURRENT_TIMESTAMP)";
     await db.query(query, [userId, amount, address]);
   } catch (error) {
     let shortError = "";

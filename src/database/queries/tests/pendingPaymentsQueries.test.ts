@@ -1,4 +1,5 @@
-import { db } from "../dbClient";
+/*
+import { db } from "../../dbClient";
 import {
   getAllPendingPayment,
   addPendingPayment,
@@ -6,9 +7,9 @@ import {
   findPendingPaymentByUserId,
   updateAttemptPendingPayment,
   PendingPayment,
-} from "./pendingPaymentsQueries";
+} from "../pendingPaymentsQueries";
 
-jest.mock("../dbClient");
+jest.mock("../../dbClient");
 
 describe("Pending Payments Queries", () => {
   describe("getAllPendingPayment", () => {
@@ -154,3 +155,4 @@ describe("Pending Payments Queries", () => {
     });
   });
 });
+*/

@@ -2,9 +2,13 @@ import { QueryResult } from "pg";
 import { db } from "../dbClient";
 
 interface ReferralBotStart {
-  tg_user_id: number;
-  referral_creator_id: number;
-  created_at: string; // Дата и время в ISO формате
+  referred_user_id: number;
+  referrer_id: number;
+  amount:number;
+  status:'pending' | 'completed';
+
+  completed_at:string;
+  created_at:string;
 }
 
 export async function addReferral(
@@ -17,9 +21,9 @@ export async function addReferral(
   }
 
   try {
-    const query = `INSERT INTO referral_bot_starts (tg_user_id, referral_creator_id) 
+    const query = `INSERT INTO referral_bonuses (referred_user_id, referrer_id) 
                     VALUES ($1, $2)
-                    ON CONFLICT (tg_user_id) DO NOTHING
+                    ON CONFLICT (referred_user_id) DO NOTHING
                     RETURNING *`;
 
     const result: QueryResult<ReferralBotStart> = await db.query(query, [
@@ -37,3 +41,64 @@ export async function addReferral(
     throw new Error("Error addReferral: " + shortError);
   }
 }
+
+// Зачисляет сумму за реферал на счет и сюда в историю
+export const completeReferralBonus = async (
+    referredUserId: number,
+    bonusAmount: number
+): Promise<void> => {
+  try {
+    const query = `
+      WITH updated_bonus AS (
+        UPDATE referral_bonuses
+        SET status = 'completed',
+            amount = $2,
+            completed_at = NOW()
+        WHERE referred_user_id = $1
+        AND status = 'pending'
+        RETURNING referrer_id, amount
+      )
+      UPDATE users
+      SET balance = balance + ub.amount
+      FROM updated_bonus ub
+      WHERE users.user_id = ub.referrer_id;
+    `;
+
+    await db.query(query, [referredUserId, bonusAmount]);
+  } catch (error) {
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error completeReferralBonus: " + shortError);
+  }
+};
+
+
+export const getReferralAccrualHistory = async (userId: number): Promise<any[]> => {
+  try {
+    const query = `
+      SELECT 
+        completed_at AS accrual_date,
+        amount AS amount,
+        referred_user_id AS referred_user_id
+      FROM referral_bonuses
+      WHERE referrer_id = $1
+      AND status = 'completed'
+      ORDER BY completed_at DESC;
+    `;
+    const result = await db.query(query, [userId]);
+    return result.rows;
+  } catch (error) {
+    console.log(error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error getReferralAccrualHistory: " + shortError);
+  }
+};

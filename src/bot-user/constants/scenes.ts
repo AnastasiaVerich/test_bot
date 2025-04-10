@@ -1,7 +1,7 @@
 export const INVITE_SCENE = {
   INVITE_FRIENDS:
     "Пригласи друга и получи 100 рублей за пройденный им первый опрос\n\nТвоя ссылка:\n",
-  INVITE_MESSAGE: "Проходи опросы и получай по 100 рублей за каждый",
+  INVITE_MESSAGE: "Проходи опросы и получай от 50 рублей за каждый",
 };
 
 export const IDENTIFICATION_SCENE = {
@@ -44,6 +44,7 @@ export const SURVEY_SCENE = {
 };
 
 export const WITHDRAWAL_SCENE = {
+  SELECT_SOURCE: "Выберите, как хотите вывести деньги",
   INPUT_AMOUNT: "Введите сумму для снятия",
   INVALID_BALANCE: "У вас нулевой баланс.",
   HAS_PENDING_PAYMENT: "Вы уже поставили средства на вывод.",

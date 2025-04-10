@@ -1,14 +1,13 @@
-import { MyContext } from "../../types/type";
-import { checkBalance } from "../../../database/queries/balanceQueries";
-import { selectWithdrawalLogByUserId } from "../../../database/queries/withdrawalLogsQueries";
-import { getUserId } from "../../utils/getUserId";
-import { MESSAGES } from "../../constants/messages";
-import { handleBalance } from "./keyboard_balance";
-import { BUTTONS_CALLBACK_QUERIES } from "../../constants/button";
+import { MyContext } from "../../../types/type";
+import { selectWithdrawalLogByUserId } from "../../../../database/queries/withdrawalLogsQueries";
+import { getUserId } from "../../../utils/getUserId";
+import { MESSAGES } from "../../../constants/messages";
+import { handleBalance } from "../keyboard_balance";
+import { BUTTONS_CALLBACK_QUERIES } from "../../../constants/button";
+import {checkBalance} from "../../../../database/queries/userQueries";
 
-jest.mock("../../../database/queries/balanceQueries");
-jest.mock("../../../database/queries/withdrawalLogsQueries");
-jest.mock("../../utils/getUserId");
+jest.mock("../../../../database/queries/withdrawalLogsQueries");
+jest.mock("../../../utils/getUserId");
 
 describe("Test handleBalance", () => {
   let ctx: Partial<MyContext>;

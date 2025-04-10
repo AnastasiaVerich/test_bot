@@ -2,7 +2,7 @@ import { Conversation } from "@grammyjs/conversations";
 import { Message } from "grammy/types";
 import { MyContext } from "../../types/type";
 
-import { AuthUserKeyboard } from "../../../bot-user/keyboards/AuthUserKeyboard";
+import { AuthUserKeyboard } from "../../keyboards/AuthUserKeyboard";
 import { SURVEY_SCENE } from "../../constants/scenes";
 import { MESSAGES } from "../../constants/messages";
 import logger from "../../../lib/logger";
@@ -38,22 +38,22 @@ export async function surveyScene(
 
     // Шаг 2: Ожидаем локацию
     const region = await regionState(conversation, ctx);
-    if (!region) return;
+    //if (!region) return;
+
 
     // Шаг 3:  Ищем опрос
-    const survey = await searchSurveyStep(ctx, userId, region);
+    const survey = {survey_id:1}//await searchSurveyStep(ctx, userId, region);
     if (!survey) return;
-
     // Шаг 4:  Ищем свободного оператора
-    const operator = await searchOperatorStep(ctx, region);
+    const operator =  {operator_id:1}//await searchOperatorStep(ctx, region);
     if (!operator) return;
 
     //Шаг 5: меняем статус пользователю, оператору и запросу.
-    const isSuccess = await reservationStep(userId, operator, survey, region);
+    const isSuccess = await reservationStep(userId, operator.operator_id, survey.survey_id);
 
     if (isSuccess) {
       return ctx.reply(
-        `Оператор @${operator.tg_account} ${SURVEY_SCENE.SUCCESS}`,
+        `Оператор @${'andrei_s086'} ${SURVEY_SCENE.SUCCESS}`,
         { reply_markup: AuthUserKeyboard() },
       );
     } else {

@@ -1,2 +1,17 @@
-{"level":"error","message":"Error in withdrawalScene: Error updateUserBalance: столбец \"userid\" не сущес","timestamp":"2025-04-08T10:16:59.832Z"}
-{"level":"error","message":"Error in withdrawalScene: Error updateUserBalance: столбец \"userid\" не сущес","timestamp":"2025-04-08T10:18:11.089Z"}
+{"level":"error","message":"Call to 'getUpdates' failed! (409: Conflict: termi","timestamp":"2025-04-10T08:12:18.687Z"}
+{"level":"error","timestamp":"2025-04-10T08:26:20.720Z"}
+{"level":"error","timestamp":"2025-04-10T08:27:49.628Z"}
+{"level":"error","timestamp":"2025-04-10T08:29:37.479Z"}
+{"level":"error","timestamp":"2025-04-10T08:31:23.364Z"}
+{"level":"error","timestamp":"2025-04-10T08:32:02.795Z"}
+{"level":"error","timestamp":"2025-04-10T08:33:11.865Z"}
+{"level":"error","timestamp":"2025-04-10T08:34:23.195Z"}
+{"level":"error","message":"Call to 'getUpdates' failed! (409: Conflict: termi","timestamp":"2025-04-10T08:42:19.713Z"}
+{"level":"error","timestamp":"2025-04-10T08:47:25.475Z"}
+{"level":"error","message":"Error in surveyScene: Error addSurveyInActive: в подготовленный оператор","timestamp":"2025-04-10T08:50:56.030Z"}
+{"level":"error","timestamp":"2025-04-10T08:53:36.904Z"}
+{"level":"error","message":"Call to 'getUpdates' failed! (409: Conflict: termi","timestamp":"2025-04-10T09:12:20.294Z"}
+{"level":"error","message":"Call to 'getUpdates' failed! (409: Conflict: termi","timestamp":"2025-04-10T09:42:20.969Z"}
+{"level":"error","message":"Call to 'getUpdates' failed! (409: Conflict: termi","timestamp":"2025-04-10T10:12:21.355Z"}
+{"level":"error","message":"Call to 'getUpdates' failed! (409: Conflict: termi","timestamp":"2025-04-10T10:42:22.066Z"}
+{"level":"error","message":"Call to 'getUpdates' failed! (409: Conflict: termi","timestamp":"2025-04-10T11:24:58.178Z"}
