@@ -46,7 +46,6 @@ export async function addWithdrawalLog(
       "INSERT INTO withdrawal_logs (user_id, amount, wallet, withdrawn_at) VALUES ($1, $2, $3, CURRENT_TIMESTAMP)";
     await db.query(query, [userId, amount, wallet]);
   } catch (error) {
-    logger.info(error)
     let shortError = "";
     if (error instanceof Error) {
       shortError = error.message.substring(0, 50);

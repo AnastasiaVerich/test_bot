@@ -10,7 +10,6 @@ import logger from "../lib/logger";
 import {addWithdrawalLog} from "../database/queries/withdrawalLogsQueries";
 
 export async function executePendingPayments(): Promise<void> {
-  logger.info("Запуск задачи проверки ожидающих платежей");
   let pass = false;
   try {
     const pendingPayments = await getAllPendingPayment();
