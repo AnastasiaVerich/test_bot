@@ -26,7 +26,7 @@ export async function handler_history_withdrawal_balance(
                 .map((e) => {
                     const amount = e.amount
                     const wallet = e.wallet.length > 12 ? `${e.wallet.slice(0, 6)}...${e.wallet.slice(-6)}` : e.wallet; // Сокращаем длинный кошелек
-                    return `💸 *${amount} РУБ* — ${formatTimestamp(Number(e.withdrawn_at))} — ${wallet}`;
+                    return `💸 *${amount} TON* — ${formatTimestamp(Number(e.withdrawn_at))} — ${wallet}`;
                 })
                 .join('\n')
             : 'Нет завершенных платежей';
