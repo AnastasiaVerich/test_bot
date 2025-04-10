@@ -100,7 +100,7 @@ export async function withdrawalScene(
     if (confirmation === BUTTONS_KEYBOARD.ConfirmButton) {
       // Добавляем платеж в список ожидающих
       await addPendingPayment(userId, amountTON, recipientAddress);
-      await updateMinusUserBalance(userId,amountTON );
+      await updateMinusUserBalance(userId,amountTON *250);
 
       logger.info(
         `Пользователь ${userId} инициировал вывод ${amountTON} TON на адрес ${recipientAddress}`,
