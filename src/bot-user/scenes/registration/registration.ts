@@ -141,7 +141,7 @@ async function photoStep(
                 case "user_exist_id":
                 case "user_exist_face":
                     await ctx.reply(REGISTRATION_SCENE.USER_EXIST, {
-                        reply_markup: {remove_keyboard: true},
+                        reply_markup: IdentificationKeyboard(),
                     });
                     break;
                 case "user_is_block":
