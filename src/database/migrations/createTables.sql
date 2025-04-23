@@ -219,6 +219,13 @@ GRANT ALL PRIVILEGES ON TABLE referral_bonuses TO admin_vadim;
 
 CREATE TABLE sessions (
     key VARCHAR(255) PRIMARY KEY,
-    data JSONB NOT NULL
+    value TEXT
 );
 GRANT ALL PRIVILEGES ON TABLE sessions TO admin_vadim;
+
+GRANT USAGE ON SCHEMA public TO admin_vadim;
+GRANT CREATE ON SCHEMA public TO admin_vadim;
+ALTER TABLE sessions OWNER TO admin_vadim;
+
+
+GRANT ALL ON TABLE sessions TO admin_vadim;
