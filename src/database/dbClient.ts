@@ -1,4 +1,4 @@
-import { Pool } from "pg";
+import {Client, Pool} from "pg";
 import {
   DB_DATABASE,
   DB_HOST,
@@ -8,6 +8,7 @@ import {
 } from "../config/env";
 import logger from "../lib/logger";
 
+
 export const db = new Pool({
   user: DB_USER,
   host: DB_HOST,
@@ -15,6 +16,15 @@ export const db = new Pool({
   password: DB_PASSWORD,
   port: Number(DB_PORT),
 });
+export const client = new Client({
+  user: DB_USER,
+  host: DB_HOST,
+  database: DB_DATABASE,
+  password: DB_PASSWORD,
+  port: Number(DB_PORT),
+});
+
+
 
 db.on("connect", () => {
   //logger.info("Подключение к базе данных установлено");

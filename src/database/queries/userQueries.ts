@@ -15,6 +15,7 @@ export interface User {
 export async function findUserByTelegramId(
   telegramId: number,
 ): Promise<User | undefined> {
+  console.log('start find user')
   if (typeof telegramId !== "number") {
     throw new Error("Invalid type provided");
   }

@@ -1,66 +1,173 @@
-import { Conversation } from "@grammyjs/conversations";
-import { MyContext } from "../../types/type";
-import { AuthUserKeyboard } from "../../../bot-user/keyboards/AuthUserKeyboard";
-import { REGISTRATION_SCENE } from "../../constants/scenes";
-import { MESSAGES } from "../../constants/messages";
+import {Conversation} from "@grammyjs/conversations";
 import logger from "../../../lib/logger";
-import { getUserId } from "../../utils/getUserId";
-import { numberStep } from "./steps/numberStep";
-import { photoFinishStep } from "./steps/photoFinishStep";
+import {getUserId} from "../../utils/getUserId";
+import {MyContext, MyConversation, MyConversationContext} from "../../types/type";
+import {findUserByTelegramId} from "../../../database/queries/userQueries";
+import {REGISTRATION_SCENE} from "./text";
+import {
+    AuthUserKeyboard,
+    IdentificationKeyboard,
+    RegistrationKeyboard,
+    sendUserPhone,
+    WebAppKeyboard
+} from "../../keyboards/inline";
+
 
 export async function registrationScene(
-  conversation: Conversation<MyContext>,
-  ctx: MyContext,
-): Promise<void> {
-  try {
-    const userId = await getUserId(ctx);
-    if (!userId) return;
+    conversation: MyConversation,
+    ctx: MyConversationContext,
+) {
+    try {
+        const userId = await conversation.external(() => getUserId(ctx));
+        if (!userId) return
 
-    // Шаг 1: Ожидаем номер телефона
-    const userPhone = await numberStep(conversation, ctx);
-
-    // Шаг 2: Проверяем фото пользователя
-    let response_text = await photoFinishStep(
-      conversation,
-      ctx,
-      userPhone,
-      userId,
-    );
-
-
-    switch (response_text) {
-      case "user_exist_number":
-      case "user_exist_id":
-      case "user_exist_face":
-        {
-          await ctx.reply(REGISTRATION_SCENE.USER_EXIST);
+        const user = await conversation.external(() => findUserByTelegramId(userId));
+        if (user) {
+            await ctx.reply(REGISTRATION_SCENE.USER_EXIST, {
+                reply_markup: IdentificationKeyboard(),
+            });
+            return;
         }
-        break;
-      case "user_is_block":
-        {
-          await ctx.reply(REGISTRATION_SCENE.USER_IN_BLOCK);
+
+        const userPhone = await phoneStep(conversation, ctx, userId);
+        if (userPhone === null) {
+            await ctx.reply(REGISTRATION_SCENE.SOME_ERROR, {
+                reply_markup: RegistrationKeyboard(),
+            });
+            return;
         }
-        break;
-      case "success":
-        {
-          await ctx.reply(REGISTRATION_SCENE.SUCCESS, {
-            reply_markup: AuthUserKeyboard(),
-          });
+
+        const response = await photoStep(conversation, ctx, userId, userPhone);
+
+        if (!response) {
+            await ctx.reply(REGISTRATION_SCENE.SOME_ERROR, {
+                reply_markup: RegistrationKeyboard(),
+            });
         }
-        break;
-      default: {
-        await ctx.reply(REGISTRATION_SCENE.FAILED);
-      }
+        // Сбрасываем сессию
+        await conversation.external((ctx) => {
+            delete ctx.session.register.phoneNumber;
+        });
+
+        return
+
+    } catch (error) {
+        let shortError = error instanceof Error ? error.message.substring(0, 50) : String(error).substring(0, 50);
+        logger.error("Error in registrationScene: " + shortError);
+        await ctx.reply(REGISTRATION_SCENE.SOME_ERROR, {
+            reply_markup: RegistrationKeyboard(),
+        });
     }
-    return;
-  } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
+}
+
+async function phoneStep(
+    conversation: Conversation<MyContext, MyConversationContext>,
+    ctx: MyConversationContext,
+    userId: number
+) {
+
+    try {
+        await ctx.reply(REGISTRATION_SCENE.ENTER_PHONE, {
+            parse_mode: "HTML",
+            reply_markup: sendUserPhone(),
+        });
+
+        let phoneNumber: any = null
+        //Два выхода из цикла — контакт юзера получен либо произошла ошибка(скорее всего на стороне тг)
+        while (true) {
+            const response = await conversation.waitFor("message:contact", {
+                otherwise: (ctx) => ctx.reply(REGISTRATION_SCENE.ENTER_PHONE_OTHERWISE, {
+                    parse_mode: "HTML",
+                    reply_markup: sendUserPhone(),
+                }),
+            });
+
+            if (!response.message?.contact) break
+
+            const contact = response.message.contact;
+            const contactUserId = contact.user_id;
+
+            if (contactUserId !== userId) {
+                await ctx.reply(REGISTRATION_SCENE.ENTERED_NOT_USER_PHONE, {
+                    parse_mode: "HTML",
+                    reply_markup: sendUserPhone(),
+                });
+                continue
+            }
+            phoneNumber = contact.phone_number;
+            break
+        }
+
+        if (!phoneNumber) return
+
+        await ctx.reply(`${REGISTRATION_SCENE.ENTERED_USER_PHONE} ${phoneNumber}`, {
+            reply_markup: {remove_keyboard: true},
+        });
+
+        await conversation.external((ctx) => {
+            ctx.session.register.phoneNumber = phoneNumber;
+        });
+
+        return phoneNumber;
+    } catch (error) {
+        return null;
     }
-    logger.error("Error in registrationScene: " + shortError);
-    await ctx.reply(MESSAGES.SOME_ERROR);
-  }
+}
+
+async function photoStep(
+    conversation: Conversation<MyContext, MyConversationContext>,
+    ctx: MyConversationContext,
+    userId: number,
+    userPhone: any
+) {
+    try {
+        let result = null
+
+        await ctx.reply(REGISTRATION_SCENE.VERIFY_BY_PHOTO, {
+            reply_markup: WebAppKeyboard(userId, userPhone, "registration", "0"),
+        });
+
+        const message_web_app_data = await conversation.waitFor("message:web_app_data", {
+            otherwise: (ctx) => ctx.reply(REGISTRATION_SCENE.VERIFY_BY_PHOTO_OTHERWISE, {
+                reply_markup: WebAppKeyboard(userId, userPhone, "registration", "0"),
+            }),
+        });
+
+        if (message_web_app_data.message?.web_app_data) {
+            const data = JSON.parse(message_web_app_data.message.web_app_data.data);
+            result = data.text
+            switch (result) {
+                case "user_exist_number":
+                case "user_exist_id":
+                case "user_exist_face":
+                    await ctx.reply(REGISTRATION_SCENE.USER_EXIST, {
+                        reply_markup: {remove_keyboard: true},
+                    });
+                    break;
+                case "user_is_block":
+                    await ctx.reply(REGISTRATION_SCENE.USER_IN_BLOCK, {
+                        reply_markup: {remove_keyboard: true},
+                    });
+                    break;
+                case "success":
+                    await ctx.reply(REGISTRATION_SCENE.SUCCESS, {
+                        reply_markup: AuthUserKeyboard(),
+                    });
+                    break;
+                default:
+                    result = null
+                    await ctx.reply(REGISTRATION_SCENE.SOME_ERROR, {
+                        reply_markup: RegistrationKeyboard(),
+                    });
+            }
+        }
+
+        return result;
+    } catch (error) {
+        console.log("photoFinishStep: Ошибка:", error);
+        await conversation.external((ctx) => {
+            delete ctx.session.register.phoneNumber;
+        });
+        return null;
+    }
 }

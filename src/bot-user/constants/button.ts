@@ -19,6 +19,9 @@ export const BUTTONS_CALLBACK_QUERIES = {
 
   SourceTgWalletTonButton: "SOURCE_TG_WALLET_TON",
   SourceTgWalletTonButtonText: "Кошелек телеграм / TON",
+
+  SendNumberButton: "SEND_NUMBER_BUTTON",
+  SendNumberButtonText: "Отправить номер",
 };
 
 export const BUTTONS_KEYBOARD = {
@@ -30,7 +33,7 @@ export const BUTTONS_KEYBOARD = {
 
   GeolocationButton: "Геолокация",
 
-  SendNumberButton: "Отправить номер",
+
 
   OpenAppButton: "Пройти фотоконтроль",
 

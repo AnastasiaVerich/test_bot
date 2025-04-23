@@ -1,13 +1,13 @@
-import { getUserId } from "../utils/getUserId";
-import { MESSAGES } from "../constants/messages";
-import logger from "../../lib/logger";
-import { MyContext } from "../types/type";
-import { userInBlacklist } from "../utils/userInBlacklist";
-import { blacklistMiddleware } from "./blacklistMiddleware";
+import { getUserId } from "../../utils/getUserId";
+import { MESSAGES } from "../../constants/messages";
+import logger from "../../../lib/logger";
+import { MyContext } from "../../types/type";
+import { userInBlacklist } from "../../utils/userInBlacklist";
+import { blacklistMiddleware } from "../blacklistMiddleware";
 
-jest.mock("../utils/userInBlacklist");
-jest.mock("../utils/getUserId");
-jest.mock("../../lib/logger");
+jest.mock("../../utils/userInBlacklist");
+jest.mock("../../utils/getUserId");
+jest.mock("../../../lib/logger");
 
 describe("Test blacklistMiddleware", () => {
   let ctx: Partial<MyContext>;

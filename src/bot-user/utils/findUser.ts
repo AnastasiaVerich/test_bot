@@ -1,10 +1,10 @@
 import { MESSAGES } from "../constants/messages";
-import { MyContext } from "../types/type";
+import {MyContext, MyConversationContext} from "../types/type";
 import { findUserByTelegramId, User } from "../../database/queries/userQueries";
 
 export const findUser = async (
   userId: number,
-  ctx: MyContext,
+  ctx: MyContext | MyConversationContext,
 ): Promise<User | undefined> => {
   const user = await findUserByTelegramId(userId);
 

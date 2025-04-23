@@ -1,7 +1,7 @@
 import { MESSAGES } from "../constants/messages";
-import { MyContext } from "../types/type";
+import {MyContext, MyConversationContext} from "../types/type";
 
-export const getUserId = async (ctx: MyContext): Promise<number | null> => {
+export const getUserId = async (ctx: MyContext | MyConversationContext): Promise<number | null> => {
   const userId = await returnUserId(ctx);
   if (!userId) {
     await ctx.reply(MESSAGES.USER_ID_UNDEFINED);
@@ -10,6 +10,6 @@ export const getUserId = async (ctx: MyContext): Promise<number | null> => {
   return userId;
 };
 
-export const returnUserId = async (ctx: MyContext): Promise<number | null> => {
+export const returnUserId = async (ctx: MyContext | MyConversationContext): Promise<number | null> => {
   return ctx?.from?.id ?? null;
 };

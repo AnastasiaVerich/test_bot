@@ -5,11 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start:bot-user": "ts-node src/bot-user/index.ts",
-
     "start:server": "ts-node src/server/index.ts",
-
     "start:scheduler": "ts-node src/jobs/index.ts",
-
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "jest"
@@ -17,7 +14,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@grammyjs/conversations": "^1.2.0",
+    "@grammyjs/conversations": "^2.0.1",
+    "@grammyjs/storage-psql": "^2.5.1",
     "@tensorflow/tfjs-node": "^4.22.0",
     "@ton/core": "^0.59.1",
     "@ton/crypto": "^3.3.0",
@@ -32,11 +30,11 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
-    "grammy": "^1.11.2",
+    "grammy": "^1.35.1",
     "multer": "^1.4.5-lts.1",
     "node-cache": "^5.1.2",
     "node-schedule": "^2.1.1",
-    "pg": "^8.13.1",
+    "pg": "^8.14.1",
     "qrcode": "^1.5.4",
     "winston": "^3.17.0"
   },

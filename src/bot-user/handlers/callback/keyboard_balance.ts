@@ -9,6 +9,8 @@ import logger from "../../../lib/logger";
 import {getUserId} from "../../utils/getUserId";
 import {findPendingPaymentByUserId} from "../../../database/queries/pendingPaymentsQueries";
 import {checkBalance} from "../../../database/queries/userQueries";
+import {BalanceMenu} from "../../keyboards/inline";
+import {curseTon} from "../../../config/env";
 
 export async function handleBalance(
     ctx: MyContext,
@@ -23,7 +25,7 @@ export async function handleBalance(
         if (!balance) {
             return ctx.reply(MESSAGES.USER_ID_UNDEFINED);
         }
-        const balanceTon = Number((balance / 250).toFixed(2))
+        const balanceTon = Number((balance / curseTon).toFixed(2))
         const pendingPayment = await findPendingPaymentByUserId(userId);
 
 
@@ -50,21 +52,7 @@ export async function handleBalance(
             return ctx.reply(message,
                 {
                     parse_mode: 'Markdown',
-                    reply_markup: new InlineKeyboard()
-                        .text(
-                        BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButtonText,
-                        BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButton
-                            )
-                        .row()
-                        .text(
-                        BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButtonText,
-                        BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButton
-                            )
-                        .row()
-                        .text(
-                        BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButtonText,
-                        BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButton
-                            )
+                    reply_markup: BalanceMenu()
                     ,
                 },
             );

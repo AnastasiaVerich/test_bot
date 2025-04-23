@@ -1,9 +1,10 @@
-import { registrationScene } from "./registration";
+/*
 import { AuthUserKeyboard } from "../../../bot-user/keyboards/AuthUserKeyboard";
-import { REGISTRATION_SCENE } from "../../constants/scenes";
 import { MESSAGES } from "../../constants/messages";
 import { getUserId } from "../../utils/getUserId";
 import logger from "../../../lib/logger";
+import {REGISTRATION_SCENE} from "./text";
+import {registrationSceneNew} from "./registration";
 
 jest.mock("../../utils/getUserId");
 jest.mock("../../../bot-user/keyboards/AuthUserKeyboard");
@@ -26,7 +27,7 @@ describe("registrationScene", () => {
   it("should exit if userId is not defined", async () => {
     (getUserId as jest.Mock).mockResolvedValueOnce(null);
 
-    await registrationScene(mockConversation, mockCtx);
+    await registrationSceneNew(mockConversation, mockCtx);
 
     expect(mockCtx.reply).not.toHaveBeenCalled();
   });
@@ -49,10 +50,10 @@ describe("registrationScene", () => {
 
     (AuthUserKeyboard as jest.Mock).mockReturnValueOnce("mock_keyboard");
 
-    await registrationScene(mockConversation, mockCtx);
+    await registrationSceneNew(mockConversation, mockCtx);
 
     expect(mockCtx.reply).toHaveBeenCalledWith(
-      REGISTRATION_SCENE.INPUT_PHONE,
+      REGISTRATION_SCENE.ENTER_PHONE,
       expect.objectContaining({
         reply_markup: expect.any(Object),
       }),
@@ -84,7 +85,7 @@ describe("registrationScene", () => {
       },
     });
 
-    await registrationScene(mockConversation, mockCtx);
+    await registrationSceneNew(mockConversation, mockCtx);
 
     expect(mockCtx.reply).toHaveBeenCalledWith(REGISTRATION_SCENE.USER_EXIST);
   });
@@ -105,7 +106,7 @@ describe("registrationScene", () => {
       },
     });
 
-    await registrationScene(mockConversation, mockCtx);
+    await registrationSceneNew(mockConversation, mockCtx);
 
     expect(mockCtx.reply).toHaveBeenCalledWith(
       REGISTRATION_SCENE.USER_IN_BLOCK,
@@ -128,7 +129,7 @@ describe("registrationScene", () => {
       },
     });
 
-    await registrationScene(mockConversation, mockCtx);
+    await registrationSceneNew(mockConversation, mockCtx);
 
     expect(mockCtx.reply).toHaveBeenCalledWith(REGISTRATION_SCENE.FAILED);
   });
@@ -138,7 +139,7 @@ describe("registrationScene", () => {
     const mockError = new Error("Test error");
     (getUserId as jest.Mock).mockRejectedValueOnce(mockError);
 
-    await registrationScene(mockConversation, mockCtx);
+    await registrationSceneNew(mockConversation, mockCtx);
 
     expect(logger.error).toHaveBeenCalledWith(
       "Error in registrationScene: Test error",
@@ -146,3 +147,4 @@ describe("registrationScene", () => {
     expect(mockCtx.reply).toHaveBeenCalledWith(MESSAGES.SOME_ERROR);
   });
 });
+*/

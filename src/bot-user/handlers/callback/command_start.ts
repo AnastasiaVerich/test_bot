@@ -7,6 +7,7 @@ import { MESSAGES } from "../../constants/messages";
 import { BUTTONS_CALLBACK_QUERIES } from "../../constants/button";
 import { getUserId, returnUserId } from "../../utils/getUserId";
 import logger from "../../../lib/logger";
+import {IdentificationKeyboard, RegistrationKeyboard} from "../../keyboards/inline";
 
 export const handleStartCommand = async (
   ctx: MyContext,
@@ -15,7 +16,7 @@ export const handleStartCommand = async (
     // Извлекаем реферальный код, если пользователь перешёл по реферальной ссылке.
     const referral = ctx?.match ?? null;
 
-    // Получаем ID текущего пользователя Telegram, вызвавшего команду `/start`.
+    // Получаем ID текущего пользователя Telegram
     const userId = await getUserId(ctx);
     if (!userId) return;
 
@@ -24,10 +25,7 @@ export const handleStartCommand = async (
 
     if (user) {
       return ctx.reply(MESSAGES.WELCOME_OLD_USER, {
-        reply_markup: new InlineKeyboard().text(
-          BUTTONS_CALLBACK_QUERIES.IdentificationButtonText,
-          BUTTONS_CALLBACK_QUERIES.IdentificationButton,
-        ),
+        reply_markup: IdentificationKeyboard(),
       });
     } else {
       if (referral) {
@@ -37,10 +35,7 @@ export const handleStartCommand = async (
 
       return ctx.reply(MESSAGES.WELCOME_MENU_USER, {
         parse_mode: "HTML", // Указываем, что текст содержит HTML
-        reply_markup: new InlineKeyboard().text(
-          BUTTONS_CALLBACK_QUERIES.RegistrationButtonText,
-          BUTTONS_CALLBACK_QUERIES.RegistrationButton,
-        ),
+        reply_markup: RegistrationKeyboard(),
       });
     }
   } catch (error) {

@@ -215,3 +215,10 @@ CREATE TABLE referral_bonuses (
     FOREIGN KEY (referrer_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 GRANT ALL PRIVILEGES ON TABLE referral_bonuses TO admin_vadim;
+
+
+CREATE TABLE sessions (
+    key VARCHAR(255) PRIMARY KEY,
+    data JSONB NOT NULL
+);
+GRANT ALL PRIVILEGES ON TABLE sessions TO admin_vadim;

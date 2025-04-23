@@ -1,8 +1,8 @@
-import { errorMiddleware } from "./errorMiddleware";
-import { MyContext } from "../types/type";
-import logger from "../../lib/logger";
+import { errorMiddleware } from "../errorMiddleware";
+import { MyContext } from "../../types/type";
+import logger from "../../../lib/logger";
 
-jest.mock("../../lib/logger");
+jest.mock("../../../lib/logger");
 
 describe("Test errorMiddleware", () => {
   let ctx: Partial<MyContext>;

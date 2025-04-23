@@ -1,14 +1,18 @@
 import { Context, SessionFlavor } from "grammy";
-import { ConversationFlavor } from "@grammyjs/conversations";
+import {Conversation, ConversationFlavor} from "@grammyjs/conversations";
 
 // Определите форму нашей сессии.
 export interface SessionData {
-  some: number;
+  [key: string]: any; // Для хранения состояния сцен
 }
 
-export type MyContext = Context &
-  ConversationFlavor &
-  SessionFlavor<SessionData>;
+// Внутренний контекст для сцен (с сессией, без разговоров)
+export type MyConversationContext = Context & SessionFlavor<SessionData>;
+
+// Внешний контекст для middleware (с сессией и разговорами)
+export type MyContext = MyConversationContext & ConversationFlavor<MyConversationContext>;
+
+export type MyConversation = Conversation<MyContext, MyConversationContext>;
 
 export interface LocationType {
   latitude: number;
