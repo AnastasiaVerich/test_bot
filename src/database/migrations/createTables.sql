@@ -59,6 +59,14 @@ CREATE TABLE photos (
 GRANT ALL PRIVILEGES ON TABLE photos TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE photos_photo_id_seq TO admin_vadim;
 
+CREATE TABLE allowed_operators (
+    id SERIAL PRIMARY KEY,
+    tg_account BIGINT UNIQUE NOT NULL, -- ID аккаунта в Telegram
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+GRANT ALL PRIVILEGES ON TABLE allowed_operators TO admin_vadim;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE allowed_operators_id_seq TO admin_vadim;
+
 -- Таблица операторов
 CREATE TABLE operators (
     operator_id BIGINT PRIMARY KEY,
@@ -228,4 +236,9 @@ GRANT CREATE ON SCHEMA public TO admin_vadim;
 ALTER TABLE sessions OWNER TO admin_vadim;
 
 
-GRANT ALL ON TABLE sessions TO admin_vadim;
+CREATE TABLE sessions_operator (
+    key VARCHAR(255) PRIMARY KEY,
+    value TEXT
+);
+GRANT ALL PRIVILEGES ON TABLE sessions_operator TO admin_vadim;
+ALTER TABLE sessions_operator OWNER TO admin_vadim;

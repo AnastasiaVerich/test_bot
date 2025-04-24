@@ -1,15 +1,15 @@
 import {InlineKeyboard} from "grammy";
 import {Message} from "grammy/types";
-import {MyContext} from "../../types/type";
-import {BUTTONS_CALLBACK_QUERIES} from "../../constants/button";
-import {MESSAGES} from "../../constants/messages";
-import {formatTimestamp} from "../../../lib/date";
-import logger from "../../../lib/logger";
-import {getUserId} from "../../utils/getUserId";
-import {getSurveyAccrualHistory} from "../../../database/queries/surveyQueries";
-import {getReferralAccrualHistory} from "../../../database/queries/referralQueries";
+import {MyContext} from "../../../types/type";
+import {BUTTONS_CALLBACK_QUERIES} from "../../../constants/button";
+import {formatTimestamp} from "../../../../lib/date";
+import logger from "../../../../lib/logger";
+import {getUserId} from "../../../utils/getUserId";
+import {getSurveyAccrualHistory} from "../../../../database/queries/surveyQueries";
+import {getReferralAccrualHistory} from "../../../../database/queries/referralQueries";
+import {HANDLER_KEYBOARD_HISTORY_ACCRUAL} from "./text";
 
-export async function handler_history_input_balance(
+export async function handler_history_accrual(
     ctx: MyContext,
 ): Promise<Message.TextMessage | void> {
     try {
@@ -25,10 +25,10 @@ export async function handler_history_input_balance(
                 .slice(0, 20) // Ограничиваем до 5 последних операций
                 .map((e) => {
                     const amount = e.amount
-                    return `💸 *${amount} Руб.* — ${formatTimestamp(Number(e.accrual_date))}`;
+                    return `💸 *${amount} ${HANDLER_KEYBOARD_HISTORY_ACCRUAL.RUB}.* — ${formatTimestamp(Number(e.accrual_date))}`;
                 })
                 .join('\n')
-            : 'Нет начислений';
+            : HANDLER_KEYBOARD_HISTORY_ACCRUAL.NO_ACCRUAL;
 
         const accrualReferralHistory = await getReferralAccrualHistory(userId);
         // Форматируем завершенные платежи
@@ -38,15 +38,15 @@ export async function handler_history_input_balance(
                 .map((e) => {
                     const amount = e.amount
                     const referred_user_id = e.referred_user_id
-                    return `💸 *${amount} Руб.* — ${formatTimestamp(Number(e.accrual_date))}`;
+                    return `💸 *${amount} ${HANDLER_KEYBOARD_HISTORY_ACCRUAL.RUB}.* — ${formatTimestamp(Number(e.accrual_date))}`;
                 })
                 .join('\n')
-            : 'Нет начислений за друзей';
+            : HANDLER_KEYBOARD_HISTORY_ACCRUAL.NO_REFERRAL_ACCRUAL;
 
 
         const message =
-            `📜 *${MESSAGES.BALANCE_ACCRUAL_HISTORY}*\n${surveyAccrualHistory_show}\n\n` +
-            `🕒 *${MESSAGES.BALANCE_ACCRUAL_REFERRAL_HISTORY}*\n${accrualReferralHistory_show}`
+            `📜 *${HANDLER_KEYBOARD_HISTORY_ACCRUAL.BALANCE_ACCRUAL_HISTORY}*\n${surveyAccrualHistory_show}\n\n` +
+            `🕒 *${HANDLER_KEYBOARD_HISTORY_ACCRUAL.BALANCE_ACCRUAL_REFERRAL_HISTORY}*\n${accrualReferralHistory_show}`
 
         return ctx.reply(message,
             {
@@ -73,6 +73,6 @@ export async function handler_history_input_balance(
             shortError = String(error).substring(0, 50);
         }
         logger.error("Error in keyboard balance: " + shortError);
-        await ctx.reply(MESSAGES.SOME_ERROR);
+        await ctx.reply(HANDLER_KEYBOARD_HISTORY_ACCRUAL.SOME_ERROR);
     }
 }

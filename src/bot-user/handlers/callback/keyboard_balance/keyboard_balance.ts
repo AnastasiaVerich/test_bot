@@ -1,20 +1,15 @@
-import {InlineKeyboard} from "grammy";
-import {Message} from "grammy/types";
-import {MyContext} from "../../types/type";
-import {BUTTONS_CALLBACK_QUERIES} from "../../constants/button";
-import {MESSAGES} from "../../constants/messages";
-import {selectWithdrawalLogByUserId} from "../../../database/queries/withdrawalLogsQueries";
-import {formatTimestamp} from "../../../lib/date";
-import logger from "../../../lib/logger";
-import {getUserId} from "../../utils/getUserId";
-import {findPendingPaymentByUserId} from "../../../database/queries/pendingPaymentsQueries";
-import {checkBalance} from "../../../database/queries/userQueries";
-import {BalanceMenu} from "../../keyboards/inline";
-import {curseTon} from "../../../config/env";
+import {MyContext} from "../../../types/type";
+import logger from "../../../../lib/logger";
+import {getUserId} from "../../../utils/getUserId";
+import {findPendingPaymentByUserId} from "../../../../database/queries/pendingPaymentsQueries";
+import {checkBalance} from "../../../../database/queries/userQueries";
+import {BalanceMenu} from "../../../keyboards/inline";
+import {curseTon} from "../../../../config/env";
+import {HANDLER_KEYBOARD_BALANCE} from "./text";
 
 export async function handleBalance(
     ctx: MyContext,
-): Promise<Message.TextMessage | void> {
+): Promise<any | void> {
     try {
         // Получаем ID текущего пользователя Telegram.
         const userId = await getUserId(ctx);
@@ -23,7 +18,7 @@ export async function handleBalance(
 
         const balance = await checkBalance(userId);
         if (!balance) {
-            return ctx.reply(MESSAGES.USER_ID_UNDEFINED);
+            return ctx.reply(HANDLER_KEYBOARD_BALANCE.USER_ID_UNDEFINED);
         }
         const balanceTon = Number((balance / curseTon).toFixed(2))
         const pendingPayment = await findPendingPaymentByUserId(userId);
@@ -35,17 +30,17 @@ export async function handleBalance(
                 .map((e) => {
                     const amount = e.amount
                     const address = e.address.length > 12 ? `${e.address.slice(0, 6)}...${e.address.slice(-6)}` : e.address;
-                    return `⏳ *${amount} РУБ* — ${address}`;
+                    return `⏳ *${amount} ${HANDLER_KEYBOARD_BALANCE.RUB}* — ${address}`;
                 })
                 .join('\n')
-            : 'Нет ожидающих платежей';
+            : HANDLER_KEYBOARD_BALANCE.NO_PENDING_PAYMENT;
 
 
 
 
 
-        const message = `💰 *${MESSAGES.BALANCE}*:\n ${balance} Руб или ${balanceTon} TON\n\n` +
-            `🕒 *${MESSAGES.BALANCE_PENDING}*\n${pendingPayment_show}`
+        const message = `💰 *${HANDLER_KEYBOARD_BALANCE.BALANCE}*:\n ${balance} ${HANDLER_KEYBOARD_BALANCE.RUB} ${HANDLER_KEYBOARD_BALANCE.OR} ${balanceTon} TON\n\n` +
+            `🕒 *${HANDLER_KEYBOARD_BALANCE.BALANCE_PENDING}*\n${pendingPayment_show}`
         if (Number(balance) === 0) {
             return ctx.reply(message, { parse_mode: 'Markdown' });
         } else {
@@ -65,6 +60,6 @@ export async function handleBalance(
             shortError = String(error).substring(0, 50);
         }
         logger.error("Error in keyboard balance: " + shortError);
-        await ctx.reply(MESSAGES.SOME_ERROR);
+        await ctx.reply(HANDLER_KEYBOARD_BALANCE.SOME_ERROR);
     }
 }

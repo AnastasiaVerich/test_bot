@@ -1,13 +1,11 @@
-import { InlineKeyboard } from "grammy";
-import { Message } from "grammy/types";
-import { findUserByTelegramId } from "../../../database/queries/userQueries";
-import { addReferral } from "../../../database/queries/referralQueries";
-import { MyContext } from "../../types/type";
-import { MESSAGES } from "../../constants/messages";
-import { BUTTONS_CALLBACK_QUERIES } from "../../constants/button";
-import { getUserId, returnUserId } from "../../utils/getUserId";
-import logger from "../../../lib/logger";
-import {IdentificationKeyboard, RegistrationKeyboard} from "../../keyboards/inline";
+import {Message} from "grammy/types";
+import {findUserByTelegramId} from "../../../../database/queries/userQueries";
+import {addReferral} from "../../../../database/queries/referralQueries";
+import {MyContext} from "../../../types/type";
+import {getUserId, returnUserId} from "../../../utils/getUserId";
+import logger from "../../../../lib/logger";
+import {IdentificationKeyboard, RegistrationKeyboard} from "../../../keyboards/inline";
+import {COMMAND_START} from "./text";
 
 export const handleStartCommand = async (
   ctx: MyContext,
@@ -24,7 +22,7 @@ export const handleStartCommand = async (
     const user = await findUserByTelegramId(userId);
 
     if (user) {
-      return ctx.reply(MESSAGES.WELCOME_OLD_USER, {
+      return ctx.reply(COMMAND_START.WELCOME_OLD_USER, {
         reply_markup: IdentificationKeyboard(),
       });
     } else {
@@ -33,7 +31,7 @@ export const handleStartCommand = async (
         await addReferral(userId, Number(referral));
       }
 
-      return ctx.reply(MESSAGES.WELCOME_MENU_USER, {
+      return ctx.reply(COMMAND_START.WELCOME_MENU_USER, {
         parse_mode: "HTML", // Указываем, что текст содержит HTML
         reply_markup: RegistrationKeyboard(),
       });
@@ -48,7 +46,7 @@ export const handleStartCommand = async (
       shortError = String(error).substring(0, 50);
     }
     logger.error(userId + ": Error in command /start: " + shortError);
-    return ctx.reply(MESSAGES.SOME_ERROR, {
+    return ctx.reply(COMMAND_START.SOME_ERROR, {
       reply_markup: { remove_keyboard: true },
     });
   }

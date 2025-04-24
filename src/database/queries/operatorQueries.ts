@@ -17,6 +17,13 @@ export interface OperatorRegions {
   created_at: string; // Дата и время в ISO формате
 }
 
+export interface AllowedOperators {
+  id: number;
+  tg_account: string;
+
+  created_at: string; // Дата и время в ISO формате
+}
+
 export const findOperatorByTelegramId = async (
   operator_id: number | null,
   phone: string | null,
@@ -49,6 +56,31 @@ export const findOperatorByTelegramId = async (
       shortError = String(error).substring(0, 50);
     }
     throw new Error("Error findOperatorByTelegramId: " + shortError);
+  }
+};
+
+export const findAllowedOperator = async (
+  tg_account: string | null,
+): Promise<Operator> => {
+
+  try {
+    const query = `
+           SELECT 1 
+           FROM allowed_operators 
+           WHERE tg_account = $1
+            ;`;
+    const result: QueryResult<Operator> = await db.query(query, [
+      tg_account,
+    ]);
+    return result.rows[0];
+  } catch (error) {
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error findAllowedOperator: " + shortError);
   }
 };
 

@@ -5,12 +5,12 @@ import {
   BUTTONS_KEYBOARD,
 } from "../constants/button";
 import { Scenes } from "../scenes";
-import { handleBalance } from "./callback/keyboard_balance";
-import { handleStartCommand } from "./callback/command_start";
+import { handleBalance } from "./callback/keyboard_balance/keyboard_balance";
+import { handleStartCommand } from "./callback/command_start/command_start";
 import { authMiddleware } from "../middleware/authMiddleware";
 import { blacklistMiddleware } from "../middleware/blacklistMiddleware";
-import {handler_history_withdrawal_balance} from "./callback/keyboard_history_withdrawal_balance";
-import {handler_history_input_balance} from "./callback/keyboard_history_input_balance";
+import {handler_history_withdrawal} from "./callback/keyboard_history_withdrawal/keyboard_history_withdrawal";
+import {handler_history_accrual} from "./callback/keyboard_history_accrual/keyboard_history_accrual";
 import {checkInitMiddleware} from "../middleware/checkInitMiddleware";
 
 
@@ -45,7 +45,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButton,
     authMiddleware,
     async (ctx: MyContext) => {
-      await handler_history_input_balance(ctx)
+      await handler_history_accrual(ctx)
     },
   );
 
@@ -53,7 +53,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButton,
     authMiddleware,
     async (ctx: MyContext) => {
-      await handler_history_withdrawal_balance(ctx)
+      await handler_history_withdrawal(ctx)
     },
   );
 }

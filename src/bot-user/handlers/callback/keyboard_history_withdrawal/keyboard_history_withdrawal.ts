@@ -1,14 +1,14 @@
 import {InlineKeyboard} from "grammy";
 import {Message} from "grammy/types";
-import {MyContext} from "../../types/type";
-import {BUTTONS_CALLBACK_QUERIES} from "../../constants/button";
-import {MESSAGES} from "../../constants/messages";
-import {selectWithdrawalLogByUserId} from "../../../database/queries/withdrawalLogsQueries";
-import {formatTimestamp} from "../../../lib/date";
-import logger from "../../../lib/logger";
-import {getUserId} from "../../utils/getUserId";
+import {MyContext} from "../../../types/type";
+import {BUTTONS_CALLBACK_QUERIES} from "../../../constants/button";
+import {selectWithdrawalLogByUserId} from "../../../../database/queries/withdrawalLogsQueries";
+import {formatTimestamp} from "../../../../lib/date";
+import logger from "../../../../lib/logger";
+import {getUserId} from "../../../utils/getUserId";
+import {HANDLER_KEYBOARD_HISTORY_WITHDRAWAL} from "./text";
 
-export async function handler_history_withdrawal_balance(
+export async function handler_history_withdrawal(
     ctx: MyContext,
 ): Promise<Message.TextMessage | void> {
     try {
@@ -29,10 +29,10 @@ export async function handler_history_withdrawal_balance(
                     return `💸 *${amount} TON* — ${formatTimestamp(Number(e.withdrawn_at))} — ${wallet}`;
                 })
                 .join('\n')
-            : 'Нет завершенных платежей';
+            : HANDLER_KEYBOARD_HISTORY_WITHDRAWAL.NO_HISTORY_WITHDRAWAL;
 
 
-        const message = `📜 *${MESSAGES.BALANCE_HISTORY}*\n${logs_show}\n\n`
+        const message = `📜 *${HANDLER_KEYBOARD_HISTORY_WITHDRAWAL.BALANCE_HISTORY}*\n${logs_show}\n\n`
 
         return ctx.reply(message,
             {
@@ -59,6 +59,6 @@ export async function handler_history_withdrawal_balance(
             shortError = String(error).substring(0, 50);
         }
         logger.error("Error in keyboard balance: " + shortError);
-        await ctx.reply(MESSAGES.SOME_ERROR);
+        await ctx.reply(HANDLER_KEYBOARD_HISTORY_WITHDRAWAL.SOME_ERROR);
     }
 }

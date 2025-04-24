@@ -5,9 +5,9 @@ export const REGISTRATION_SCENE = {
         "Для регистрации пришлите свой номер телефона." +
         "\n" +
         "\n" +
-        `Нажмите на кнопку '${BUTTONS_CALLBACK_QUERIES.SendNumberButtonText}', которая появилась внизу экрана.`,
+        `Нажмите на кнопку '${BUTTONS_KEYBOARD.SendNumberButton}', которая появилась внизу экрана.`,
 
-    ENTER_PHONE_OTHERWISE: `Пожалуйста, отправьте номер, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.SendNumberButtonText}'.`,
+    ENTER_PHONE_OTHERWISE: `Пожалуйста, отправьте номер, нажав на кнопку '${BUTTONS_KEYBOARD.SendNumberButton}'.`,
 
     ENTERED_NOT_USER_PHONE: "Пожалуйста, отправьте свой собственный номер.",
 

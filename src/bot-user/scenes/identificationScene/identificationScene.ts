@@ -53,12 +53,12 @@ export async function photoStep(
         let result = null
 
         await ctx.reply(IDENTIFICATION_SCENE.VERIFY_BY_PHOTO, {
-            reply_markup: WebAppKeyboard(userId, "", "identification", "0"),
+            reply_markup: WebAppKeyboard(userId, "", "identification", "1"),
         });
 
         const message_web_app_data = await conversation.waitFor("message:web_app_data", {
                 otherwise: (ctx) => ctx.reply(IDENTIFICATION_SCENE.VERIFY_BY_PHOTO_OTHERWISE, {
-                    reply_markup: WebAppKeyboard(userId, "", "identification", "0"),
+                    reply_markup: WebAppKeyboard(userId, "", "identification", "1"),
                 }),
             }
         );

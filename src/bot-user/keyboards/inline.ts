@@ -12,7 +12,7 @@ export const IdentificationKeyboard = (): InlineKeyboard => new InlineKeyboard()
 );
 
 export const sendUserPhone = (): Keyboard => new Keyboard()
-    .requestContact(BUTTONS_CALLBACK_QUERIES.SendNumberButtonText)
+    .requestContact(BUTTONS_KEYBOARD.SendNumberButton)
     .resized()
     .persistent();
 

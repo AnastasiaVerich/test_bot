@@ -5,8 +5,6 @@ export const BUTTONS_CALLBACK_QUERIES = {
   IdentificationButton: "IDENTIFICATION",
   IdentificationButtonText: "Идентификация",
 
-  BalanceButton: "BALANCE",
-  BalanceButtonText: "Баланс",
 
   WithdrawalOfMoneyButton: "WITHDRAWAL_OF_MONEY",
   WithdrawalOfMoneyButtonText: "Вывод средств",
@@ -20,8 +18,6 @@ export const BUTTONS_CALLBACK_QUERIES = {
   SourceTgWalletTonButton: "SOURCE_TG_WALLET_TON",
   SourceTgWalletTonButtonText: "Кошелек телеграм / TON",
 
-  SendNumberButton: "SEND_NUMBER_BUTTON",
-  SendNumberButtonText: "Отправить номер",
 };
 
 export const BUTTONS_KEYBOARD = {
@@ -31,7 +27,10 @@ export const BUTTONS_KEYBOARD = {
 
   BalanceButton: "Баланс",
 
+
   GeolocationButton: "Геолокация",
+
+  SendNumberButton: "Отправить номер",
 
 
 

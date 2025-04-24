@@ -124,12 +124,12 @@ async function photoStep(
         let result = null
 
         await ctx.reply(REGISTRATION_SCENE.VERIFY_BY_PHOTO, {
-            reply_markup: WebAppKeyboard(userId, userPhone, "registration", "0"),
+            reply_markup: WebAppKeyboard(userId, userPhone, "registration", "1"),
         });
 
         const message_web_app_data = await conversation.waitFor("message:web_app_data", {
             otherwise: (ctx) => ctx.reply(REGISTRATION_SCENE.VERIFY_BY_PHOTO_OTHERWISE, {
-                reply_markup: WebAppKeyboard(userId, userPhone, "registration", "0"),
+                reply_markup: WebAppKeyboard(userId, userPhone, "registration", "1"),
             }),
         });
 
