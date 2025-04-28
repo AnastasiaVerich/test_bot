@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { detectFaces, findDistance } from "../../services/embeddingService";
 import { InterfaceResponse } from "../../types/type";
 import { checkExistInBlockUser } from "../../../database/queries/blacklistUsersQueries";
-import { findOperatorByTelegramId } from "../../../database/queries/operatorQueries";
+import { findOperator } from "../../../database/queries/operatorQueries";
 import { getFaceEmbeddingByUserId } from "../../../database/queries/faceEmbeddingsQueries";
 import { IdentificationResponseText } from "../../../config/common_types";
 import logger from "../../../lib/logger";
@@ -39,7 +39,7 @@ export const identification = async (
     }
 
     const isBlockUser = await checkExistInBlockUser(userId, null);
-    const isOperator = await findOperatorByTelegramId(userId, null, null);
+    const isOperator = await findOperator(userId, null, null);
 
     // Если пользователь с таким ID заблокирован
     if (isBlockUser || isOperator) {

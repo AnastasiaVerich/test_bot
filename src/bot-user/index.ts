@@ -3,12 +3,13 @@ import * as dotenv from "dotenv";
 dotenv.config();
 import { conversations } from "@grammyjs/conversations";
 import { token } from "../config/env";
-import { MyContext, SessionData } from "./types/type";
 import { registerScenes } from "./scenes";
 import { registerCallbackQueries, registerCommands, registerMessage } from "./handlers";
 import logger from "../lib/logger";
 import {client} from "../database/dbClient";
 import {PsqlAdapter} from "@grammyjs/storage-psql";
+import {subscribeOperatorAssigned} from "./subscribe";
+import {MyContext, SessionData} from "../bot-common/types/type";
 
 // Начальные данные сессии
 function initialSession(): SessionData {
@@ -26,7 +27,7 @@ function initialSession(): SessionData {
 
 
 async function bootstrap() {
-    console.log("1: Начало bootstrap");
+    logger.info("1: Начало bootstrap");
     try {
 
         await client.connect();
@@ -39,7 +40,7 @@ async function bootstrap() {
             initial: initialSession,
             storage: storageAdapter,
         }));
-        console.log("6: Сессии настроены");
+        logger.info("6: Сессии настроены");
         bot.use(conversations());
         // bot.use(errorMiddleware);
 
@@ -47,22 +48,23 @@ async function bootstrap() {
         registerCommands(bot);
         registerCallbackQueries(bot);
         registerMessage(bot);
+        subscribeOperatorAssigned(bot);
 
         // Обработчик ошибок
         bot.catch((err) => {
-            console.error("Ошибка в боте:", err);
+            logger.info("Ошибка в боте:", err);
         });
 
         // Запуск бота
-        console.log("7: Запуск бота");
+        logger.info("7: Запуск бота");
         await bot.start().then((res) => {
             logger.info("Бот запущен:", res);
         });
     } catch (err) {
-        console.error("Ошибка в bootstrap:", err);
+        logger.info("Ошибка в bootstrap:", err);
     }
 }
 
 bootstrap().catch(err => {
-    console.error("Ошибка при запуске bootstrap:", err);
+    logger.info("Ошибка при запуске bootstrap:", err);
 });

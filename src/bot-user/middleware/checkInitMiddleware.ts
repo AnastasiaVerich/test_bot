@@ -1,11 +1,11 @@
 import { MiddlewareFn } from "grammy";
-import { MESSAGES } from "../constants/messages";
-import { MyContext } from "../types/type";
 import { getUserId } from "../utils/getUserId";
 import logger from "../../lib/logger";
 import { findUser } from "../utils/findUser";
 import {isDateDifferenceAtLeast} from "../../lib/date";
-import {Scenes} from "../scenes";
+import {ScenesUser} from "../scenes";
+import {RESPONSES} from "../../bot-common/constants/responses";
+import {MyContext} from "../../bot-common/types/type";
 
 export const checkInitMiddleware: MiddlewareFn<MyContext> = async (ctx, next) => {
     try {
@@ -17,7 +17,7 @@ export const checkInitMiddleware: MiddlewareFn<MyContext> = async (ctx, next) =>
         const user = await findUser(userId, ctx);
         if (!user) return;
         if (isDateDifferenceAtLeast(nowDateTime.toString(), user.last_init, 7)) {
-            await ctx.conversation.enter(Scenes.IdentificationScene);
+            await ctx.conversation.enter(ScenesUser.IdentificationScene);
             return
         }
 
@@ -31,7 +31,7 @@ export const checkInitMiddleware: MiddlewareFn<MyContext> = async (ctx, next) =>
             shortError = String(error).substring(0, 50);
         }
         logger.error("Error checkInitMiddleware: " + shortError);
-        await ctx.reply(MESSAGES.SOME_ERROR, {
+        await ctx.reply(RESPONSES.SOME_ERROR, {
             reply_markup: { remove_keyboard: true },
         });
     }

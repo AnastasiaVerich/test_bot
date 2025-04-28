@@ -3,12 +3,13 @@ import * as dotenv from "dotenv";
 dotenv.config();
 import { conversations } from "@grammyjs/conversations";
 import {token, token_operator} from "../config/env";
-import { MyContext, SessionData } from "./types/type";
 import { registerScenes } from "./scenes";
-import { registerCallbackQueries, registerCommands, registerMessage } from "./handlers";
+import {registerCallbackQueries, registerChatEvents, registerCommands, registerMessage} from "./handlers";
 import logger from "../lib/logger";
 import {client} from "../database/dbClient";
 import {PsqlAdapter} from "@grammyjs/storage-psql";
+import {subscribeNotify} from "./subscribe";
+import {MyContext, SessionData} from "../bot-common/types/type";
 
 // Начальные данные сессии
 function initialSession(): SessionData {
@@ -38,22 +39,27 @@ async function bootstrap() {
         registerCommands(bot);
         registerCallbackQueries(bot);
         registerMessage(bot);
+        registerChatEvents(bot);
+        subscribeNotify(bot);
 
         // Обработчик ошибок
         bot.catch((err) => {
-            console.error("Ошибка в боте:", err);
+            logger.info("Ошибка в боте:", err);
         });
 
         // Запуск бота
-        console.log("7: Запуск бота");
-        await bot.start().then((res) => {
+        logger.info("7: Запуск бота");
+        await bot.start({
+            allowed_updates: ["chat_member", "message", "callback_query"],
+
+        }).then((res) => {
             logger.info("Бот запущен:", res);
         });
     } catch (err) {
-        console.error("Ошибка в bootstrap:", err);
+        logger.info("Ошибка в bootstrap:", err);
     }
 }
 
 bootstrap().catch(err => {
-    console.error("Ошибка при запуске bootstrap:", err);
+    logger.info("Ошибка при запуске bootstrap:", err);
 });

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { detectFaces, findDistance } from "../../services/embeddingService";
 import { InterfaceResponse } from "../../types/type";
 import { checkExistInBlockUser } from "../../../database/queries/blacklistUsersQueries";
-import { findOperatorByTelegramId } from "../../../database/queries/operatorQueries";
+import { findOperator } from "../../../database/queries/operatorQueries";
 import {
   addUser,
   findUserByPhone,
@@ -42,18 +42,18 @@ export const registration = async (
       const userId = Number(req.body.userId);
       // Проверка наличия обязательных полей
       if (!req.file || !req.file.mimetype.startsWith("image/")) {
-        console.log('missing_photo')
+        logger.info('missing_photo')
         return res.status(400).send({ status: 2, text: "missing_photo" });
       }
       if (!userId || typeof userId !== "number") {
-        console.log('missing_user_id')
+        logger.info('missing_user_id')
         return res.status(400).send({
           status: 2,
           text: "missing_user_id",
         });
       }
       if (!userPhone || typeof userPhone !== "string") {
-        console.log('missing_user_phone')
+        logger.info('missing_user_phone')
         return res.status(400).send({
           status: 2,
           text: "missing_user_phone",
@@ -64,7 +64,7 @@ export const registration = async (
       const isHasSomeNumberUser = await findUserByPhone(userPhone);
       const isHasSomeIdUser = await findUserByTelegramId(userId);
       const isBlockUser = await checkExistInBlockUser(userId, userPhone);
-      const isOperator = await findOperatorByTelegramId(
+      const isOperator = await findOperator(
         userId,
         userPhone,
         null,

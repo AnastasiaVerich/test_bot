@@ -1,6 +1,6 @@
-import { MESSAGES } from "../constants/messages";
-import { MyContext } from "../types/type";
 import { getUserId } from "./getUserId";
+import {RESPONSES} from "../../bot-common/constants/responses";
+import {MyContext} from "../../bot-common/types/type";
 
 describe("getUserId", () => {
   let ctx: Partial<MyContext>;
@@ -33,7 +33,7 @@ describe("getUserId", () => {
     it("should reply with error message if user ID is undefined", async () => {
       const userId = await getUserId(ctx as MyContext);
 
-      expect(ctx.reply).toHaveBeenCalledWith(MESSAGES.USER_ID_UNDEFINED);
+      expect(ctx.reply).toHaveBeenCalledWith(RESPONSES.USER_ID_UNDEFINED);
       expect(userId).toBeNull();
     });
   });

@@ -1,6 +1,6 @@
-import { errorMiddleware } from "../errorMiddleware";
-import { MyContext } from "../../types/type";
+import { errorMiddleware } from "../../../bot-common/middleware/errorMiddleware";
 import logger from "../../../lib/logger";
+import {MyContext} from "../../../bot-common/types/type";
 
 jest.mock("../../../lib/logger");
 

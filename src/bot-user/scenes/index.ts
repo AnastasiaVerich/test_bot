@@ -1,13 +1,13 @@
 import {Bot} from "grammy";
 import {createConversation} from "@grammyjs/conversations";
-import {registrationScene} from "./registration/registration";
-import {MyContext} from "../types/type";
-import {identificationScene} from "./identificationScene/identificationScene";
-import {inviteScene} from "./inviteScene/inviteScene";
-import {surveyScene} from "./surveyScene/surveyScene";
-import {withdrawalScene} from "./withdrawalScene/withdrawalScene";
+import {registrationUserScene} from "./registration_user";
+import {identificationScene} from "./identification";
+import {inviteScene} from "./invite";
+import {surveyScene} from "./survey";
+import {withdrawalScene} from "./withdrawal";
+import {MyContext} from "../../bot-common/types/type";
 
-export enum Scenes {
+export enum ScenesUser {
     RegisterScene = "RegisterScene", // eslint-disable-line no-unused-vars
     IdentificationScene = "IdentificationScene", // eslint-disable-line no-unused-vars
     SurveyScene = "SurveyScene", // eslint-disable-line no-unused-vars
@@ -17,9 +17,9 @@ export enum Scenes {
 
 export function registerScenes(bot: Bot<MyContext>): void {
     // Регистрируем сцену
-    bot.use(createConversation(registrationScene, {id: Scenes.RegisterScene}));
-    bot.use(createConversation(identificationScene, {id: Scenes.IdentificationScene}));
-    bot.use(createConversation(inviteScene, {id: Scenes.InviteScene}));
-    bot.use(createConversation(surveyScene, {id: Scenes.SurveyScene}));
-    bot.use(createConversation(withdrawalScene, {id: Scenes.WithdrawalScene}));
+    bot.use(createConversation(registrationUserScene, {id: ScenesUser.RegisterScene}));
+    bot.use(createConversation(identificationScene, {id: ScenesUser.IdentificationScene}));
+    bot.use(createConversation(inviteScene, {id: ScenesUser.InviteScene}));
+    bot.use(createConversation(surveyScene, {id: ScenesUser.SurveyScene}));
+    bot.use(createConversation(withdrawalScene, {id: ScenesUser.WithdrawalScene}));
 }

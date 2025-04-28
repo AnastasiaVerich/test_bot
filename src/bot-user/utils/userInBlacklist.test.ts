@@ -1,7 +1,7 @@
-import { MyContext } from "../types/type";
 import { userInBlacklist } from "./userInBlacklist";
 import { checkExistInBlockUser } from "../../database/queries/blacklistUsersQueries";
-import { MESSAGES } from "../constants/messages";
+import {RESPONSES} from "../../bot-common/constants/responses";
+import {MyContext} from "../../bot-common/types/type";
 
 jest.mock("../../database/queries/blacklistUsersQueries");
 
@@ -27,7 +27,7 @@ describe("Test userInBlacklist", () => {
 
     const res = await userInBlacklist(12345, null, ctx as MyContext);
     expect(res).toBe(true);
-    expect(ctx.reply).toHaveBeenCalledWith(MESSAGES.YOU_IN_BLACKLIST, {
+    expect(ctx.reply).toHaveBeenCalledWith(RESPONSES.YOU_IN_BLACKLIST, {
       reply_markup: { remove_keyboard: true },
     });
   });

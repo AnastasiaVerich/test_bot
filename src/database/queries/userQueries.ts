@@ -1,5 +1,6 @@
 import { QueryResult } from "pg";
 import { db } from "../dbClient";
+import logger from "../../lib/logger";
 
 
 export interface User {
@@ -15,7 +16,7 @@ export interface User {
 export async function findUserByTelegramId(
   telegramId: number,
 ): Promise<User | undefined> {
-  console.log('start find user')
+  logger.info('start find user')
   if (typeof telegramId !== "number") {
     throw new Error("Invalid type provided");
   }

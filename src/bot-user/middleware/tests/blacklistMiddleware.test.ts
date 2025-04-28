@@ -1,9 +1,9 @@
 import { getUserId } from "../../utils/getUserId";
-import { MESSAGES } from "../../constants/messages";
 import logger from "../../../lib/logger";
-import { MyContext } from "../../types/type";
 import { userInBlacklist } from "../../utils/userInBlacklist";
 import { blacklistMiddleware } from "../blacklistMiddleware";
+import {RESPONSES} from "../../../bot-common/constants/responses";
+import {MyContext} from "../../../bot-common/types/type";
 
 jest.mock("../../utils/userInBlacklist");
 jest.mock("../../utils/getUserId");
@@ -61,7 +61,7 @@ describe("Test blacklistMiddleware", () => {
     await blacklistMiddleware(ctx as MyContext, next);
 
     expect(next).not.toHaveBeenCalled();
-    expect(ctx.reply).toHaveBeenCalledWith(MESSAGES.SOME_ERROR, {
+    expect(ctx.reply).toHaveBeenCalledWith(RESPONSES.SOME_ERROR, {
       reply_markup: { remove_keyboard: true },
     });
 

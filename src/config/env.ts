@@ -8,6 +8,8 @@ export const token = process.env.BOT_TOKEN ?? "";
 export const token_operator = process.env.BOT_TOKEN_OPERATOR ?? "";
 export const seed_phrase = process.env.SEED_PHRASE ?? "";
 
+export const channelId = process.env.CHANNEL_ID ?? "";
+
 export const DB_USER = process.env.DB_USER ?? "";
 export const DB_HOST = process.env.DB_HOST ?? "";
 export const DB_DATABASE = process.env.DB_DATABASE ?? "";

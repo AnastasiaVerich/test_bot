@@ -50,7 +50,7 @@ export async function executePendingPayments(): Promise<void> {
       }
     }
   } catch (error) {
-    console.error(error);
+    logger.info(error);
     logger.error(error);
     let shortError = "";
     if (error instanceof Error) {

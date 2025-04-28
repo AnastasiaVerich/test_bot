@@ -1,5 +1,6 @@
 import { QueryResult } from "pg";
 import { db } from "../dbClient";
+import logger from "../../lib/logger";
 
 type SurveyType = "test_site";
 
@@ -23,11 +24,14 @@ interface SurveyTask {
 
   created_at: string; // Дата и время в ISO формате
 }
-interface SurveyActive {
+export interface SurveyActive {
   survey_active_id: number;
   survey_id: number;
   user_id: number;
   operator_id: number;
+  message_id: number;
+  is_joined_to_chat: boolean;
+  link_invite: string;
 
   created_at: string; // Дата и время в ISO формате
 }
@@ -136,11 +140,151 @@ export const isOperatorInSurveyActive = async (
   }
 };
 
+// Проверяем оператор уже проходит опрос или нет
+export const getActiveSurveyByMessageID = async (
+    message_id: number
+): Promise<SurveyActive | undefined> => {
+  try {
+    const query = `
+      SELECT *
+      FROM survey_active
+      WHERE message_id = $1;
+    `;
+
+    const result:QueryResult<SurveyActive> = await db.query(query, [message_id]);
+
+    return result.rows[0];
+  } catch (error) {
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error isOperatorInSurveyActive: " + shortError);
+  }
+};
+
+export const getActiveSurveyByUserId = async (
+    user_id: number
+): Promise<SurveyActive | undefined> => {
+  try {
+    const query = `
+      SELECT *
+      FROM survey_active
+      WHERE user_id = $1;
+    `;
+
+    const result:QueryResult<SurveyActive> = await db.query(query, [user_id]);
+
+    return result.rows[0];
+  } catch (error) {
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error getActiveSurveyByUserId: " + shortError);
+  }
+};
+export const getActiveSurveyByOperatorId = async (
+    operator_id: number
+): Promise<SurveyActive | undefined> => {
+  try {
+    const query = `
+      SELECT *
+      FROM survey_active
+      WHERE operator_id = $1;
+    `;
+
+    const result:QueryResult<SurveyActive> = await db.query(query, [operator_id]);
+
+    return result.rows[0];
+  } catch (error) {
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error getActiveSurveyByUserId: " + shortError);
+  }
+};
+
+export const updateActiveSurveyMessageID = async (
+    message_id: number,
+    survey_active_id: number
+): Promise<SurveyActive | undefined> => {
+  try {
+    const query =
+        `UPDATE survey_active SET message_id = $1 WHERE survey_active_id = $2`;
+
+    const result:QueryResult<SurveyActive> = await db.query(query, [message_id,survey_active_id]);
+
+    return result.rows[0];
+  } catch (error) {
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error updateActiveSurveyMessageID: " + shortError);
+  }
+};
+
+export const updateActiveSurveyOperatorId= async (
+    operator_id: number,
+    survey_active_id: number,
+    link_invite:string
+): Promise<SurveyActive | undefined> => {
+  try {
+    const query =
+        `UPDATE survey_active SET operator_id = $1, link_invite=$3 WHERE survey_active_id = $2`;
+
+    const result:QueryResult<SurveyActive> = await db.query(query, [operator_id,survey_active_id,link_invite]);
+
+    return result.rows[0];
+  } catch (error) {
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error updateActiveSurveyOperatorId: " + shortError);
+  }
+};
+export const updateActiveSurveyIsJoinedToChat= async (
+    is_joined_to_chat: boolean,
+    survey_active_id: number,
+): Promise<SurveyActive | undefined> => {
+  try {
+    const query =
+        `UPDATE survey_active SET is_joined_to_chat = $1 WHERE survey_active_id = $2`;
+
+    const result:QueryResult<SurveyActive> = await db.query(query, [is_joined_to_chat,survey_active_id]);
+
+    return result.rows[0];
+  } catch (error) {
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error updateActiveSurveyIsJoinedToChat: " + shortError);
+  }
+};
+
+
+
+
 //Добавление "резервации" и в целом пока опрос в промежуточнм состоянии он тут
 export const addSurveyInActive = async (
     surveyId: number,
     userId: number,
-    operatorId: number
 ): Promise<void> => {
   const client = await db.connect(); // Получаем клиента для транзакции
   try {
@@ -155,14 +299,14 @@ export const addSurveyInActive = async (
 
     const insertQuery = `
       INSERT INTO survey_active (survey_id, user_id, operator_id)
-      VALUES ($1, $2, $3);
+      VALUES ($1, $2, NULL);
     `;
-    await client.query(insertQuery, [surveyId, userId, operatorId]);
+    await client.query(insertQuery, [surveyId, userId]);
 
     await client.query('COMMIT'); // Завершаем транзакцию
   } catch (error) {
     await client.query('ROLLBACK'); // Откатываем при ошибке
-    console.log(error);
+    logger.info(error);
     let shortError = "";
     if (error instanceof Error) {
       shortError = error.message.substring(0, 50);
@@ -245,7 +389,7 @@ export const completeSurvey = async (
     await client.query('COMMIT'); // Завершаем транзакцию
   } catch (error) {
     await client.query('ROLLBACK'); // Откатываем при ошибке
-    console.log(error);
+    logger.info(error);
     let shortError = "";
     if (error instanceof Error) {
       shortError = error.message.substring(0, 50);
@@ -289,7 +433,7 @@ export const abortSurvey = async (
     await client.query('COMMIT'); // Завершаем транзакцию
   } catch (error) {
     await client.query('ROLLBACK'); // Откатываем при ошибке
-    console.log(error);
+    logger.info(error);
     let shortError = "";
     if (error instanceof Error) {
       shortError = error.message.substring(0, 50);
@@ -316,7 +460,7 @@ export const getSurveyAccrualHistory = async (userId: number): Promise<any[]> =>
     const result = await db.query(query, [userId]);
     return result.rows;
   } catch (error) {
-    console.log(error);
+    logger.info(error);
     let shortError = "";
     if (error instanceof Error) {
       shortError = error.message.substring(0, 50);

@@ -59,23 +59,20 @@ CREATE TABLE photos (
 GRANT ALL PRIVILEGES ON TABLE photos TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE photos_photo_id_seq TO admin_vadim;
 
-CREATE TABLE allowed_operators (
-    id SERIAL PRIMARY KEY,
-    tg_account BIGINT UNIQUE NOT NULL, -- ID аккаунта в Telegram
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-GRANT ALL PRIVILEGES ON TABLE allowed_operators TO admin_vadim;
-GRANT USAGE, SELECT, UPDATE ON SEQUENCE allowed_operators_id_seq TO admin_vadim;
 
 -- Таблица операторов
 CREATE TABLE operators (
-    operator_id BIGINT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
+    operator_id BIGINT UNIQUE NOT NULL DEFAULT nextval('operator_default_id_seq'),
     tg_account VARCHAR(255) NOT NULL,
-    phone VARCHAR(15) NOT NULL,
+    phone VARCHAR(15),
+    telegram_chat_id BIGINT NOT NULL,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE operator_default_id_seq TO admin_vadim;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE operators_id_seq TO admin_vadim;
 GRANT ALL PRIVILEGES ON TABLE operators TO admin_vadim;
 
 
@@ -150,12 +147,15 @@ CREATE TABLE survey_active (
     survey_active_id SERIAL PRIMARY KEY,
     survey_id INT NOT NULL,
     user_id BIGINT NOT NULL,
-    operator_id BIGINT NOT NULL,
+    operator_id BIGINT,
+    message_id BIGINT,
+    is_joined_to_chat BOOLEAN NOT NULL DEFAULT FALSE,
+    link_invite VARCHAR(255),
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (operator_id) REFERENCES operators(operator_id) ON DELETE CASCADE,
+    FOREIGN KEY (operator_id) REFERENCES operators(operator_id) ON DELETE SET NULL,
     FOREIGN KEY (survey_id) REFERENCES surveys(survey_id) ON DELETE CASCADE
 );
 
@@ -168,14 +168,14 @@ CREATE TABLE survey_completions (
     survey_id INT NOT NULL,
     user_id BIGINT NOT NULL,
     operator_id BIGINT NOT NULL,
-    count_completed INT NOT NULL,
+    count_completed DECIMAL(10, 2) NOT NULL,
     reward DECIMAL(10, 2) NOT NULL, -- Фактическая награда (может отличаться от tasks.reward, если меняется со временем)
 
     completed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (operator_id) REFERENCES operators(operator_id) ON DELETE CASCADE,
-    FOREIGN KEY (survey_id) REFERENCES surveys(survey_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL,
+    FOREIGN KEY (operator_id) REFERENCES operators(operator_id) ON DELETE SET NULL,
+    FOREIGN KEY (survey_id) REFERENCES surveys(survey_id) ON DELETE SET NULL
 
 );
 GRANT ALL PRIVILEGES ON TABLE survey_completions TO admin_vadim;
@@ -191,7 +191,7 @@ CREATE TABLE withdrawal_logs (
 
     withdrawn_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
 GRANT ALL PRIVILEGES ON TABLE withdrawal_logs TO admin_vadim;
@@ -242,3 +242,39 @@ CREATE TABLE sessions_operator (
 );
 GRANT ALL PRIVILEGES ON TABLE sessions_operator TO admin_vadim;
 ALTER TABLE sessions_operator OWNER TO admin_vadim;
+
+-- Функция для отправки NOTIFY
+CREATE OR REPLACE FUNCTION notify_survey_active() RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.operator_id IS NULL AND NEW.message_id IS NULL THEN
+    PERFORM pg_notify('survey_active_insert', row_to_json(NEW)::text);
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Триггер на таблицу survey_active
+CREATE TRIGGER survey_active_trigger
+AFTER INSERT ON survey_active
+FOR EACH ROW
+EXECUTE FUNCTION notify_survey_active();
+
+
+
+-- Функция для отправки NOTIFY при появлении operator_id и отсутствии is_joined_to_chat
+CREATE OR REPLACE FUNCTION notify_operator_assigned() RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.operator_id IS NOT NULL AND NEW.is_joined_to_chat IS FALSE THEN
+    PERFORM pg_notify('operator_assigned', row_to_json(NEW)::text);
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Триггер на таблицу survey_active
+CREATE TRIGGER operator_assigned_trigger
+AFTER UPDATE OF operator_id ON survey_active
+FOR EACH ROW
+WHEN (NEW.operator_id IS NOT NULL AND NEW.is_joined_to_chat IS NULL)
+EXECUTE FUNCTION notify_operator_assigned();
+

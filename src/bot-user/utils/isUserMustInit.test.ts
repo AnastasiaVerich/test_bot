@@ -1,7 +1,7 @@
-import { MyContext } from "../types/type";
 import { User } from "../../database/queries/userQueries";
 import { isUserMustInit } from "./isUserMustInit";
-import { Scenes } from "../scenes";
+import { ScenesUser } from "../scenes";
+import {MyContext} from "../../bot-common/types/type";
 
 jest.mock("../../database/queries/userQueries");
 
@@ -38,7 +38,7 @@ describe("Test isUserMustInit", () => {
     };
     const result = await isUserMustInit(ctx as MyContext, user as User);
     expect(result).toBe(true);
-    expect(ctx.conversation?.enter).toBeCalledWith(Scenes.IdentificationScene);
+    expect(ctx.conversation?.enter).toBeCalledWith(ScenesUser.IdentificationScene);
   });
 
   // Проверяем, если последняя инициализация была давно, то возвращать надо false

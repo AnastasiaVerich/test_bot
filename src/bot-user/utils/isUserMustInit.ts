@@ -1,7 +1,7 @@
-import { MyContext } from "../types/type";
 import { User } from "../../database/queries/userQueries";
 import { isDateDifferenceAtLeast } from "../../lib/date";
-import { Scenes } from "../scenes";
+import { ScenesUser } from "../scenes";
+import {MyContext} from "../../bot-common/types/type";
 
 export const isUserMustInit = async (
   ctx: MyContext,
@@ -11,7 +11,7 @@ export const isUserMustInit = async (
   const nowDateTime = new Date();
 
   if (isDateDifferenceAtLeast(nowDateTime.toString(), user.last_init, 7)) {
-    await ctx.conversation.enter(Scenes.IdentificationScene);
+    await ctx.conversation.enter(ScenesUser.IdentificationScene);
     isInitLongTimeAgo = true;
   }
   return isInitLongTimeAgo;

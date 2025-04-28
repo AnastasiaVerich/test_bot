@@ -1,5 +1,6 @@
 import { QueryResult } from "pg";
 import { db } from "../dbClient";
+import logger from "../../lib/logger";
 
 interface ReferralBotStart {
   referred_user_id: number;
@@ -92,7 +93,7 @@ export const getReferralAccrualHistory = async (userId: number): Promise<any[]> 
     const result = await db.query(query, [userId]);
     return result.rows;
   } catch (error) {
-    console.log(error);
+    logger.info(error);
     let shortError = "";
     if (error instanceof Error) {
       shortError = error.message.substring(0, 50);

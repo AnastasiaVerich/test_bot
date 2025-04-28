@@ -1,6 +1,6 @@
-import { MESSAGES } from "../constants/messages";
-import {MyContext, MyConversationContext} from "../types/type";
 import { findUserByTelegramId, User } from "../../database/queries/userQueries";
+import {RESPONSES} from "../../bot-common/constants/responses";
+import {MyContext, MyConversationContext} from "../../bot-common/types/type";
 
 export const findUser = async (
   userId: number,
@@ -9,7 +9,7 @@ export const findUser = async (
   const user = await findUserByTelegramId(userId);
 
   if (!user) {
-    await ctx.reply(MESSAGES.YOU_NOT_AUTH, {
+    await ctx.reply(RESPONSES.YOU_NOT_AUTH, {
       reply_markup: { remove_keyboard: true },
     });
   }
