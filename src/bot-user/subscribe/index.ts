@@ -82,7 +82,7 @@ async function processRecord(bot: Bot<MyContext>,record: SurveyActive): Promise<
 async function checkMissedRecords(bot: Bot<MyContext>): Promise<void> {
     try {
         const result = await pgClient.query(`
-            SELECT survey_active_id, survey_id, user_id, operator_id, created_at
+            SELECT *
             FROM survey_active
             WHERE operator_id IS NOT NULL
             AND is_joined_to_chat IS FALSE
