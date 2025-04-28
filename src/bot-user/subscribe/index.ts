@@ -101,6 +101,8 @@ async function checkMissedRecords(bot: Bot<MyContext>): Promise<void> {
 // Обработка уведомлений
 function handleNotifications(bot: Bot<MyContext>): void {
     pgNotifyClient.on("notification", async (msg) => {
+        logger.info('УРРРРРРРРРАААААААА')
+        logger.info(msg.channel)
         if (msg.channel === "operator_assigned" && msg.payload) {
             try {
                 const record: SurveyActive = JSON.parse(msg.payload);
