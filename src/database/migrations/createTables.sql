@@ -59,7 +59,7 @@ CREATE TABLE photos (
 GRANT ALL PRIVILEGES ON TABLE photos TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE photos_photo_id_seq TO admin_vadim;
 
-
+CREATE SEQUENCE operator_default_id_seq;
 -- Таблица операторов
 CREATE TABLE operators (
     id SERIAL PRIMARY KEY,

@@ -12,7 +12,7 @@ import logger from "../../lib/logger";
 
 export function registerCommands(bot: Bot<MyContext>): void {
     bot.chatType("private").command("start", handleStartCommand);
-    bot.chatType("private").command("chatid", handleChatidCommand);
+    bot.command("chatid", handleChatidCommand);
 }
 
 export function registerCallbackQueries(bot: Bot<MyContext>): void {
