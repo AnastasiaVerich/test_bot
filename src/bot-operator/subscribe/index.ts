@@ -4,6 +4,7 @@ import {Bot} from "grammy";
 import {SurveyActive, updateActiveSurveyMessageID} from "../../database/queries/surveyQueries";
 import {channelId} from "../../config/env";
 import {MyContext} from "../../bot-common/types/type";
+import logger from "../../lib/logger";
 
 const pgNotifyClient = new Client(pgConfig);
 const pgClient = new Client(pgConfig);
@@ -12,9 +13,9 @@ const pgClient = new Client(pgConfig);
 async function connectPgClient(client: Client, name: string): Promise<void> {
     try {
         await client.connect();
-        console.log(`Подключен ${name} к PostgreSQL`);
+        logger.info(`Подключен ${name} к PostgreSQL`);
     } catch (err) {
-        console.error(`Ошибка подключения ${name} к PostgreSQL:`, err);
+        logger.error(`Ошибка подключения ${name} к PostgreSQL:`, err);
         throw err;
     }
 }
@@ -22,9 +23,9 @@ async function connectPgClient(client: Client, name: string): Promise<void> {
 async function subscribeToNotifications(): Promise<void> {
     try {
         await pgNotifyClient.query("LISTEN survey_active_insert");
-        console.log("Подписка на survey_active_insert установлена");
+        logger.info("Подписка на survey_active_insert установлена");
     } catch (err) {
-        console.error("Ошибка при подписке на уведомления:", err);
+        logger.error("Ошибка при подписке на уведомления:", err);
         throw err;
     }
 }
@@ -36,17 +37,16 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 async function sendMessageWithRetry(bot: Bot<MyContext>,message: string): Promise<number | null> {
     const maxAttempts = 3;
     let attempt = 1;
-    console.log(channelId)
 
     while (attempt <= maxAttempts) {
         try {
             const result = await bot.api.sendMessage(channelId, message);
-            console.log(`Сообщение успешно отправлено в канал, message_id: ${result.message_id}, попытка: ${attempt}`);
+            logger.info(`Сообщение успешно отправлено в канал, message_id: ${result.message_id}, попытка: ${attempt}`);
             return result.message_id;
         } catch (error) {
-            console.warn(`Попытка ${attempt} не удалась: ${error}`);
+            logger.info(`Попытка ${attempt} не удалась: ${error}`);
             if (attempt === maxAttempts) {
-                console.error("Не удалось отправить сообщение после всех попыток");
+                logger.error("Не удалось отправить сообщение после всех попыток");
                 return null;
             }
             await sleep(1000); // Задержка 1 секунда перед следующей попыткой
@@ -68,12 +68,12 @@ async function processRecord(bot: Bot<MyContext>,record: SurveyActive): Promise<
         if (messageId !== null) {
             // Обновление message_id в таблице survey_active
             await updateActiveSurveyMessageID(messageId, survey_active_id);
-            console.log(`Запись ${survey_active_id} обновлена с message_id: ${messageId}`);
+            logger.info(`Запись ${survey_active_id} обновлена с message_id: ${messageId}`);
         } else {
-            console.error(`Не удалось обновить запись ${survey_active_id}: сообщение не отправлено`);
+            logger.error(`Не удалось обновить запись ${survey_active_id}: сообщение не отправлено`);
         }
     } catch (error) {
-        console.error(`Ошибка при обработке записи ${survey_active_id}:`, error);
+        logger.error(`Ошибка при обработке записи ${survey_active_id}:`, error);
     }
 }
 
@@ -89,11 +89,11 @@ async function checkMissedRecords(bot: Bot<MyContext>): Promise<void> {
     `);
 
         for (const record of result.rows as SurveyActive[]) {
-            console.log(`Обработка пропущенной записи: ${record.survey_active_id}`);
+            logger.info(`Обработка пропущенной записи: ${record.survey_active_id}`);
             await processRecord(bot,record);
         }
     } catch (error) {
-        console.error("Ошибка при проверке пропущенных записей:", error);
+        logger.error("Ошибка при проверке пропущенных записей:", error);
     }
 }
 
@@ -105,25 +105,25 @@ function handleNotifications(bot: Bot<MyContext>): void {
                 const record: SurveyActive = JSON.parse(msg.payload);
                 await processRecord(bot,record);
             } catch (error) {
-                console.error("Ошибка при обработке уведомления:", error);
+                logger.error("Ошибка при обработке уведомления:", error);
             }
         }
     });
 
     pgNotifyClient.on("error", (error) => {
-        console.error("Ошибка клиента уведомлений:", error);
+        logger.error("Ошибка клиента уведомлений:", error);
         void reconnectNotifyClient(bot);
     });
 }
 // Переподключение при потере соединения
 async function reconnectNotifyClient(bot: Bot<MyContext>): Promise<void> {
-    console.warn("Соединение с PostgreSQL (уведомления) закрыто. Пытаемся переподключиться...");
+    logger.info("Соединение с PostgreSQL (уведомления) закрыто. Пытаемся переподключиться...");
     try {
         await connectPgClient(pgNotifyClient, "клиент уведомлений");
         await subscribeToNotifications();
         await checkMissedRecords(bot);
     } catch (err) {
-        console.error("Ошибка переподключения клиента уведомлений:", err);
+        logger.error("Ошибка переподключения клиента уведомлений:", err);
         setTimeout(reconnectNotifyClient, 5000); // Повтор через 5 секунд
     }
 }
@@ -143,7 +143,7 @@ export async function  subscribeNotify(bot: Bot<MyContext>): Promise<void>{
         // Проверка пропущенных записей
         await checkMissedRecords(bot);
     } catch (err) {
-        console.error("Ошибка инициализации:", err);
+        logger.error("Ошибка инициализации:", err);
         process.exit(1);
     }
 }
