@@ -23,7 +23,7 @@ export const client = new Client(pgConfig);
 
 
 db.on("connect", () => {
-  logger.info("Подключение к базе данных установлено");
+  //logger.info("Подключение к базе данных установлено");
 });
 
 db.on("error", (error) => {

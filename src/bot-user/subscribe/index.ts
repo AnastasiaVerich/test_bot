@@ -1,9 +1,10 @@
 import {Client} from "pg";
 import {pgConfig} from "../../database/dbClient";
 import {Bot} from "grammy";
-import {SurveyActive} from "../../database/queries/surveyQueries";
+import {SurveyActive, updateActiveSurveyIsJoinedToChat} from "../../database/queries/surveyQueries";
 import {MyContext} from "../../bot-common/types/type";
 import logger from "../../lib/logger";
+import {findOperator} from "../../database/queries/operatorQueries";
 
 const pgNotifyClient = new Client(pgConfig);
 const pgClient = new Client(pgConfig);
@@ -59,13 +60,16 @@ async function sendMessageWithRetry(bot: Bot<MyContext>,message: string,chatId:n
 
 // Функция обработки записи
 async function processRecord(bot: Bot<MyContext>,record: SurveyActive): Promise<void> {
-    const { survey_active_id, user_id,operator_id, created_at, link_invite } = record;
+    const { survey_active_id, user_id,operator_id, created_at } = record;
 
-    const message =`Вступите в чат для прохождения опроса с оператором: ${link_invite}`
+    const operator = await findOperator(operator_id,null,null)
+    const message =`Напишите оператору: @${operator?.tg_account}`
 
     try {
         // Отправка сообщения и получение message_id
         const messageId = await sendMessageWithRetry(bot,message,user_id);
+        await updateActiveSurveyIsJoinedToChat(true, survey_active_id)
+
 
         if (messageId !== null) {
             // Обновление message_id в таблице survey_active
@@ -85,7 +89,7 @@ async function checkMissedRecords(bot: Bot<MyContext>): Promise<void> {
             SELECT *
             FROM survey_active
             WHERE operator_id IS NOT NULL
-            AND is_joined_to_chat IS FALSE
+            AND is_user_notified IS FALSE
             ORDER BY created_at ASC
     `);
 

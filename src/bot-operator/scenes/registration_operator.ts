@@ -30,8 +30,6 @@ export async function registrationOperatorScene(
         await ctx.reply(`${REGISTRATION_OPERATOR_SCENE.SUCCESS}`, {
             reply_markup: {remove_keyboard: true},
         });
-        logger.info(operator)
-        await link(ctx,Number(operator.telegram_chat_id))
         return
 
     } catch (error) {

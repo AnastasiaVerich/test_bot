@@ -1,12 +1,17 @@
 import {getUserId} from "../../utils/getUserId";
 import {MessageOrigin} from "@grammyjs/types/message";
 import {channelId} from "../../../config/env";
-import {getActiveSurveyByMessageID, updateActiveSurveyOperatorId} from "../../../database/queries/surveyQueries";
+import {
+    getActiveSurveyByMessageID,
+    getSurveyActiveInfo, getSurveyInformations,
+    updateActiveSurveyOperatorId
+} from "../../../database/queries/surveyQueries";
 import {findOperator} from "../../../database/queries/operatorQueries";
 import {Bot} from "grammy";
 import {MESSAGE_OPERATOR_FROWARD} from "../../../bot-common/constants/handler_message";
 import {MyContext} from "../../../bot-common/types/type";
 import logger from "../../../lib/logger";
+import {FinishSurveyKeyboard} from "../../../bot-common/keyboards/inlineKeyboard";
 
 
 export  const handleMessageForward = async (ctx: MyContext,bot: Bot<MyContext>)=>{
@@ -23,23 +28,46 @@ export  const handleMessageForward = async (ctx: MyContext,bot: Bot<MyContext>)=
         const messageId = forwardOrigin.message_id;
         if(!messageId) return
         const active_survey = await getActiveSurveyByMessageID(messageId)
-        if(!active_survey)return
+        if(!active_survey) return
 
         if(active_survey.operator_id){
             return ctx.reply(MESSAGE_OPERATOR_FROWARD.BUSY)
         }
 
         const operator = await findOperator(userId,null,null)
-        if(!operator|| !operator.telegram_chat_id){
+        if(!operator){
             return
             //что-то придумать.
         }
-        const link = await create_link(bot, Number(operator.telegram_chat_id))
-        if(!link)return
 
-        await updateActiveSurveyOperatorId(userId,active_survey.survey_active_id, link)
+        await updateActiveSurveyOperatorId(userId,active_survey.survey_active_id)
 
-        await ctx.reply(`${MESSAGE_OPERATOR_FROWARD.SUCCESS} `)
+        await ctx.reply(`${MESSAGE_OPERATOR_FROWARD.SUCCESS}`)
+        const surveyActive = await getSurveyActiveInfo(active_survey.survey_active_id)
+        const surveyActiveTasks = await getSurveyInformations(active_survey.survey_id)
+
+
+        if(!surveyActive)return
+        let message = [
+            `<b>📋 Опрос</b>`,
+            //`<b>📋 Опрос: ${surveyActive.topic}</b>`,
+            //`<b>Тип:</b> ${surveyActive.survey_type}`,
+            //`<b>Описание:</b> ${surveyActive.description}`,
+            `<b>Геолокация:</b> ${surveyActive.region_name}`,
+            `<b>Цена за задание:</b> ${surveyActive.task_price}`,
+            `<b>Время резерва:</b> ${surveyActive.reservation_time_min} мин`,
+            `` // Empty line for spacing
+        ].join('\n');
+
+        message += '\n\n<b>📝 Информация:</b>\n';
+        surveyActiveTasks.forEach((task, index) => {
+            message += `<b>${task.label}:</b> ${task.description}\n`;
+        });
+        await ctx.reply(`${message}`, {parse_mode:'HTML'})
+
+        await ctx.reply('После окончания опроса нажми на кнопку завершения.',
+            {reply_markup:FinishSurveyKeyboard()})
+
         // Удаление сообщения из канала (для всех участников)
 
         try {
@@ -53,38 +81,5 @@ export  const handleMessageForward = async (ctx: MyContext,bot: Bot<MyContext>)=
             );
             return;
         }
-    }
-}
-async function create_link(
-    bot: Bot<MyContext>,
-    chatId: number
-) {
-
-    try {
-        await bot.init(); // ID бота
-        const botId = bot.botInfo.id; // ID бота
-        logger.info(chatId)
-        const member = await bot.api.getChatMember(chatId, botId);
-
-        if (member.status !== "administrator") {
-            //await ctx.reply("У бота нет доступа к вашей группе, напишите в поддержку.!");
-            return;
-        }
-        if (!member.can_invite_users) {
-            //await ctx.reply("У бота нет разрешения для приглошения новых пользователей. Напишите в поддержку.");
-            return;
-        }
-
-        // Создаём одноразовую пригласительную ссылку
-        const link = await bot.api.createChatInviteLink(chatId, {
-            member_limit: 1, // Ограничиваем до 1 использования
-            expire_date: Math.floor(Date.now() / 1000) + 3600, // Ссылка действует 1 час
-            name: `One-time link ${new Date().toISOString()}`, // Название ссылки для удобства
-        });
-        return link.invite_link
-
-    } catch (error) {
-        logger.info(error)
-        return null;
     }
 }

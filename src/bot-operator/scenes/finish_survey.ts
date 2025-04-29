@@ -18,7 +18,7 @@ export async function finishSurveyScene(
         if (!operator_id) return
 
         const operator = await findOperator(operator_id,null,null)
-        if(!operator|| !operator.telegram_chat_id){
+        if(!operator){
             return
             //что-то придумать.
         }
@@ -38,8 +38,20 @@ export async function finishSurveyScene(
             });
             return;
         }
+        console.log(1)
+
+        const result_position = await countResultStep(conversation, ctx)
+
+        if (!result_position) {
+            await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
+                reply_markup: FinishSurveyKeyboard(),
+            });
+            return;
+        }
+        console.log(2)
 
         const resultConfirm = await stepConfirm(conversation, ctx)
+        console.log(3)
 
         if (!resultConfirm) {
             await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
@@ -50,9 +62,7 @@ export async function finishSurveyScene(
 
         if (resultConfirm === BUTTONS_KEYBOARD.ConfirmButton) {
             // Добавляем платеж в список ожидающих
-            await completeSurvey(surveyActive.survey_active_id, count_completed);
-            await ctx.api.banChatMember(Number(operator.telegram_chat_id), surveyActive.user_id)
-            await ctx.api.unbanChatMember(Number(operator.telegram_chat_id), surveyActive.user_id)
+            await completeSurvey(surveyActive.survey_active_id, count_completed, result_position);
 
             return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SUCCESS, {
                 reply_markup: {remove_keyboard:true},
@@ -100,6 +110,39 @@ async function countCompletedStep(
             break
         }
         return count_completed;
+    } catch (error) {
+        return null;
+    }
+}
+
+async function countResultStep(
+    conversation: MyConversation,
+    ctx: MyConversationContext,
+
+) {
+
+    try {
+        console.log(888)
+
+        await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT);
+
+        let result_position: any = null
+        //Два выхода из цикла — контакт юзера получен либо произошла ошибка(скорее всего на стороне тг)
+        while (true) {
+            const response = await conversation.waitFor("message:text", {
+                otherwise: (ctx) => ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT_OTHERWISE),
+            });
+            const userInput = response.message?.text.trim() ?? '';
+            const number = Number(userInput); // Преобразуем в целое число
+
+            if (isNaN(number)) {
+                await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTERED_NOT_CORRECT_RESULT);
+                continue
+            }
+            result_position = number;
+            break
+        }
+        return result_position;
     } catch (error) {
         return null;
     }

@@ -6,7 +6,6 @@ export interface Operator {
     operator_id: number;
     tg_account: string;
     phone: string | null;
-    telegram_chat_id: number;
 
     created_at: string; // Дата и время в ISO формате
 }
@@ -89,14 +88,12 @@ export const registerOperator = async (
 
 export const addAllowedOperator = async (
     tg_account: string,
-    telegram_chat_id: number,
 ): Promise<Operator | undefined> => {
 
     try {
-        const query = `INSERT INTO operators (tg_account,telegram_chat_id) VALUES ($1, $2);`;
+        const query = `INSERT INTO operators (tg_account) VALUES ($1);`;
         const result: QueryResult<Operator> = await db.query(query, [
             tg_account,
-            telegram_chat_id,
         ]);
         return result.rows[0];
     } catch (error) {

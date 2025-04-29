@@ -9,6 +9,12 @@ export const FINISH_SURVEY_OPERATOR_SCENE = {
 
     ENTERED_NOT_CORRECT_COUNT: "Пожалуйста, введите число!",
 
+    ENTER_RESULT: "Введите позицию сайта во время опроса",
+
+    ENTER_RESULT_OTHERWISE: `Пожалуйста, введите число, обозначающее позицию сайта при поиске.`,
+
+    ENTERED_NOT_CORRECT_RESULT: "Пожалуйста, введите число!",
+
     CONFIRMATION: "Подтвердите, что вы ввели корректные данные по окончанию прохождения опроса.",
 
     CONFIRMATION_OTHERWISE:

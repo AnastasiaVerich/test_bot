@@ -17,21 +17,13 @@ export interface Survey {
 
   created_at: string; // Дата и время в ISO формате
 }
-interface SurveyTask {
-  task_id: number;
-  survey_id: number;
-  description: string;
-
-  created_at: string; // Дата и время в ISO формате
-}
 export interface SurveyActive {
   survey_active_id: number;
   survey_id: number;
   user_id: number;
   operator_id: number;
   message_id: number;
-  is_joined_to_chat: boolean;
-  link_invite: string;
+  is_user_notified: boolean;
 
   created_at: string; // Дата и время в ISO формате
 }
@@ -41,13 +33,15 @@ interface SurveyCompletions {
   user_id: number;
   operator_id: number;
   count_completed: number;
+  result: string;
   reward: number;
 
   created_at: string; // Дата и время в ISO формате
 }
-interface SurveyTask {
-  task_id: number;
+interface SurveyInformations  {
+  survey_information_id: number;
   survey_id: number;
+  label: string;
   description: string;
 
   created_at: string; // Дата и время в ISO формате
@@ -237,13 +231,12 @@ export const updateActiveSurveyMessageID = async (
 export const updateActiveSurveyOperatorId= async (
     operator_id: number,
     survey_active_id: number,
-    link_invite:string
 ): Promise<SurveyActive | undefined> => {
   try {
     const query =
-        `UPDATE survey_active SET operator_id = $1, link_invite=$3 WHERE survey_active_id = $2`;
+        `UPDATE survey_active SET operator_id = $1 WHERE survey_active_id = $2`;
 
-    const result:QueryResult<SurveyActive> = await db.query(query, [operator_id,survey_active_id,link_invite]);
+    const result:QueryResult<SurveyActive> = await db.query(query, [operator_id,survey_active_id]);
 
     return result.rows[0];
   } catch (error) {
@@ -257,14 +250,14 @@ export const updateActiveSurveyOperatorId= async (
   }
 };
 export const updateActiveSurveyIsJoinedToChat= async (
-    is_joined_to_chat: boolean,
+    is_user_notified: boolean,
     survey_active_id: number,
 ): Promise<SurveyActive | undefined> => {
   try {
     const query =
-        `UPDATE survey_active SET is_joined_to_chat = $1 WHERE survey_active_id = $2`;
+        `UPDATE survey_active SET is_user_notified = $1 WHERE survey_active_id = $2`;
 
-    const result:QueryResult<SurveyActive> = await db.query(query, [is_joined_to_chat,survey_active_id]);
+    const result:QueryResult<SurveyActive> = await db.query(query, [is_user_notified,survey_active_id]);
 
     return result.rows[0];
   } catch (error) {
@@ -323,7 +316,8 @@ export const addSurveyInActive = async (
 //Опрос выполнен, тут мы его переносим в выполненные, удаляем из прогресс и зачисляем баланс
 export const completeSurvey = async (
     surveyActiveId: number,
-    completedTasksCount: number
+    completedTasksCount: number,
+    result_position: string,
 ): Promise<void> => {
   const client = await db.connect(); // Получаем клиента для транзакции
   try {
@@ -344,19 +338,20 @@ export const completeSurvey = async (
     // Добавляем запись в survey_completions
     const insertQuery = `
       INSERT INTO survey_completions (
-        survey_id, user_id, operator_id, count_completed, reward
+        survey_id, user_id, operator_id, count_completed, reward, result
       )
       SELECT 
         $1 AS survey_id,
         $2 AS user_id,
         $3 AS operator_id,
         $4 AS count_completed,
-        $4 * s.task_price AS reward
+        $4 * s.task_price AS reward,
+        $5
       FROM surveys s
       WHERE s.survey_id = $1
       RETURNING user_id, reward;
     `;
-    const insertResult = await client.query(insertQuery, [survey_id, user_id, operator_id, completedTasksCount]);
+    const insertResult = await client.query(insertQuery, [survey_id, user_id, operator_id, completedTasksCount,result_position]);
     const { reward } = insertResult.rows[0];
 
     // Обновляем баланс пользователя за прохождение опроса
@@ -468,5 +463,67 @@ export const getSurveyAccrualHistory = async (userId: number): Promise<any[]> =>
       shortError = String(error).substring(0, 50);
     }
     throw new Error("Error getSurveyAccrualHistory: " + shortError);
+  }
+};
+
+interface SurveyActiveJoin {
+  survey_type: SurveyType;
+  topic: string;
+  description: string;
+  task_price: number;
+  region_name: string;
+  reservation_time_min: string;
+}
+export const getSurveyActiveInfo = async (survey_active_id: number): Promise<SurveyActiveJoin|undefined> => {
+  try {
+    const query = `
+      SELECT 
+    s.survey_type,
+    s.topic,
+    s.description,
+    s.task_price,
+    rs.region_name,
+    rs.reservation_time_min
+FROM 
+    survey_active sa
+    JOIN surveys s ON sa.survey_id = s.survey_id
+    JOIN region_settings rs ON s.region_id = rs.region_id
+WHERE 
+    sa.survey_active_id = $1;
+    `;
+    const result = await db.query(query, [survey_active_id]);
+    return result.rows[0];
+  } catch (error) {
+    logger.info(error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error getSurveyActiveInfo: " + shortError);
+  }
+};
+export const getSurveyInformations = async (survey_id: number): Promise<SurveyInformations[]> => {
+  try {
+    const query = `
+     SELECT 
+    *
+FROM 
+    survey_informations
+WHERE 
+    survey_id = $1;
+    `;
+    const result = await db.query(query, [survey_id]);
+    return result.rows;
+  } catch (error) {
+    logger.info(error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error getSurveyInformations: " + shortError);
   }
 };

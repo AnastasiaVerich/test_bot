@@ -66,7 +66,6 @@ CREATE TABLE operators (
     operator_id BIGINT UNIQUE NOT NULL DEFAULT nextval('operator_default_id_seq'),
     tg_account VARCHAR(255) NOT NULL,
     phone VARCHAR(15),
-    telegram_chat_id BIGINT NOT NULL,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -129,18 +128,19 @@ GRANT ALL PRIVILEGES ON TABLE surveys TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE surveys_survey_id_seq TO admin_vadim;
 
 -- Таблица заданий опросов
-CREATE TABLE survey_tasks (
-    task_id SERIAL PRIMARY KEY,
-    survey_id INT NOT NULL,
-    description VARCHAR(255) NOT NULL,
+-- Создание таблицы survey_informations
+CREATE TABLE survey_informations (
+    survey_information_id SERIAL PRIMARY KEY, -- Идентификатор записи об опросе
+    survey_id INT NOT NULL,                  -- Идентификатор опроса
+    label VARCHAR(255) NOT NULL,             -- Название задания
+    description VARCHAR(255) NOT NULL,       -- Описание задания
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Время создания
 
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (survey_id) REFERENCES surveys(survey_id) ON DELETE CASCADE
+    FOREIGN KEY (survey_id) REFERENCES surveys(survey_id) ON DELETE CASCADE -- Внешний ключ на таблицу surveys
 );
 
-GRANT ALL PRIVILEGES ON TABLE survey_tasks TO admin_vadim;
-GRANT USAGE, SELECT, UPDATE ON SEQUENCE survey_tasks_task_id_seq TO admin_vadim;
+GRANT ALL PRIVILEGES ON TABLE survey_informations TO admin_vadim;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE survey_informations_survey_information_id_seq TO admin_vadim;
 
 -- Таблица в которой зафиксировано, что сейчас опрос проходит ибо собирается проходить пользователь с оператором
 CREATE TABLE survey_active (
@@ -149,8 +149,7 @@ CREATE TABLE survey_active (
     user_id BIGINT NOT NULL,
     operator_id BIGINT,
     message_id BIGINT,
-    is_joined_to_chat BOOLEAN NOT NULL DEFAULT FALSE,
-    link_invite VARCHAR(255),
+    is_user_notified BOOLEAN NOT NULL DEFAULT FALSE,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
@@ -169,6 +168,7 @@ CREATE TABLE survey_completions (
     user_id BIGINT NOT NULL,
     operator_id BIGINT NOT NULL,
     count_completed DECIMAL(10, 2) NOT NULL,
+    result VARCHAR(255) NOT NULL,
     reward DECIMAL(10, 2) NOT NULL, -- Фактическая награда (может отличаться от tasks.reward, если меняется со временем)
 
     completed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -243,7 +243,7 @@ CREATE TABLE sessions_operator (
 GRANT ALL PRIVILEGES ON TABLE sessions_operator TO admin_vadim;
 ALTER TABLE sessions_operator OWNER TO admin_vadim;
 
--- Функция для отправки NOTIFY
+-- Функция для отправки в канал операторов нового опроса
 CREATE OR REPLACE FUNCTION notify_survey_active() RETURNS TRIGGER AS $$
 BEGIN
   IF NEW.operator_id IS NULL AND NEW.message_id IS NULL THEN
@@ -261,10 +261,10 @@ EXECUTE FUNCTION notify_survey_active();
 
 
 
--- Функция для отправки NOTIFY при появлении operator_id и отсутствии is_joined_to_chat
+-- Функция для отправки NOTIFY при появлении operator_id и отсутствии is_user_notified
 CREATE OR REPLACE FUNCTION notify_operator_assigned() RETURNS TRIGGER AS $$
 BEGIN
-  IF NEW.operator_id IS NOT NULL AND NEW.is_joined_to_chat IS FALSE THEN
+  IF NEW.operator_id IS NOT NULL AND NEW.is_user_notified IS FALSE THEN
     PERFORM pg_notify('operator_assigned', row_to_json(NEW)::text);
   END IF;
   RETURN NEW;
@@ -272,9 +272,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Триггер на таблицу survey_active
-CREATE TRIGGER operator_assigned_trigger
+CREATE OR REPLACE TRIGGER operator_assigned_trigger
 AFTER UPDATE OF operator_id ON survey_active
 FOR EACH ROW
-WHEN (NEW.operator_id IS NOT NULL AND NEW.is_joined_to_chat IS NULL)
+WHEN (NEW.operator_id IS NOT NULL AND NEW.is_user_notified IS FALSE)
 EXECUTE FUNCTION notify_operator_assigned();
 
