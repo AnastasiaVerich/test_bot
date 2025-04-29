@@ -1,5 +1,5 @@
 import logger from "../../lib/logger";
-import {getUserId} from "../utils/getUserId";
+import {getUserId} from "../../bot-common/utils/getUserId";
 import {completeSurvey, getActiveSurveyByOperatorId} from "../../database/queries/surveyQueries";
 import {Conversation} from "@grammyjs/conversations";
 import {findOperator} from "../../database/queries/operatorQueries";

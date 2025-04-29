@@ -1,5 +1,5 @@
 import { MiddlewareFn } from "grammy";
-import { getUserId } from "../utils/getUserId";
+import { getUserId } from "../../bot-common/utils/getUserId";
 import logger from "../../lib/logger";
 import { userInBlacklist } from "../utils/userInBlacklist";
 import {RESPONSES} from "../../bot-common/constants/responses";

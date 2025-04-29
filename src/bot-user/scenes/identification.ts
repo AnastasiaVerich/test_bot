@@ -1,5 +1,5 @@
 import logger from "../../lib/logger";
-import {getUserId, returnUserId} from "../utils/getUserId";
+import {getUserId, returnUserId} from "../../bot-common/utils/getUserId";
 import {findUserByTelegramId, updateUserLastInit} from "../../database/queries/userQueries";
 import {RESPONSES} from "../../bot-common/constants/responses";
 import {IdentificationKeyboard, RegistrationKeyboard} from "../../bot-common/keyboards/inlineKeyboard";

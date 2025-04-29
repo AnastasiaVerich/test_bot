@@ -1,11 +1,11 @@
 import logger from "../../lib/logger";
-import {getUserId} from "../utils/getUserId";
-import {getUserAccount} from "../utils/getUserTgAccount";
+import {getUserId} from "../../bot-common/utils/getUserId";
 import {registerOperator} from "../../database/queries/operatorQueries";
 import {RegistrationKeyboard} from "../../bot-common/keyboards/inlineKeyboard";
 import {sendUserPhone} from "../../bot-common/keyboards/keyboard";
 import {REGISTRATION_OPERATOR_SCENE} from "../../bot-common/constants/scenes";
 import {MyConversation, MyConversationContext} from "../../bot-common/types/type";
+import {getUserAccount} from "../../bot-common/utils/getUserTgAccount";
 
 export async function registrationOperatorScene(
     conversation: MyConversation,

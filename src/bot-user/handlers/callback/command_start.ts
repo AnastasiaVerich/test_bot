@@ -1,11 +1,11 @@
 import {Message} from "grammy/types";
 import {findUserByTelegramId} from "../../../database/queries/userQueries";
 import {addReferral} from "../../../database/queries/referralQueries";
-import {getUserId, returnUserId} from "../../utils/getUserId";
 import logger from "../../../lib/logger";
 import {COMMAND_USER_START} from "../../../bot-common/constants/handler_command";
 import {IdentificationKeyboard, RegistrationKeyboard} from "../../../bot-common/keyboards/inlineKeyboard";
 import {MyContext} from "../../../bot-common/types/type";
+import {getUserId, returnUserId} from "../../../bot-common/utils/getUserId";
 
 export const handleStartCommand = async (
   ctx: MyContext,

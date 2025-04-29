@@ -1,11 +1,11 @@
 import logger from "../../../lib/logger";
-import {getUserId} from "../../utils/getUserId";
 import {findPendingPaymentByUserId} from "../../../database/queries/pendingPaymentsQueries";
 import {checkBalance} from "../../../database/queries/userQueries";
 import {curseTon} from "../../../config/env";
 import {HANDLER_BALANCE} from "../../../bot-common/constants/handler_callback_queries";
 import {BalanceMenu} from "../../../bot-common/keyboards/inlineKeyboard";
 import {MyContext} from "../../../bot-common/types/type";
+import {getUserId} from "../../../bot-common/utils/getUserId";
 
 export async function handleBalance(
     ctx: MyContext,

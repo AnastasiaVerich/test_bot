@@ -1,6 +1,6 @@
 import {Conversation} from "@grammyjs/conversations";
 import logger from "../../lib/logger";
-import {getUserId} from "../utils/getUserId";
+import {getUserId} from "../../bot-common/utils/getUserId";
 import {findUserByTelegramId} from "../../database/queries/userQueries";
 
 import {IdentificationKeyboard, RegistrationKeyboard} from "../../bot-common/keyboards/inlineKeyboard";

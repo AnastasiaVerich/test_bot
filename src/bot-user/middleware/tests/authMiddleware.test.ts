@@ -1,12 +1,12 @@
 // import { authMiddleware } from "./authMiddleware";
 // import { findUserByTelegramId } from "../../database/queries/userQueries";
-// import { getUserId } from "../utils/getUserId";
+// import { getUserId } from "../../bot-common/utils/getUserId";
 // import { MESSAGES } from "../constants/messages";
 // import logger from "../../lib/logger";
 // import { MyContext } from "../types/type";
 //
 // jest.mock("../../database/queries/userQueries");
-// jest.mock("../utils/getUserId");
+// jest.mock("../../bot-common/utils/getUserId");
 // jest.mock("../../lib/logger");
 //
 // describe("Test authMiddleware", () => {

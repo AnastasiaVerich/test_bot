@@ -2,7 +2,8 @@ import {InlineKeyboard} from "grammy";
 import {Message} from "grammy/types";
 import {formatTimestamp} from "../../../lib/date";
 import logger from "../../../lib/logger";
-import {getUserId} from "../../utils/getUserId";
+import {getUserId} from "../../../bot-common/utils/getUserId"
+;
 import {getSurveyAccrualHistory} from "../../../database/queries/surveyQueries";
 import {getReferralAccrualHistory} from "../../../database/queries/referralQueries";
 import {BUTTONS_CALLBACK_QUERIES} from "../../../bot-common/constants/buttons";

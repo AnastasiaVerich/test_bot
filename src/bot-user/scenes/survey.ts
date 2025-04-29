@@ -1,7 +1,7 @@
 import {Message} from "grammy/types";
 
 import logger from "../../lib/logger";
-import {getUserId} from "../utils/getUserId";
+import {getUserId} from "../../bot-common/utils/getUserId";
 import {findUser} from "../utils/findUser";
 import {
     addSurveyInActive,
@@ -204,7 +204,8 @@ async function reservationStep(
 //
 // import {MESSAGES} from "../../constants/messages";
 // import logger from "../../../lib/logger";
-// import {getUserId} from "../../utils/getUserId";
+// import {getUserId} from "../../../bot-common/utils/getUserId"
+;
 // import {findUser} from "../../utils/findUser";
 // import {
 //     addSurveyInActive,

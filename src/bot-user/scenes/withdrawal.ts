@@ -1,7 +1,7 @@
 import {Message} from "grammy/types";
 import {addPendingPayment, findPendingPaymentByUserId,} from "../../database/queries/pendingPaymentsQueries";
 import logger from "../../lib/logger";
-import {getUserId} from "../utils/getUserId";
+import {getUserId} from "../../bot-common/utils/getUserId";
 import {checkBalance, updateMinusUserBalance} from "../../database/queries/userQueries";
 
 import {curseTon} from "../../config/env";

@@ -1,7 +1,7 @@
 import {InlineKeyboard, InputFile} from "grammy";
 import {Message} from "grammy/types";
 import logger from "../../lib/logger";
-import {getUserId} from "../utils/getUserId";
+import {getUserId} from "../../bot-common/utils/getUserId";
 import {BUTTONS_KEYBOARD} from "../../bot-common/constants/buttons";
 import {RESPONSES} from "../../bot-common/constants/responses";
 import {INVITE_USER_SCENE} from "../../bot-common/constants/scenes";

@@ -1,4 +1,5 @@
-import {getUserId} from "../../utils/getUserId";
+import {getUserId} from "../../../bot-common/utils/getUserId"
+;
 import {MessageOrigin} from "@grammyjs/types/message";
 import {channelId} from "../../../config/env";
 import {

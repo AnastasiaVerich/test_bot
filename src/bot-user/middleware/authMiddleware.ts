@@ -1,9 +1,9 @@
 import { MiddlewareFn } from "grammy";
-import { getUserId } from "../utils/getUserId";
 import logger from "../../lib/logger";
 import { findUser } from "../utils/findUser";
 import {RESPONSES} from "../../bot-common/constants/responses";
 import {MyContext} from "../../bot-common/types/type";
+import {getUserId} from "../../bot-common/utils/getUserId";
 
 export const authMiddleware: MiddlewareFn<MyContext> = async (ctx, next) => {
   try {

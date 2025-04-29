@@ -1,5 +1,5 @@
 import { MiddlewareFn } from "grammy";
-import { getUserId } from "../utils/getUserId";
+import { getUserId } from "../../bot-common/utils/getUserId";
 import logger from "../../lib/logger";
 import { findUser } from "../utils/findUser";
 import {isDateDifferenceAtLeast} from "../../lib/date";

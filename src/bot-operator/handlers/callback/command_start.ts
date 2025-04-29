@@ -1,10 +1,10 @@
 import {Message} from "grammy/types";
 import {findOperatorByTgAccount} from "../../../database/queries/operatorQueries";
-import {getUserAccount} from "../../utils/getUserTgAccount";
 import {COMMAND_OPERATOR_START} from "../../../bot-common/constants/handler_command";
 import {RegistrationKeyboard} from "../../../bot-common/keyboards/inlineKeyboard";
 import {MyContext} from "../../../bot-common/types/type";
 import logger from "../../../lib/logger";
+import {getUserAccount} from "../../../bot-common/utils/getUserTgAccount";
 
 export const handleStartCommand = async (
     ctx: MyContext,

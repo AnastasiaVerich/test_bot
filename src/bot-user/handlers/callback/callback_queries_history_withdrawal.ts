@@ -3,7 +3,8 @@ import {Message} from "grammy/types";
 import {selectWithdrawalLogByUserId} from "../../../database/queries/withdrawalLogsQueries";
 import {formatTimestamp} from "../../../lib/date";
 import logger from "../../../lib/logger";
-import {getUserId} from "../../utils/getUserId";
+import {getUserId} from "../../../bot-common/utils/getUserId"
+;
 import {BUTTONS_CALLBACK_QUERIES} from "../../../bot-common/constants/buttons";
 import {HANDLER_HISTORY_WITHDRAWAL} from "../../../bot-common/constants/handler_callback_queries";
 import {MyContext} from "../../../bot-common/types/type";

@@ -18,8 +18,8 @@ export async function connectPgClient(client: Client, name: string): Promise<voi
 
 export async function sendMessageWithRetry(
     bot: Bot<MyContext>,
-    chatId: number | string,
     message: string,
+    chatId: number | string,
     maxAttempts = 3
 ): Promise<number | null> {
     let attempt = 1;
