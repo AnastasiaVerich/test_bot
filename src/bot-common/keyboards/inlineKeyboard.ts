@@ -1,15 +1,21 @@
-import {InlineKeyboard} from "grammy";
+import {Bot, InlineKeyboard} from "grammy";
 import {BUTTONS_CALLBACK_QUERIES} from "../constants/buttons";
+import {MyContext} from "../types/type";
 
 export const RegistrationKeyboard = (): InlineKeyboard => new InlineKeyboard().text(
     BUTTONS_CALLBACK_QUERIES.RegistrationButtonText,
     BUTTONS_CALLBACK_QUERIES.RegistrationButton,
 );
 
-export const FinishSurveyKeyboard = (): InlineKeyboard => new InlineKeyboard().text(
-    BUTTONS_CALLBACK_QUERIES.FinishSurveyButtonText,
-    BUTTONS_CALLBACK_QUERIES.FinishSurveyButton,
-);
+export const FinishSurveyKeyboard = (): InlineKeyboard => new InlineKeyboard()
+    .text(
+        BUTTONS_CALLBACK_QUERIES.FinishSurveyButtonText,
+        BUTTONS_CALLBACK_QUERIES.FinishSurveyButton,
+    ).text(
+        BUTTONS_CALLBACK_QUERIES.CancelSurveyButtonText,
+        BUTTONS_CALLBACK_QUERIES.CancelSurveyButton,
+    );
+
 export const IdentificationKeyboard = (): InlineKeyboard => new InlineKeyboard().text(
     BUTTONS_CALLBACK_QUERIES.IdentificationButtonText,
     BUTTONS_CALLBACK_QUERIES.IdentificationButton,

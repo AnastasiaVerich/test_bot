@@ -179,5 +179,16 @@ export const WITHDRAWAL_USER_SCENE = {
     SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButtonText}'.`,
 
 }
+export const START_SURVEY_OPERATOR_SCENE = {
+
+    BUSY: 'Уже успели забрать',
+
+    TOOK_IT: 'Пользователь @{tg_account} будет уведомлен о том, что ему нужно написать вам.',
+
+    CONFIRMATION: `Если пользователь написал вам, то нажмите на ${BUTTONS_KEYBOARD.ConfirmButton}. Если не написал, то в течении {res_time} резервация будет снята.`,
+    CONFIRMATION_OTHERWISE:
+        "Нажмите на соответсвующую кнопку для подтверждения.",
+    SOME_ERROR: `Произошла ошибка.`,
+}
 
 

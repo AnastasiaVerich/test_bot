@@ -156,9 +156,9 @@ import {sendMessageWithRetry, subscribeToChannel} from "../../bot-common/utils/p
 
 
 async function processRecord(bot: Bot<MyContext>, record: SurveyActive): Promise<void> {
-    const { survey_active_id, user_id,operator_id, created_at } = record;
+    const { survey_active_id, user_id,operator_id, created_at, reservation_end } = record;
     const operator = await findOperator(operator_id,null,null)
-    const message =`Напишите оператору: @${operator?.tg_account}`
+    const message =`Напишите оператору: @${operator?.tg_account} до ${reservation_end}.`
     try {
         const messageId = await sendMessageWithRetry(bot,message,user_id);
         await updateActiveSurveyIsJoinedToChat(true, survey_active_id)

@@ -16,6 +16,7 @@ import {RESPONSES} from "../../bot-common/constants/responses";
 import {AuthUserKeyboard, sendLocation} from "../../bot-common/keyboards/keyboard";
 import {SURVEY_USER_SCENE} from "../../bot-common/constants/scenes";
 import {MyContext, MyConversation, MyConversationContext, LocationType} from "../../bot-common/types/type";
+import {getUserAccount} from "../../bot-common/utils/getUserTgAccount";
 
 export async function surveyScene(
     conversation: MyConversation,
@@ -24,6 +25,9 @@ export async function surveyScene(
     try {
         const userId = await conversation.external(() => getUserId(ctx));
         if (!userId) return
+
+        const userAccount = await conversation.external(() => getUserAccount(ctx));
+        if (!userAccount) return
 
         const user = await conversation.external(() => findUser(userId, ctx));
         if (!user) return;
@@ -81,7 +85,7 @@ export async function surveyScene(
         }
 
         //Шаг 5: меняем статус пользователю, оператору и запросу.
-        const isSuccess = await reservationStep(userId, survey.survey_id);
+        const isSuccess = await reservationStep(userId, survey.survey_id, userAccount);
 
         if (isSuccess) {
             return ctx.reply(
@@ -185,6 +189,7 @@ async function stepSearchOperator(
 async function reservationStep(
     userId: number,
     survey_id: number,
+    tg_account: string,
 ): Promise<boolean> {
     try {
 
@@ -192,6 +197,7 @@ async function reservationStep(
         await addSurveyInActive(
             survey_id,
             userId,
+            tg_account
         );
         return true;
     } catch (error) {

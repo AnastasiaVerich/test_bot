@@ -150,6 +150,8 @@ CREATE TABLE survey_active (
     operator_id BIGINT,
     message_id BIGINT,
     is_user_notified BOOLEAN NOT NULL DEFAULT FALSE,
+    is_reservation_end BOOLEAN NOT NULL DEFAULT FALSE,
+    reservation_end TIMESTAMP WITH TIME ZONE,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
@@ -278,3 +280,39 @@ FOR EACH ROW
 WHEN (NEW.operator_id IS NOT NULL AND NEW.is_user_notified IS FALSE)
 EXECUTE FUNCTION notify_operator_assigned();
 
+
+
+
+-- Функция для отправки NOTIFY при установке is_reservation_end в TRUE
+CREATE OR REPLACE FUNCTION notify_reservation_ended()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.is_reservation_end IS TRUE THEN
+        PERFORM pg_notify('reservation_ended', row_to_json(NEW)::text);
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Триггер на таблицу survey_active
+CREATE OR REPLACE TRIGGER reservation_ended_trigger
+AFTER UPDATE OF is_reservation_end ON survey_active
+FOR EACH ROW
+WHEN (NEW.is_reservation_end IS TRUE)
+EXECUTE FUNCTION notify_reservation_ended();
+
+
+
+CREATE OR REPLACE FUNCTION notify_survey_completion()
+RETURNS TRIGGER AS $$
+BEGIN
+    PERFORM pg_notify('survey_completion_added', row_to_json(NEW)::text);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER survey_completion_trigger
+AFTER INSERT ON survey_completions
+FOR EACH ROW
+EXECUTE FUNCTION notify_survey_completion();

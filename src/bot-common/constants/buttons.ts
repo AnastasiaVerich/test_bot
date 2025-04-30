@@ -5,6 +5,7 @@ export const BUTTONS_CALLBACK_QUERIES = {
     IdentificationButton: "IDENTIFICATION",
     IdentificationButtonText: "Идентификация",
 
+
     WithdrawalOfMoneyButton: "WITHDRAWAL_OF_MONEY",
     WithdrawalOfMoneyButtonText: "Вывод средств",
 
@@ -20,6 +21,9 @@ export const BUTTONS_CALLBACK_QUERIES = {
 
     FinishSurveyButton:"FINISH_SURVEY",
     FinishSurveyButtonText:"Опрос окончен",
+
+    CancelSurveyButton:"CANCEL_SURVEY",
+    CancelSurveyButtonText:"Опрос отменен",
 };
 export const BUTTONS_KEYBOARD = {
     SendNumberButton: "Отправить номер",
@@ -31,4 +35,5 @@ export const BUTTONS_KEYBOARD = {
     GeolocationButton: "Геолокация",
     OpenAppButton: "Пройти фотоконтроль",
     ShareButton: "Поделиться",
+    SkipButton: "Пропустить",
 }

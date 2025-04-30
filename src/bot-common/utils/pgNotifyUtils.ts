@@ -1,5 +1,5 @@
 import { Client } from "pg";
-import { Bot } from "grammy";
+import {Bot, InlineKeyboard, Keyboard} from "grammy";
 import { MyContext } from "../types/type";
 import {pgConfig} from "../../database/dbClient";
 import logger from "../../lib/logger";
@@ -20,12 +20,15 @@ export async function sendMessageWithRetry(
     bot: Bot<MyContext>,
     message: string,
     chatId: number | string,
+    keyboard: InlineKeyboard | Keyboard | undefined = undefined,
     maxAttempts = 3
 ): Promise<number | null> {
     let attempt = 1;
     while (attempt <= maxAttempts) {
         try {
-            const result = await bot.api.sendMessage(chatId, message);
+            const result = await bot.api.sendMessage(chatId, message,{
+                reply_markup:keyboard
+            });
             logger.info(`Сообщение отправлено, message_id: ${result.message_id}, попытка: ${attempt}`);
             return result.message_id;
         } catch (error) {

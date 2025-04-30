@@ -6,6 +6,8 @@ import {handleMessageForward} from "./callback/message_forward";
 import {BUTTONS_CALLBACK_QUERIES} from "../../bot-common/constants/buttons";
 import {MyContext} from "../../bot-common/types/type";
 import logger from "../../lib/logger";
+import {deleteSurveyInActive, getActiveSurveyByOperatorId} from "../../database/queries/surveyQueries";
+import {getUserId} from "../../bot-common/utils/getUserId";
 
 
 export function registerCommands(bot: Bot<MyContext>): void {
@@ -23,15 +25,32 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     bot.chatType("private").callbackQuery(
         BUTTONS_CALLBACK_QUERIES.FinishSurveyButton,
         async (ctx: MyContext) => {
-            logger.info(1)
+            logger.info(111)
             await ctx.conversation.enter(ScenesOperator.FinishSurveyScene);
+        },
+    );
+    bot.chatType("private").callbackQuery(
+        BUTTONS_CALLBACK_QUERIES.CancelSurveyButton,
+        async (ctx: MyContext) => {
+            logger.info(222)
+
+            const operatorId = await getUserId(ctx)
+            if(!operatorId)return
+
+            const activeSurvey =await getActiveSurveyByOperatorId(operatorId)
+
+            if(!activeSurvey) return
+            await deleteSurveyInActive(activeSurvey.survey_active_id)
+            ctx.reply('Опрос успешно отменен')
+
         },
     );
 }
 
 export function registerMessage(bot: Bot<MyContext>): void {
 // Обработка пересланных сообщений
-    bot.chatType("private").on("message:forward_origin", async (ctx: MyContext) => {
+    bot.chatType("private")
+        .on("message:forward_origin", async (ctx: MyContext) => {
         await handleMessageForward(ctx, bot)
     });
 }

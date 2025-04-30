@@ -7,7 +7,7 @@ import {checkBalance, updateMinusUserBalance} from "../../database/queries/userQ
 import {curseTon} from "../../config/env";
 import {Conversation} from "@grammyjs/conversations";
 import {BUTTONS_KEYBOARD} from "../../bot-common/constants/buttons";
-import {AuthUserKeyboard, ConfirmButtons, EmptyKeyboard} from "../../bot-common/keyboards/keyboard";
+import {AuthUserKeyboard, ConfirmCancelButtons, EmptyKeyboard} from "../../bot-common/keyboards/keyboard";
 import {BalanceMenu} from "../../bot-common/keyboards/inlineKeyboard";
 import {WITHDRAWAL_USER_SCENE} from "../../bot-common/constants/scenes";
 import {MyContext, MyConversation, MyConversationContext} from "../../bot-common/types/type";
@@ -227,7 +227,7 @@ async function stepConfirm(
             ).replace("{address}", recipientAddress),
             {
                 parse_mode: "HTML",
-                reply_markup: ConfirmButtons(),
+                reply_markup: ConfirmCancelButtons(),
             },
         );
 
@@ -239,7 +239,7 @@ async function stepConfirm(
                 {
                     otherwise: (ctx) => ctx.reply(WITHDRAWAL_USER_SCENE.CONFIRMATION_OTHERWISE, {
                         parse_mode: "HTML",
-                        reply_markup: ConfirmButtons(),
+                        reply_markup: ConfirmCancelButtons(),
                     }),
                 });
 

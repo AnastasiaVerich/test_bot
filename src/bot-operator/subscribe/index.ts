@@ -1,10 +1,7 @@
-import {Client} from "pg";
-import {pgConfig} from "../../database/dbClient";
 import {Bot} from "grammy";
 import {SurveyActive, updateActiveSurveyMessageID} from "../../database/queries/surveyQueries";
 import {channelId} from "../../config/env";
 import {MyContext} from "../../bot-common/types/type";
-import logger from "../../lib/logger";
 import {sendMessageWithRetry, subscribeToChannel} from "../../bot-common/utils/pgNotifyUtils";
 
 // const pgNotifyClient = new Client(pgConfig);

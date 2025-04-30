@@ -10,6 +10,7 @@ import {client} from "../database/dbClient";
 import {PsqlAdapter} from "@grammyjs/storage-psql";
 import {subscribeNotify} from "./subscribe";
 import {MyContext, SessionData} from "../bot-common/types/type";
+import {subscribeReservationEndedOper} from "./subscribe/reservation_ended__oper";
 
 // Начальные данные сессии
 function initialSession(): SessionData {
@@ -41,7 +42,7 @@ async function bootstrap() {
         registerMessage(bot);
         registerChatEvents(bot);
         subscribeNotify(bot);
-
+        subscribeReservationEndedOper(bot);
         // Обработчик ошибок
         bot.catch((err) => {
             logger.info("Ошибка в боте:", err);
@@ -49,10 +50,7 @@ async function bootstrap() {
 
         // Запуск бота
         logger.info("7: Запуск бота");
-        await bot.start({
-            allowed_updates: ["chat_member", "message", "callback_query"],
-
-        }).then((res) => {
+        await bot.start().then((res) => {
             logger.info("Бот запущен:", res);
         });
     } catch (err) {

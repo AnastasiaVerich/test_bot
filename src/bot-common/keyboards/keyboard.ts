@@ -7,9 +7,19 @@ export const sendUserPhone = (): Keyboard => new Keyboard()
     .resized()
     .persistent();
 
-export const ConfirmButtons = ():Keyboard=> new Keyboard()
+export const ConfirmCancelButtons = ():Keyboard=> new Keyboard()
     .text(BUTTONS_KEYBOARD.ConfirmButton)
     .text(BUTTONS_KEYBOARD.CancelButton)
+    .resized()
+    .oneTime()
+
+export const ConfirmButton = ():Keyboard=> new Keyboard()
+    .text(BUTTONS_KEYBOARD.ConfirmButton)
+    .resized()
+    .oneTime()
+
+export const SkipButton = ():Keyboard=> new Keyboard()
+    .text(BUTTONS_KEYBOARD.SkipButton)
     .resized()
     .oneTime()
 

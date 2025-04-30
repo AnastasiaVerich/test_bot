@@ -1,15 +1,17 @@
-import { Bot, session } from "grammy";
+import {Bot, session} from "grammy";
 import * as dotenv from "dotenv";
-dotenv.config();
-import { conversations } from "@grammyjs/conversations";
-import { token } from "../config/env";
-import { registerScenes } from "./scenes";
-import { registerCallbackQueries, registerCommands, registerMessage } from "./handlers";
+import {conversations} from "@grammyjs/conversations";
+import {token} from "../config/env";
+import {registerScenes} from "./scenes";
+import {registerCallbackQueries, registerCommands, registerMessage} from "./handlers";
 import logger from "../lib/logger";
 import {client} from "../database/dbClient";
 import {PsqlAdapter} from "@grammyjs/storage-psql";
-import {subscribeOperatorAssigned} from "./subscribe";
 import {MyContext, SessionData} from "../bot-common/types/type";
+import {subscribeReservationEnded} from "./subscribe/reservation_ended";
+import {subscribeOperatorAssigned} from "./subscribe/operator_assigned";
+
+dotenv.config();
 
 // Начальные данные сессии
 function initialSession(): SessionData {
@@ -49,6 +51,7 @@ async function bootstrap() {
         registerCallbackQueries(bot);
         registerMessage(bot);
         subscribeOperatorAssigned(bot);
+        subscribeReservationEnded(bot);
 
         // Обработчик ошибок
         bot.catch((err) => {

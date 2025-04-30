@@ -24,6 +24,9 @@ export interface SurveyActive {
   operator_id: number;
   message_id: number;
   is_user_notified: boolean;
+  tg_account: string;
+  reservation_end: string;
+  is_reservation_end: boolean;
 
   created_at: string; // Дата и время в ISO формате
 }
@@ -231,12 +234,13 @@ export const updateActiveSurveyMessageID = async (
 export const updateActiveSurveyOperatorId= async (
     operator_id: number,
     survey_active_id: number,
+    reservation_time_min: string,
 ): Promise<SurveyActive | undefined> => {
   try {
     const query =
-        `UPDATE survey_active SET operator_id = $1 WHERE survey_active_id = $2`;
+        `UPDATE survey_active SET operator_id = $1, reservation_end = (CURRENT_TIMESTAMP +INTERVAL '1 minute' * $3)  WHERE survey_active_id = $2`;
 
-    const result:QueryResult<SurveyActive> = await db.query(query, [operator_id,survey_active_id]);
+    const result:QueryResult<SurveyActive> = await db.query(query, [operator_id,survey_active_id,reservation_time_min]);
 
     return result.rows[0];
   } catch (error) {
@@ -247,6 +251,28 @@ export const updateActiveSurveyOperatorId= async (
       shortError = String(error).substring(0, 50);
     }
     throw new Error("Error updateActiveSurveyOperatorId: " + shortError);
+  }
+};
+
+export const updateActiveSurveyReservationEnd= async (
+    survey_active_id: number,
+
+): Promise<SurveyActive | undefined> => {
+  try {
+    const query =
+        `UPDATE survey_active SET reservation_end = NULL  WHERE survey_active_id = $1`;
+
+    const result:QueryResult<SurveyActive> = await db.query(query, [survey_active_id]);
+
+    return result.rows[0];
+  } catch (error) {
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error updateActiveSurveyReservationEnd: " + shortError);
   }
 };
 export const updateActiveSurveyIsJoinedToChat= async (
@@ -278,6 +304,7 @@ export const updateActiveSurveyIsJoinedToChat= async (
 export const addSurveyInActive = async (
     surveyId: number,
     userId: number,
+    tg_account:string
 ): Promise<void> => {
   const client = await db.connect(); // Получаем клиента для транзакции
   try {
@@ -291,10 +318,51 @@ export const addSurveyInActive = async (
     await client.query(updateQuery, [surveyId]);
 
     const insertQuery = `
-      INSERT INTO survey_active (survey_id, user_id, operator_id)
-      VALUES ($1, $2, NULL);
+      INSERT INTO survey_active (survey_id, user_id, operator_id,tg_account)
+      VALUES ($1, $2, NULL, $3);
     `;
-    await client.query(insertQuery, [surveyId, userId]);
+    await client.query(insertQuery, [surveyId, userId, tg_account]);
+
+    await client.query('COMMIT'); // Завершаем транзакцию
+  } catch (error) {
+    await client.query('ROLLBACK'); // Откатываем при ошибке
+    logger.info(error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error addSurveyInActive: " + shortError);
+  } finally {
+    client.release(); // Освобождаем клиента
+  }
+};
+
+export const deleteSurveyInActive = async (
+    surveyActiveId: number,
+): Promise<void> => {
+  const client = await db.connect(); // Получаем клиента для транзакции
+  try {
+    await client.query('BEGIN'); // Начинаем транзакцию
+
+    // Удаляем из survey_active и получаем данные
+    const deleteQuery = `
+      DELETE FROM survey_active
+      WHERE survey_active_id = $1
+      RETURNING survey_id, user_id, operator_id;
+    `;
+    const deleteResult = await client.query(deleteQuery, [surveyActiveId]);
+    const { survey_id, user_id, operator_id } = deleteResult.rows[0];
+
+
+    const updateQuery = `
+      UPDATE surveys
+      SET active_and_completed_count = active_and_completed_count - 1
+      WHERE survey_id = $1;
+    `;
+    await client.query(updateQuery, [survey_id]);
+
 
     await client.query('COMMIT'); // Завершаем транзакцию
   } catch (error) {
