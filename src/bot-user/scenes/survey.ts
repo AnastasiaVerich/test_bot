@@ -86,6 +86,7 @@ export async function surveyScene(
 
         //Шаг 5: меняем статус пользователю, оператору и запросу.
         const isSuccess = await reservationStep(userId, survey.survey_id, userAccount);
+        logger.info('isSuccess'+isSuccess)
 
         if (isSuccess) {
             return ctx.reply(
@@ -191,6 +192,7 @@ async function reservationStep(
     survey_id: number,
     tg_account: string,
 ): Promise<boolean> {
+    logger.info('start reserv')
     try {
 
         // Обновляем опрос
