@@ -309,19 +309,21 @@ export const addSurveyInActive = async (
   const client = await db.connect(); // Получаем клиента для транзакции
   try {
     await client.query('BEGIN'); // Начинаем транзакцию
-
+    logger.info('1111')
     const updateQuery = `
       UPDATE surveys
       SET active_and_completed_count = active_and_completed_count + 1
       WHERE survey_id = $1;
     `;
     await client.query(updateQuery, [surveyId]);
+    logger.info('22222')
 
     const insertQuery = `
       INSERT INTO survey_active (survey_id, user_id, operator_id,tg_account)
       VALUES ($1, $2, NULL, $3);
     `;
     await client.query(insertQuery, [surveyId, userId, tg_account]);
+    logger.info('3333')
 
     await client.query('COMMIT'); // Завершаем транзакцию
   } catch (error) {
