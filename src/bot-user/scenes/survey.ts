@@ -203,6 +203,7 @@ async function reservationStep(
         );
         return true;
     } catch (error) {
+        logger.info(error)
 
         return false;
     }
