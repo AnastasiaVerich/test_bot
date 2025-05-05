@@ -28,6 +28,7 @@ export async function registrationOperatorScene(
 
         const operator = await registerOperator(userId,userPhone,userAccount)
         await ctx.reply(`${REGISTRATION_OPERATOR_SCENE.SUCCESS}`, {
+            parse_mode:'HTML',
             reply_markup: {remove_keyboard: true},
         });
         return

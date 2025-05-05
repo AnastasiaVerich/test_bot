@@ -36,4 +36,6 @@ export const BUTTONS_KEYBOARD = {
     OpenAppButton: "Пройти фотоконтроль",
     ShareButton: "Поделиться",
     SkipButton: "Пропустить",
+    YesButton: "Да",
+    NoButton: "Нет",
 }

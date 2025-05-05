@@ -13,6 +13,12 @@ export const ConfirmCancelButtons = ():Keyboard=> new Keyboard()
     .resized()
     .oneTime()
 
+export const YesNoButtons = ():Keyboard=> new Keyboard()
+    .text(BUTTONS_KEYBOARD.YesButton)
+    .text(BUTTONS_KEYBOARD.NoButton)
+    .resized()
+    .oneTime()
+
 export const ConfirmButton = ():Keyboard=> new Keyboard()
     .text(BUTTONS_KEYBOARD.ConfirmButton)
     .resized()
@@ -39,6 +45,17 @@ export const AuthUserKeyboard = (): Keyboard =>
         .text(BUTTONS_KEYBOARD.InviteButton)
         .text(BUTTONS_KEYBOARD.BalanceButton)
         .resized();
+
+
+export const createKeyboardFromWords = (words: string[]): Keyboard => {
+    const keyboard = new Keyboard();
+
+    for (const word of words) {
+        keyboard.text(word).row(); // Добавляем кнопку с текстом и переходим на новую строку
+    }
+
+    return keyboard.resized(); // Возвращаем адаптивную клавиатуру
+};
 
 export const WebAppKeyboard = (
     userId: number,

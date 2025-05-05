@@ -1,11 +1,16 @@
 import logger from "../../lib/logger";
 import {getUserId} from "../../bot-common/utils/getUserId";
-import {completeSurvey, getActiveSurveyByOperatorId} from "../../database/queries/surveyQueries";
+import {
+    completeSurvey,
+    getActiveSurveyByOperatorId,
+    getSurveyTasks,
+    SurveyTasks
+} from "../../database/queries/surveyQueries";
 import {Conversation} from "@grammyjs/conversations";
 import {findOperator} from "../../database/queries/operatorQueries";
 import {BUTTONS_KEYBOARD} from "../../bot-common/constants/buttons";
 import {FinishSurveyKeyboard} from "../../bot-common/keyboards/inlineKeyboard";
-import {ConfirmCancelButtons} from "../../bot-common/keyboards/keyboard";
+import {ConfirmCancelButtons, createKeyboardFromWords, YesNoButtons} from "../../bot-common/keyboards/keyboard";
 import {FINISH_SURVEY_OPERATOR_SCENE} from "../../bot-common/constants/scenes";
 import {MyContext, MyConversation, MyConversationContext} from "../../bot-common/types/type";
 
@@ -14,44 +19,78 @@ export async function finishSurveyScene(
     ctx: MyConversationContext,
 ) {
     try {
+        const result:{
+            survey_task_id: number;
+            isCompleted:boolean,
+            result?: string,
+            result_positions?: string,
+        }[] = await conversation.external(() => [])
+
         const operator_id = await conversation.external(() => getUserId(ctx));
         if (!operator_id) return
 
-        const operator = await findOperator(operator_id,null,null)
-        if(!operator){
+        const operator = await findOperator(operator_id, null, null)
+        if (!operator) {
             return
             //что-то придумать.
         }
 
         const surveyActive = await getActiveSurveyByOperatorId(operator_id)
-        if(!surveyActive){
-            return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SURVEY_ACTIVE_NOT_FOUND, {reply_markup:{remove_keyboard:true}})
+        if (!surveyActive) {
+            return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SURVEY_ACTIVE_NOT_FOUND, {reply_markup: {remove_keyboard: true}})
         }
+        const survey_tasks = await conversation.external(() => getSurveyTasks(surveyActive.survey_id));
+
         //скиньте видео
         //сколько выполнил заданий
         //подтвердить
+        for (const survey_task of survey_tasks) {
+            const index = survey_tasks.indexOf(survey_task);
+            const isCompleted = await completedOrNotStep(conversation, ctx, survey_task);
+            if (isCompleted === null) {
+                await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
+                    reply_markup: FinishSurveyKeyboard(),
+                });
+                continue;
+            }
+            if (isCompleted === BUTTONS_KEYBOARD.YesButton) {
+                result[index]={
+                    isCompleted:true,
+                    survey_task_id:survey_task.survey_task_id
+                }
 
-        const count_completed = await countCompletedStep(conversation, ctx);
-        if (count_completed === null) {
-            await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-                reply_markup: FinishSurveyKeyboard(),
-            });
-            return;
+                const result_position = await countResultStep(conversation, ctx)
+                if (!result_position) {
+                    await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
+                        reply_markup: FinishSurveyKeyboard(),
+                    });
+                    continue;
+                }
+                result[index].result = result_position
+
+
+                const result_positions = await countResultPositionVarStep(conversation, ctx, survey_task.data)
+                if (!result_positions) {
+                    await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
+                        reply_markup: FinishSurveyKeyboard(),
+                    });
+                    continue;
+                }
+                result[index].result_positions = result_positions.join(', ')
+
+
+
+            } else {
+                result[index]={
+                    isCompleted:false,
+                    survey_task_id:survey_task.survey_task_id
+                }
+
+            }
         }
-        console.log(1)
 
-        const result_position = await countResultStep(conversation, ctx)
-
-        if (!result_position) {
-            await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-                reply_markup: FinishSurveyKeyboard(),
-            });
-            return;
-        }
-        console.log(2)
 
         const resultConfirm = await stepConfirm(conversation, ctx)
-        console.log(3)
 
         if (!resultConfirm) {
             await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
@@ -62,10 +101,10 @@ export async function finishSurveyScene(
 
         if (resultConfirm === BUTTONS_KEYBOARD.ConfirmButton) {
             // Добавляем платеж в список ожидающих
-            await completeSurvey(surveyActive.survey_active_id, count_completed, result_position);
+            await completeSurvey(surveyActive.survey_active_id, result);
 
             return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SUCCESS, {
-                reply_markup: {remove_keyboard:true},
+                reply_markup: {remove_keyboard: true},
             });
         } else {
             return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.CANCELLED, {
@@ -75,8 +114,7 @@ export async function finishSurveyScene(
 
 
     } catch (error) {
-        let shortError = error instanceof Error ? error.message.substring(0, 50) : String(error).substring(0, 50);
-        logger.error("Error in registrationScene: " + shortError);
+        logger.error("Error in registrationScene: " + error);
         await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
             reply_markup: FinishSurveyKeyboard(),
         });
@@ -84,32 +122,41 @@ export async function finishSurveyScene(
 }
 
 
-async function countCompletedStep(
+async function completedOrNotStep(
     conversation: MyConversation,
     ctx: MyConversationContext,
-
+    survey_task: SurveyTasks
 ) {
 
     try {
-        await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_COUNT);
+        await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_COMPLETED_OR_NOT
+            + `\n\n${survey_task.description.replaceAll('/n', '\n')}`,
+            {
+                parse_mode: 'HTML',
+                reply_markup: YesNoButtons(),
+            });
 
-        let count_completed: any = null
+
+        let result: string | null = null
         //Два выхода из цикла — контакт юзера получен либо произошла ошибка(скорее всего на стороне тг)
         while (true) {
-            const response = await conversation.waitFor("message:text", {
-                otherwise: (ctx) => ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_COUNT_OTHERWISE),
-            });
-            const userInput = response.message?.text.trim() ?? '';
-            const number = Number(userInput); // Преобразуем в целое число
+            const response = await conversation.waitForHears(
+                [BUTTONS_KEYBOARD.YesButton, BUTTONS_KEYBOARD.NoButton],
+                {
+                    otherwise: (ctx) => ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_COMPLETED_OR_NOT_OTHERWISE, {
+                        parse_mode: "HTML",
+                        reply_markup: YesNoButtons(),
+                    }),
+                });
 
-            if (isNaN(number)) {
-                await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTERED_NOT_CORRECT_COUNT);
-                continue
-            }
-            count_completed = number;
+            if (!response.message?.text) break
+
+            result = response.message?.text;
             break
         }
-        return count_completed;
+
+        if (!result) return null
+        return result;
     } catch (error) {
         return null;
     }
@@ -118,11 +165,9 @@ async function countCompletedStep(
 async function countResultStep(
     conversation: MyConversation,
     ctx: MyConversationContext,
-
 ) {
 
     try {
-        console.log(888)
 
         await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT);
 
@@ -148,6 +193,75 @@ async function countResultStep(
     }
 }
 
+async function countResultPositionVarStep(
+    conversation: MyConversation,
+    ctx: MyConversationContext,
+    data:any
+) {
+
+    try {
+        const {positions_var} = data
+
+
+        await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT_POS_VAR_1, {
+            reply_markup:createKeyboardFromWords(positions_var)
+        });
+
+        let result_1: string | null = null
+        //Два выхода из цикла — контакт юзера получен либо произошла ошибка(скорее всего на стороне тг)
+        while (true) {
+            const response = await conversation.waitFor("message:text", {
+                otherwise: (ctx) => ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RES_POS_OTHERWISE, {
+                    reply_markup:createKeyboardFromWords(positions_var)
+                }),
+            });
+            const userInput = response.message?.text.trim() ?? '';
+
+            result_1 = userInput;
+            break
+        }
+        await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT_POS_VAR_2, {
+            reply_markup:createKeyboardFromWords(positions_var)
+        });
+
+        let result_2: string | null = null
+        //Два выхода из цикла — контакт юзера получен либо произошла ошибка(скорее всего на стороне тг)
+        while (true) {
+            const response = await conversation.waitFor("message:text", {
+                otherwise: (ctx) => ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RES_POS_OTHERWISE, {
+                    reply_markup:createKeyboardFromWords(positions_var)
+                }),
+            });
+            const userInput = response.message?.text.trim() ?? '';
+
+            result_2 = userInput;
+            break
+        }
+        await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT_POS_VAR_3, {
+            reply_markup:createKeyboardFromWords(positions_var)
+        });
+
+        let result_3: string | null = null
+        //Два выхода из цикла — контакт юзера получен либо произошла ошибка(скорее всего на стороне тг)
+        while (true) {
+            const response = await conversation.waitFor("message:text", {
+                otherwise: (ctx) => ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RES_POS_OTHERWISE, {
+                    reply_markup:createKeyboardFromWords(positions_var)
+                }),
+            });
+            const userInput = response.message?.text.trim() ?? '';
+
+            result_3 = userInput;
+            break
+        }
+
+
+        return [result_1, result_2, result_3];
+    } catch (error) {
+        return null;
+    }
+}
+
 async function stepConfirm(
     conversation: Conversation<MyContext, MyConversationContext>,
     ctx: MyConversationContext,
@@ -155,7 +269,7 @@ async function stepConfirm(
 
     try {
         await ctx.reply(
-            FINISH_SURVEY_OPERATOR_SCENE.CONFIRMATION,{
+            FINISH_SURVEY_OPERATOR_SCENE.CONFIRMATION, {
                 parse_mode: "HTML",
                 reply_markup: ConfirmCancelButtons(),
             },

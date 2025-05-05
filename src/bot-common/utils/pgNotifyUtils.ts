@@ -113,7 +113,7 @@ export async function reconnectNotifyClient<T>(
 export async function subscribeToChannel<T>(
     bot: Bot<MyContext>,
     channel: string,
-    query: string,
+    query: string | null,
     processRecord: (bot: Bot<MyContext>, record: T) => Promise<void>
 ): Promise<void> {
     const pgClient = new Client(pgConfig);
@@ -123,7 +123,10 @@ export async function subscribeToChannel<T>(
         await connectPgClient(pgNotifyClient, "клиент уведомлений");
         await subscribeToNotifications(pgNotifyClient, channel);
         handleNotifications(pgNotifyClient, bot, channel, processRecord);
-        await checkMissedRecords(pgClient, bot, query, processRecord);
+        if(query){
+            await checkMissedRecords(pgClient, bot, query, processRecord);
+
+        }
     } catch (err) {
         logger.info("Ошибка инициализации:", err);
         process.exit(1);

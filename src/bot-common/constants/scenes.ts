@@ -1,11 +1,12 @@
 import {BUTTONS_CALLBACK_QUERIES, BUTTONS_KEYBOARD} from "./buttons";
+import {linkWelcome} from "../../config/env";
 
 export const FINISH_SURVEY_OPERATOR_SCENE = {
     SURVEY_ACTIVE_NOT_FOUND:'Активный опрос отсутствует',
 
-    ENTER_COUNT: "Введите к-во выполненных заданий (за каждое задание пользователь получается 50 руб)",
+    ENTER_COMPLETED_OR_NOT: "Пользователь выполнил это задание?",
 
-    ENTER_COUNT_OTHERWISE: `Пожалуйста, введите число выполненных заданий.`,
+    ENTER_COMPLETED_OR_NOT_OTHERWISE: `Нажмите на соответствующую кнопку`,
 
     ENTERED_NOT_CORRECT_COUNT: "Пожалуйста, введите число!",
 
@@ -14,6 +15,14 @@ export const FINISH_SURVEY_OPERATOR_SCENE = {
     ENTER_RESULT_OTHERWISE: `Пожалуйста, введите число, обозначающее позицию сайта при поиске.`,
 
     ENTERED_NOT_CORRECT_RESULT: "Пожалуйста, введите число!",
+
+    ENTER_RESULT_POS_VAR_1: "Выберите сайт, который был на 1ой позиции",
+
+    ENTER_RESULT_POS_VAR_2: "Выберите сайт, который был на 2ой позиции",
+
+    ENTER_RESULT_POS_VAR_3: "Выберите сайт, который был на 3ей позиции",
+
+    ENTER_RES_POS_OTHERWISE: `Пожалуйста, выберете сайт.`,
 
     CONFIRMATION: "Подтвердите, что вы ввели корректные данные по окончанию прохождения опроса.",
 
@@ -61,7 +70,7 @@ export const REGISTRATION_OPERATOR_SCENE = {
 
     SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.RegistrationButtonText}'.`,
 
-    SUCCESS: "Регистрация пройдена.",
+    SUCCESS: "Регистрация пройдена.\n\nВступите в канал для операторов, что бы получать новые опросы. Перейдите по ссылке: "+linkWelcome,
 }
 
 export const IDENTIFICATION_USER_SCENE = {

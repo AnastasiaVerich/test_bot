@@ -2,11 +2,13 @@ import { QueryResult } from "pg";
 import { db } from "../dbClient";
 import logger from "../../lib/logger";
 
+type NotifyReasonType = "finish_survey" | null;
 
 export interface User {
   user_id: number;
   phone: string;
   balance: number; // Текущий баланс пользователя
+  notify_reason: NotifyReasonType ;
   survey_lock_until: string | null; // Возможно, в ISO строке
   last_init: string; // Дата и время в ISO формате
 
@@ -94,6 +96,20 @@ export async function updateUserLastInit(userId: number): Promise<void> {
       shortError = String(error).substring(0, 50);
     }
     throw new Error("Error updateUserLastInit: " + shortError);
+  }
+}
+export async function updateUserNotifyReason(userId: number, notify_reason:NotifyReasonType ): Promise<void> {
+  try {
+    const query = `UPDATE users SET notify_reason = $2 WHERE user_id = $1;`;
+    await db.query(query, [userId, notify_reason]);
+  } catch (error) {
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error updateUserNotifyReason: " + shortError);
   }
 }
 

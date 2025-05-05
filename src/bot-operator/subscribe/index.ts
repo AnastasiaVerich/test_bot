@@ -3,6 +3,7 @@ import {SurveyActive, updateActiveSurveyMessageID} from "../../database/queries/
 import {channelId} from "../../config/env";
 import {MyContext} from "../../bot-common/types/type";
 import {sendMessageWithRetry, subscribeToChannel} from "../../bot-common/utils/pgNotifyUtils";
+import logger from "../../lib/logger";
 
 // const pgNotifyClient = new Client(pgConfig);
 // const pgClient = new Client(pgConfig);
@@ -157,12 +158,12 @@ async function processRecord(bot: Bot<MyContext>, record: SurveyActive): Promise
         const messageId = await sendMessageWithRetry(bot,message,channelId);
         if (messageId !== null) {
             await updateActiveSurveyMessageID(messageId, survey_active_id);
-            console.log(`Запись ${survey_active_id} обновлена с message_id: ${messageId}`);
+            logger.info(`Запись ${survey_active_id} обновлена с message_id: ${messageId}`);
         } else {
-            console.error(`Не удалось отправить сообщение для записи ${survey_active_id}`);
+            logger.error(`Не удалось отправить сообщение для записи ${survey_active_id}`);
         }
     } catch (error) {
-        console.error(`Ошибка при обработке записи ${survey_active_id}:`, error);
+        logger.error(`Ошибка при обработке записи ${survey_active_id}:`, error);
     }
 }
 

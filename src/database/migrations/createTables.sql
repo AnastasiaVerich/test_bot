@@ -1,6 +1,7 @@
 -- Типы ENUM
 CREATE TYPE survey_type_enum AS ENUM ('test_site');
 CREATE TYPE referral_bonuses_status_enum AS ENUM ('pending', 'completed');
+CREATE TYPE notify_reason_enum AS ENUM ('finish_survey');
 
 -- Таблица чёрного списка пользователей
 CREATE TABLE blacklist_users (
@@ -23,6 +24,7 @@ CREATE TABLE users (
     user_id BIGINT PRIMARY KEY,
     phone VARCHAR(15) NOT NULL,
     balance DECIMAL(10, 2) DEFAULT 0.0 NOT NULL,  --Баланс, который можно снять
+    notify_reason notify_reason_enum DEFAULT NULL,
     survey_lock_until TIMESTAMP WITH TIME ZONE DEFAULT NULL,  --Дата после которой можно проходить опрос
     last_init TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Последний раз его идентификация была в этот день и час
 
@@ -128,19 +130,19 @@ GRANT ALL PRIVILEGES ON TABLE surveys TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE surveys_survey_id_seq TO admin_vadim;
 
 -- Таблица заданий опросов
--- Создание таблицы survey_informations
-CREATE TABLE survey_informations (
-    survey_information_id SERIAL PRIMARY KEY, -- Идентификатор записи об опросе
+-- Создание таблицы survey_tasks
+CREATE TABLE survey_tasks (
+    survey_task_id SERIAL PRIMARY KEY, -- Идентификатор записи об опросе
     survey_id INT NOT NULL,                  -- Идентификатор опроса
-    label VARCHAR(255) NOT NULL,             -- Название задания
     description VARCHAR(255) NOT NULL,       -- Описание задания
+    data JSONB NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Время создания
 
     FOREIGN KEY (survey_id) REFERENCES surveys(survey_id) ON DELETE CASCADE -- Внешний ключ на таблицу surveys
 );
 
-GRANT ALL PRIVILEGES ON TABLE survey_informations TO admin_vadim;
-GRANT USAGE, SELECT, UPDATE ON SEQUENCE survey_informations_survey_information_id_seq TO admin_vadim;
+GRANT ALL PRIVILEGES ON TABLE survey_tasks TO admin_vadim;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE survey_tasks_survey_task_id_seq TO admin_vadim;
 
 -- Таблица в которой зафиксировано, что сейчас опрос проходит ибо собирается проходить пользователь с оператором
 CREATE TABLE survey_active (
@@ -152,6 +154,9 @@ CREATE TABLE survey_active (
     is_user_notified BOOLEAN NOT NULL DEFAULT FALSE,
     is_reservation_end BOOLEAN NOT NULL DEFAULT FALSE,
     reservation_end TIMESTAMP WITH TIME ZONE,
+    reservation_end TIMESTAMP WITH TIME ZONE,
+    tg_account VARCHAR(255) NOT NULL,
+
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
@@ -167,17 +172,18 @@ GRANT USAGE, SELECT, UPDATE ON SEQUENCE survey_active_survey_active_id_seq TO ad
 CREATE TABLE survey_completions (
     completion_id SERIAL PRIMARY KEY,
     survey_id INT NOT NULL,
+    survey_task_id INT NOT NULL,
     user_id BIGINT NOT NULL,
     operator_id BIGINT NOT NULL,
-    count_completed DECIMAL(10, 2) NOT NULL,
     result VARCHAR(255) NOT NULL,
+    result_positions_var VARCHAR(255) NOT NULL,
     reward DECIMAL(10, 2) NOT NULL, -- Фактическая награда (может отличаться от tasks.reward, если меняется со временем)
 
     completed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL,
     FOREIGN KEY (operator_id) REFERENCES operators(operator_id) ON DELETE SET NULL,
-    FOREIGN KEY (survey_id) REFERENCES surveys(survey_id) ON DELETE SET NULL
+    FOREIGN KEY (survey_task_id) REFERENCES survey_tasks(survey_task_id) ON DELETE SET NULL
 
 );
 GRANT ALL PRIVILEGES ON TABLE survey_completions TO admin_vadim;
@@ -302,17 +308,20 @@ WHEN (NEW.is_reservation_end IS TRUE)
 EXECUTE FUNCTION notify_reservation_ended();
 
 
-
-CREATE OR REPLACE FUNCTION notify_survey_completion()
+-- Создаем функцию-триггер для уведомления о изменении notify_reason на 'finish_survey'
+CREATE OR REPLACE FUNCTION notify_finish_survey()
 RETURNS TRIGGER AS $$
 BEGIN
-    PERFORM pg_notify('survey_completion_added', row_to_json(NEW)::text);
+    IF NEW.notify_reason = 'finish_survey' AND (OLD.notify_reason IS DISTINCT FROM NEW.notify_reason) THEN
+        PERFORM pg_notify('finish_survey_notification', row_to_json(NEW)::text);
+    END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-
-CREATE OR REPLACE TRIGGER survey_completion_trigger
-AFTER INSERT ON survey_completions
+-- Создаем триггер на таблицу users
+CREATE OR REPLACE TRIGGER finish_survey_trigger
+AFTER UPDATE OF notify_reason ON users
 FOR EACH ROW
-EXECUTE FUNCTION notify_survey_completion();
+WHEN (NEW.notify_reason = 'finish_survey' AND OLD.notify_reason IS DISTINCT FROM NEW.notify_reason)
+EXECUTE FUNCTION notify_finish_survey();

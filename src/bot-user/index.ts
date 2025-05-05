@@ -10,6 +10,7 @@ import {PsqlAdapter} from "@grammyjs/storage-psql";
 import {MyContext, SessionData} from "../bot-common/types/type";
 import {subscribeReservationEnded} from "./subscribe/reservation_ended";
 import {subscribeOperatorAssigned} from "./subscribe/operator_assigned";
+import {subscribeFinishSurveyNotification} from "./subscribe/finish_survey_notification";
 
 dotenv.config();
 
@@ -52,6 +53,7 @@ async function bootstrap() {
         registerMessage(bot);
         subscribeOperatorAssigned(bot);
         subscribeReservationEnded(bot);
+        subscribeFinishSurveyNotification(bot);
 
         // Обработчик ошибок
         bot.catch((err) => {

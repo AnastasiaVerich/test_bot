@@ -2,7 +2,7 @@ import {getUserId} from "../../bot-common/utils/getUserId";
 import {
     getActiveSurveyByMessageID,
     getSurveyActiveInfo,
-    getSurveyInformations,
+    getSurveyTasks,
     updateActiveSurveyOperatorId, updateActiveSurveyReservationEnd
 } from "../../database/queries/surveyQueries";
 import {Conversation} from "@grammyjs/conversations";
@@ -13,6 +13,7 @@ import {ConfirmButton, ConfirmCancelButtons} from "../../bot-common/keyboards/ke
 import {START_SURVEY_OPERATOR_SCENE} from "../../bot-common/constants/scenes";
 import {MyContext, MyConversation, MyConversationContext} from "../../bot-common/types/type";
 import {channelId} from "../../config/env";
+import logger from "../../lib/logger";
 
 export async function startSurveyScene(
     conversation: MyConversation,
@@ -24,23 +25,18 @@ export async function startSurveyScene(
     }
 ) {
     try {
-        console.log(1)
         const operatorId = await conversation.external(() => getUserId(ctx));
         if (!operatorId) return
-        console.log(2)
 
         const messageId = params.state.message_id;
         if (!messageId) return
-        console.log(3)
 
         const active_survey = await conversation.external(() => getActiveSurveyByMessageID(messageId))
         if (!active_survey) return
-        console.log(4)
 
         if (active_survey.operator_id) {
             return ctx.reply(START_SURVEY_OPERATOR_SCENE.BUSY)
         }
-        console.log(5)
 
         const operator = await conversation.external(() => findOperator(operatorId, null, null))
         if (!operator) return
@@ -67,7 +63,7 @@ export async function startSurveyScene(
         }
 
         if (resultConfirm === BUTTONS_KEYBOARD.ConfirmButton) {
-            const surveyActiveInformations = await conversation.external(() => getSurveyInformations(active_survey.survey_id))
+            const surveyActiveInformations = await conversation.external(() => getSurveyTasks(active_survey.survey_id))
              await conversation.external(() => updateActiveSurveyReservationEnd(active_survey.survey_active_id))
             let message = [
                 `<b>📋 Опрос</b>`,
@@ -79,9 +75,9 @@ export async function startSurveyScene(
                 `` // Empty line for spacing
             ].join('\n');
 
-            message += '\n\n<b>📝 Информация:</b>\n';
+            message += '\n\n<b>📝 Задания:</b>\n';
             surveyActiveInformations.forEach((task, index) => {
-                message += `<b>${task.label}:</b> ${task.description}\n`;
+                message += `<b>${index+1}:</b> ${task.description.replaceAll('/n','\n')}\n`;
             });
             await ctx.reply(`${message}`, {parse_mode: 'HTML'})
 
@@ -91,13 +87,12 @@ export async function startSurveyScene(
 
 
         } else if(resultConfirm === BUTTONS_KEYBOARD.SkipButton){
-            console.log('exit')
             return
         }
 
 
     } catch (error) {
-        console.log(error)
+        logger.error(error)
     }
 }
 
@@ -121,7 +116,6 @@ async function stepConfirm(
         let result: string | null = null
         //Два выхода из цикла — контакт юзера получен либо произошла ошибка(скорее всего на стороне тг)
         while (true) {
-            console.log('123456')
             const response = await conversation.waitForHears(
                 [BUTTONS_KEYBOARD.ConfirmButton, BUTTONS_KEYBOARD.SkipButton],
                 {
@@ -140,7 +134,7 @@ async function stepConfirm(
         if (!result) return null
         return result;
     } catch (error) {
-        console.log(error)
+        logger.error(error)
         return null;
     }
 }

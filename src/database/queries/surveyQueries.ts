@@ -1,6 +1,7 @@
 import { QueryResult } from "pg";
 import { db } from "../dbClient";
 import logger from "../../lib/logger";
+import {getAllRegions, getRegionById} from "./regionQueries";
 
 type SurveyType = "test_site";
 
@@ -30,22 +31,23 @@ export interface SurveyActive {
 
   created_at: string; // Дата и время в ISO формате
 }
-interface SurveyCompletions {
+export interface SurveyCompletions {
   completion_id: number;
   survey_id: number;
+  survey_task_id: number;
   user_id: number;
   operator_id: number;
-  count_completed: number;
+  result_positions_var: string;
   result: string;
   reward: number;
 
   created_at: string; // Дата и время в ISO формате
 }
-interface SurveyInformations  {
-  survey_information_id: number;
+export interface SurveyTasks  {
+  survey_task_id: number;
   survey_id: number;
-  label: string;
   description: string;
+  data: string; // Данные в формате JSONB
 
   created_at: string; // Дата и время в ISO формате
 }
@@ -319,7 +321,7 @@ export const addSurveyInActive = async (
     logger.info('22222')
 
     const insertQuery = `
-      INSERT INTO survey_active (survey_id, user_id, operator_id,tg_account)
+      INSERT INTO survey_active (survey_id, user_id, operator_id, tg_account)
       VALUES ($1, $2, NULL, $3);
     `;
     await client.query(insertQuery, [surveyId, userId, tg_account]);
@@ -386,8 +388,12 @@ export const deleteSurveyInActive = async (
 //Опрос выполнен, тут мы его переносим в выполненные, удаляем из прогресс и зачисляем баланс
 export const completeSurvey = async (
     surveyActiveId: number,
-    completedTasksCount: number,
-    result_position: string,
+    result:{
+      survey_task_id: number;
+      isCompleted:boolean,
+      result?: string,
+      result_positions?: string,
+    }[],
 ): Promise<void> => {
   const client = await db.connect(); // Получаем клиента для транзакции
   try {
@@ -408,29 +414,51 @@ export const completeSurvey = async (
     // Добавляем запись в survey_completions
     const insertQuery = `
       INSERT INTO survey_completions (
-        survey_id, user_id, operator_id, count_completed, reward, result
+        survey_id, survey_task_id, user_id, operator_id, reward, result, result_positions_var
       )
       SELECT 
         $1 AS survey_id,
-        $2 AS user_id,
-        $3 AS operator_id,
-        $4 AS count_completed,
-        $4 * s.task_price AS reward,
-        $5
+        $2 AS survey_task_id,
+        $3 AS user_id,
+        $4 AS operator_id,        
+        s.task_price AS reward,
+        $5 AS result, 
+        $6 AS result_positions_var
       FROM surveys s
       WHERE s.survey_id = $1
       RETURNING user_id, reward;
     `;
-    const insertResult = await client.query(insertQuery, [survey_id, user_id, operator_id, completedTasksCount,result_position]);
-    const { reward } = insertResult.rows[0];
+    let reward = 0
+    for (const item of result) {
+      if(item.isCompleted){
+        const insertResult = await client.query(insertQuery, [
+          1,
+          item.survey_task_id,
+          user_id,
+          operator_id,
+          item.result?.toString(),
+          item.result_positions,
+        ]);
+        reward += Number(insertResult.rows[0].reward)
+      }
+
+    }
+
+    const survey = await getSurveyById(survey_id)
+    if(!survey) throw new Error('странно')
+    const region = await getRegionById(survey.region_id)
+    if(!region) throw new Error('странно')
 
     // Обновляем баланс пользователя за прохождение опроса
     const updateBalanceQuery = `
       UPDATE users
-      SET balance = balance + $1
+      SET balance = balance + $1,
+      notify_reason = 'finish_survey',
+      survey_lock_until = (CURRENT_TIMESTAMP + $3)
       WHERE user_id = $2;
     `;
-    await client.query(updateBalanceQuery, [reward, user_id]);
+
+    await client.query(updateBalanceQuery, [reward, user_id, region.survey_interval]);
 
     // Проверяем referral_bonuses и обновляем статус + начисляем бонус
     const referralQuery = `
@@ -455,13 +483,7 @@ export const completeSurvey = async (
   } catch (error) {
     await client.query('ROLLBACK'); // Откатываем при ошибке
     logger.info(error);
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error completeSurvey: " + shortError);
+    throw new Error("Error completeSurvey: " + error);
   } finally {
     client.release(); // Освобождаем клиента
   }
@@ -574,13 +596,13 @@ WHERE
     throw new Error("Error getSurveyActiveInfo: " + shortError);
   }
 };
-export const getSurveyInformations = async (survey_id: number): Promise<SurveyInformations[]> => {
+export const getSurveyTasks = async (survey_id: number): Promise<SurveyTasks[]> => {
   try {
     const query = `
      SELECT 
     *
 FROM 
-    survey_informations
+    survey_tasks
 WHERE 
     survey_id = $1;
     `;
@@ -595,5 +617,28 @@ WHERE
       shortError = String(error).substring(0, 50);
     }
     throw new Error("Error getSurveyInformations: " + shortError);
+  }
+};
+export const getSurveyById = async (survey_id: number): Promise<Survey | undefined> => {
+  try {
+    const query = `
+     SELECT 
+    *
+FROM 
+    surveys
+WHERE 
+    survey_id = $1;
+    `;
+    const result = await db.query(query, [survey_id]);
+    return result.rows[0];
+  } catch (error) {
+    logger.info(error);
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error getSurveyById: " + shortError);
   }
 };

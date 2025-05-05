@@ -26,3 +26,21 @@ export async function getAllRegions(): Promise<RegionSettings[]> {
     throw new Error("Error getAllRegions: " + shortError);
   }
 }
+
+export async function getRegionById(
+    region_id: number
+): Promise<RegionSettings | undefined> {
+  try {
+    const query = "SELECT * FROM region_settings WHERE region_id = $1";
+    const result: QueryResult<RegionSettings> = await db.query(query, [region_id]);
+    return result.rows[0];
+  } catch (error) {
+    let shortError = "";
+    if (error instanceof Error) {
+      shortError = error.message.substring(0, 50);
+    } else {
+      shortError = String(error).substring(0, 50);
+    }
+    throw new Error("Error getRegionById: " + shortError);
+  }
+}

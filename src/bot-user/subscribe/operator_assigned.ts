@@ -3,6 +3,7 @@ import {SurveyActive, updateActiveSurveyIsJoinedToChat} from "../../database/que
 import {MyContext} from "../../bot-common/types/type";
 import {findOperator} from "../../database/queries/operatorQueries";
 import {sendMessageWithRetry, subscribeToChannel} from "../../bot-common/utils/pgNotifyUtils";
+import logger from "../../lib/logger";
 
 // const pgNotifyClient = new Client(pgConfig);
 // const pgClient = new Client(pgConfig);
@@ -158,19 +159,19 @@ import {sendMessageWithRetry, subscribeToChannel} from "../../bot-common/utils/p
 async function processRecord(bot: Bot<MyContext>, record: SurveyActive): Promise<void> {
     const { survey_active_id, user_id,operator_id, created_at, reservation_end } = record;
     const operator = await findOperator(operator_id,null,null)
-    const message =`Напишите оператору: @${operator?.tg_account} до ${reservation_end}.`
+    const message =`Напишите оператору: @${operator?.tg_account}.`
     try {
         const messageId = await sendMessageWithRetry(bot,message,user_id);
         await updateActiveSurveyIsJoinedToChat(true, survey_active_id)
 
 
         if (messageId !== null) {
-            console.log(`Сообщение для записи ${survey_active_id} отправлено, message_id: ${messageId}`);
+            logger.info(`Сообщение для записи ${survey_active_id} отправлено, message_id: ${messageId}`);
         } else {
-            console.error(`Не удалось отправить сообщение для записи ${survey_active_id}`);
+            logger.info(`Не удалось отправить сообщение для записи ${survey_active_id}`);
         }
     } catch (error) {
-        console.error(`Ошибка при обработке записи ${survey_active_id}:`, error);
+        logger.error(`Ошибка при обработке записи ${survey_active_id}:`, error);
     }
 }
 

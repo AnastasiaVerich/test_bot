@@ -9,6 +9,7 @@ import {findOperator} from "../../database/queries/operatorQueries";
 import {sendMessageWithRetry, subscribeToChannel} from "../../bot-common/utils/pgNotifyUtils";
 import {SkipButton} from "../../bot-common/keyboards/keyboard";
 import {BUTTONS_KEYBOARD} from "../../bot-common/constants/buttons";
+import logger from "../../lib/logger";
 
 
 
@@ -21,12 +22,12 @@ async function processRecord(bot: Bot<MyContext>, record: SurveyActive): Promise
         await deleteSurveyInActive(survey_active_id)
 
         if (messageId !== null) {
-            console.log(`Сообщение для записи ${survey_active_id} отправлено, message_id: ${messageId}`);
+            logger.info(`Сообщение для записи ${survey_active_id} отправлено, message_id: ${messageId}`);
         } else {
-            console.error(`Не удалось отправить сообщение для записи ${survey_active_id}`);
+            logger.error(`Не удалось отправить сообщение для записи ${survey_active_id}`);
         }
     } catch (error) {
-        console.error(`Ошибка при обработке записи ${survey_active_id}:`, error);
+        logger.error(`Ошибка при обработке записи ${survey_active_id}:`, error);
     }
 }
 
