@@ -20,7 +20,7 @@ async function processRecord(bot: Bot<MyContext>, record: User): Promise<void> {
 
     let message =`Опрос пройден.`
     if(survey_lock_until){
-        message+= `Следующий опрос будет доступен не раньше, чем ${formatTimestamp(lockUntilTimespan??0)}.`
+        message+= ` Следующий опрос будет доступен не раньше, чем ${formatTimestamp(lockUntilTimespan??0)}.`
     }
     try {
         const messageId = await sendMessageWithRetry(bot,message,user_id);

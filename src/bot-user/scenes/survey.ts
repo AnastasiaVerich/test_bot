@@ -29,7 +29,9 @@ export async function surveyScene(
         let codeWord = null
         const userAccount = await conversation.external(() => getUserAccount(ctx, true));
         if (!userAccount) {
-            codeWord = '1234'
+            const randomNumber = Math.floor(Math.random() * (99 - 10 + 1)) + 10;
+
+            codeWord = randomNumber.toString()
         }
 
         const user = await conversation.external(() => findUser(userId, ctx));
