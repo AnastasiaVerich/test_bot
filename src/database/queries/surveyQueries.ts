@@ -25,7 +25,8 @@ export interface SurveyActive {
   operator_id: number;
   message_id: number;
   is_user_notified: boolean;
-  tg_account: string;
+  tg_account: string | null;
+  code_word: string | null;
   reservation_end: string;
   is_reservation_end: boolean;
 
@@ -240,7 +241,7 @@ export const updateActiveSurveyOperatorId= async (
 ): Promise<SurveyActive | undefined> => {
   try {
     const query =
-        `UPDATE survey_active SET operator_id = $1, reservation_end = (CURRENT_TIMESTAMP +INTERVAL '1 minute' * $3)  WHERE survey_active_id = $2`;
+        `UPDATE survey_active SET operator_id = $1, reservation_end = (CURRENT_TIMESTAMP +INTERVAL '1 minute' * $3)  WHERE survey_active_id = $2 AND operator_id IS NULL RETURNING *`;
 
     const result:QueryResult<SurveyActive> = await db.query(query, [operator_id,survey_active_id,reservation_time_min]);
 
@@ -306,7 +307,8 @@ export const updateActiveSurveyIsJoinedToChat= async (
 export const addSurveyInActive = async (
     surveyId: number,
     userId: number,
-    tg_account:string
+    tg_account:string | null,
+    code_word:string | null
 ): Promise<void> => {
   const client = await db.connect(); // Получаем клиента для транзакции
   try {
@@ -321,10 +323,10 @@ export const addSurveyInActive = async (
     logger.info('22222')
 
     const insertQuery = `
-      INSERT INTO survey_active (survey_id, user_id, operator_id, tg_account)
-      VALUES ($1, $2, NULL, $3);
+      INSERT INTO survey_active (survey_id, user_id, operator_id, tg_account,code_word)
+      VALUES ($1, $2, NULL, $3, $4);
     `;
-    await client.query(insertQuery, [surveyId, userId, tg_account]);
+    await client.query(insertQuery, [surveyId, userId, tg_account,code_word]);
     logger.info('3333')
 
     await client.query('COMMIT'); // Завершаем транзакцию

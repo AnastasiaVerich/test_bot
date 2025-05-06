@@ -1,6 +1,6 @@
-import {Bot, InlineKeyboard} from "grammy";
+import {InlineKeyboard} from "grammy";
 import {BUTTONS_CALLBACK_QUERIES} from "../constants/buttons";
-import {MyContext} from "../types/type";
+import {COMMAND_USER_HELP} from "../constants/handler_command";
 
 export const RegistrationKeyboard = (): InlineKeyboard => new InlineKeyboard().text(
     BUTTONS_CALLBACK_QUERIES.RegistrationButtonText,
@@ -21,8 +21,7 @@ export const IdentificationKeyboard = (): InlineKeyboard => new InlineKeyboard()
     BUTTONS_CALLBACK_QUERIES.IdentificationButton,
 );
 
-export const BalanceMenu = (): InlineKeyboard =>
-    new InlineKeyboard()
+export const BalanceMenu = (): InlineKeyboard => new InlineKeyboard()
         .text(
             BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButtonText,
             BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButton
@@ -38,3 +37,28 @@ export const BalanceMenu = (): InlineKeyboard =>
             BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButton
         )
 
+export const HelpKeyboard = (): InlineKeyboard  => {
+    return new InlineKeyboard()
+        .text(COMMAND_USER_HELP.FirstQuestionButtonText, COMMAND_USER_HELP.FirstQuestionButton)
+        .row()
+        .text(COMMAND_USER_HELP.SecondQuestionButtonText, COMMAND_USER_HELP.SecondQuestionButton)
+        .row()
+        .text(COMMAND_USER_HELP.ThirdQuestionButtonText, COMMAND_USER_HELP.ThirdQuestionButton)
+        .row()
+        .text(COMMAND_USER_HELP.LastQuestionButtonText, COMMAND_USER_HELP.LastQuestionButton);
+};
+
+export const HelpBackKeyboard = (): InlineKeyboard  => {
+    return new InlineKeyboard()
+        .text(COMMAND_USER_HELP.BackButtonText, COMMAND_USER_HELP.BackButton)
+};
+
+export const TookKeyboard = (): InlineKeyboard  => {
+    return new InlineKeyboard()
+        .text(BUTTONS_CALLBACK_QUERIES.TookButtonText, BUTTONS_CALLBACK_QUERIES.TookButton)
+};
+
+export const IsUserWriteKeyboard = (): InlineKeyboard  => {
+    return new InlineKeyboard()
+        .text(BUTTONS_CALLBACK_QUERIES.UserWriteButtonText, BUTTONS_CALLBACK_QUERIES.UserWriteButton)
+};

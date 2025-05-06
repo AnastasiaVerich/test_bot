@@ -19,9 +19,10 @@ async function processRecord(bot: Bot<MyContext>, record: SurveyActive): Promise
     const message =`Время резервации вышло. Нажмите на '${BUTTONS_KEYBOARD.SkipButton}', что бы можно было брать новые опросы`
     try {
         const messageId = await sendMessageWithRetry(bot,message,operator_id, SkipButton());
-        await deleteSurveyInActive(survey_active_id)
 
         if (messageId !== null) {
+            await deleteSurveyInActive(survey_active_id)
+
             logger.info(`Сообщение для записи ${survey_active_id} отправлено, message_id: ${messageId}`);
         } else {
             logger.error(`Не удалось отправить сообщение для записи ${survey_active_id}`);

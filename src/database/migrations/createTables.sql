@@ -154,8 +154,8 @@ CREATE TABLE survey_active (
     is_user_notified BOOLEAN NOT NULL DEFAULT FALSE,
     is_reservation_end BOOLEAN NOT NULL DEFAULT FALSE,
     reservation_end TIMESTAMP WITH TIME ZONE,
-    reservation_end TIMESTAMP WITH TIME ZONE,
-    tg_account VARCHAR(255) NOT NULL,
+    tg_account VARCHAR(255),
+    code_word VARCHAR(255),
 
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

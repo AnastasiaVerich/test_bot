@@ -1,10 +1,16 @@
 import {Bot} from "grammy";
-import {SurveyActive, SurveyCompletions, updateActiveSurveyIsJoinedToChat} from "../../database/queries/surveyQueries";
+import {
+    deleteSurveyInActive,
+    SurveyActive,
+    SurveyCompletions,
+    updateActiveSurveyIsJoinedToChat
+} from "../../database/queries/surveyQueries";
 import {MyContext} from "../../bot-common/types/type";
 import {findOperator} from "../../database/queries/operatorQueries";
 import {sendMessageWithRetry, subscribeToChannel} from "../../bot-common/utils/pgNotifyUtils";
 import {updateUserNotifyReason, User} from "../../database/queries/userQueries";
 import {formatTimestamp} from "../../lib/date";
+import logger from "../../lib/logger";
 
 
 
@@ -17,8 +23,13 @@ async function processRecord(bot: Bot<MyContext>, record: User): Promise<void> {
         message+= `Следующий опрос будет доступен не раньше, чем ${formatTimestamp(lockUntilTimespan??0)}.`
     }
     try {
-       await sendMessageWithRetry(bot,message,user_id);
-       await updateUserNotifyReason(user_id, null)
+        const messageId = await sendMessageWithRetry(bot,message,user_id);
+        if (messageId !== null) {
+            await updateUserNotifyReason(user_id, null)
+
+
+        } else {
+        }
 
     } catch (error) {
         console.error(`Ошибка при обработке записи ${user_id}:`, error);

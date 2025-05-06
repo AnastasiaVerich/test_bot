@@ -27,6 +27,7 @@ export async function sendMessageWithRetry(
     while (attempt <= maxAttempts) {
         try {
             const result = await bot.api.sendMessage(chatId, message,{
+                parse_mode:'HTML',
                 reply_markup:keyboard
             });
             logger.info(`Сообщение отправлено, message_id: ${result.message_id}, попытка: ${attempt}`);

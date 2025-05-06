@@ -26,8 +26,11 @@ export async function surveyScene(
         const userId = await conversation.external(() => getUserId(ctx));
         if (!userId) return
 
-        const userAccount = await conversation.external(() => getUserAccount(ctx));
-        if (!userAccount) return
+        let codeWord = null
+        const userAccount = await conversation.external(() => getUserAccount(ctx, true));
+        if (!userAccount) {
+            codeWord = '1234'
+        }
 
         const user = await conversation.external(() => findUser(userId, ctx));
         if (!user) return;
@@ -85,7 +88,7 @@ export async function surveyScene(
         }
 
         //Шаг 5: меняем статус пользователю, оператору и запросу.
-        const isSuccess = await reservationStep(userId, survey.survey_id, userAccount);
+        const isSuccess = await reservationStep(userId, survey.survey_id, userAccount,codeWord);
         logger.info('isSuccess'+isSuccess)
 
         if (isSuccess) {
@@ -190,7 +193,8 @@ async function stepSearchOperator(
 async function reservationStep(
     userId: number,
     survey_id: number,
-    tg_account: string,
+    tg_account: string | null,
+    code_word: string| null,
 ): Promise<boolean> {
     logger.info('start reserv')
     try {
@@ -199,7 +203,8 @@ async function reservationStep(
         await addSurveyInActive(
             survey_id,
             userId,
-            tg_account
+            tg_account,
+            code_word
         );
         return true;
     } catch (error) {

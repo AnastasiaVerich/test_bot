@@ -24,6 +24,12 @@ export const BUTTONS_CALLBACK_QUERIES = {
 
     CancelSurveyButton:"CANCEL_SURVEY",
     CancelSurveyButtonText:"Опрос отменен",
+
+    TookButton:"TookButton",
+    TookButtonText:"Провести опрос",
+
+    UserWriteButton:"UserWriteButton",
+    UserWriteButtonText:"Пользователь написал",
 };
 export const BUTTONS_KEYBOARD = {
     SendNumberButton: "Отправить номер",
