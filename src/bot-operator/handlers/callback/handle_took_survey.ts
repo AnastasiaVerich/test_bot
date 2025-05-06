@@ -46,7 +46,7 @@ export const handleTookSurvey = async (ctx: MyContext, bot: Bot<MyContext>) => {
 
                 }
                 if (updatingSurveyActive.code_word) {
-                    messages = `${HANDLER_TOOK_SURVEY.TOOK_IT__NOW_CODE_WORD} ${updatingSurveyActive.code_word}`
+                    messages = `${HANDLER_TOOK_SURVEY.TOOK_IT__NOW_CODE_WORD} <b>${updatingSurveyActive.code_word}</b> `
                 }
 
                 messages += HANDLER_TOOK_SURVEY.CONFIRMATION
