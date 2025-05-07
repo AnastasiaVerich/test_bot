@@ -34,14 +34,16 @@ async function getTonRubPrice(): Promise<number | null> {
             headers: { 'X-CMC_PRO_API_KEY': convertApiKey },
         });
         const data = response.data;
+        logger.info('Запроса:', data);
+
         if (data.status.error_code === 0) {
             return data.data.TON.quote.RUB.price;
         } else {
-            logger.error('Ошибка API:', data.status.error_message);
+            logger.info('Ошибка API:', data.status.error_message);
             return null;
         }
     } catch (error) {
-        logger.error('Ошибка запроса:', error);
+        logger.info('Ошибка запроса:', error);
         return null;
     }
 }
