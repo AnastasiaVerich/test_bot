@@ -4,7 +4,6 @@ import {
   RegionSettings,
 } from "../database/queries/regionQueries";
 import {LocationType} from "../server/types/type";
-import logger from "../lib/logger";
 
 export async function findRegionByLocation(
   location_coordinate: LocationType,

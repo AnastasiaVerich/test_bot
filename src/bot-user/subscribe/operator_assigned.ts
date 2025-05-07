@@ -17,7 +17,6 @@ async function processRecord(bot: Bot<MyContext>, record: SurveyActive): Promise
         message =`Напишите оператору: @${operator?.tg_account}. Отправьте ему кодовую комбинацию <code>${code_word}</code>`
     }
     try {
-        console.log(message)
         const messageId = await sendMessageWithRetry(bot,message,user_id);
 
 

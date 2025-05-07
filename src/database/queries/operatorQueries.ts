@@ -6,6 +6,7 @@ export interface Operator {
     operator_id: number;
     tg_account: string;
     phone: string | null;
+    can_take_multiple_surveys: boolean;
 
     created_at: string; // Дата и время в ISO формате
 }

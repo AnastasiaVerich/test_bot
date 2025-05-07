@@ -74,7 +74,8 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
                 //`<b>📋 Опрос: ${surveyActive.topic}</b>`,
                 //`<b>Тип:</b> ${surveyActive.survey_type}`,
                 //`<b>Описание:</b> ${surveyActive.description}`,
-                `<b>Геолокация:</b> ${surveyActiveInfo.region_name}`,
+                `<b>Геолокация опроса:</b> ${surveyActiveInfo.region_name}`,
+                `<b>Геолокация пользователя:</b> ${active_survey.user_location}`,
                 `<b>Цена за задание:</b> ${surveyActiveInfo.task_price}`,
                 `` // Empty line for spacing
             ].join('\n');

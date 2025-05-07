@@ -2,6 +2,7 @@
 CREATE TYPE survey_type_enum AS ENUM ('test_site');
 CREATE TYPE referral_bonuses_status_enum AS ENUM ('pending', 'completed');
 CREATE TYPE notify_reason_enum AS ENUM ('finish_survey');
+CREATE TYPE common_variable_label AS ENUM ('ton_rub_price');
 
 -- Таблица чёрного списка пользователей
 CREATE TABLE blacklist_users (
@@ -68,6 +69,7 @@ CREATE TABLE operators (
     operator_id BIGINT UNIQUE NOT NULL DEFAULT nextval('operator_default_id_seq'),
     tg_account VARCHAR(255) NOT NULL,
     phone VARCHAR(15),
+    can_take_multiple_surveys BOOLEAN NOT NULL DEFAULT FALSE,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -156,6 +158,7 @@ CREATE TABLE survey_active (
     reservation_end TIMESTAMP WITH TIME ZONE,
     tg_account VARCHAR(255),
     code_word VARCHAR(255),
+    user_location VARCHAR(255),
 
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -204,6 +207,18 @@ CREATE TABLE withdrawal_logs (
 
 GRANT ALL PRIVILEGES ON TABLE withdrawal_logs TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE withdrawal_logs_withdrawal_id_seq TO admin_vadim;
+
+
+CREATE TABLE common_variables(
+    common_vars_id SERIAL PRIMARY KEY,
+    label common_variable_label UNIQUE,
+    value VARCHAR(100) NOT NULL,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+GRANT ALL PRIVILEGES ON TABLE common_variables TO admin_vadim;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE common_variables_common_vars_id_seq TO admin_vadim;
 
 --Таблица в которой хранится список, который ожидает вывода
 CREATE TABLE pending_payments (

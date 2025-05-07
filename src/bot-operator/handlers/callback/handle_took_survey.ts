@@ -2,7 +2,7 @@ import {channelId} from "../../../config/env";
 import {Bot} from "grammy";
 import {MyContext} from "../../../bot-common/types/type";
 import {
-    getActiveSurveyByMessageID,
+    getActiveSurveyByMessageID, getActiveSurveyByOperatorId,
     getSurveyActiveInfo,
     updateActiveSurveyOperatorId
 } from "../../../database/queries/surveyQueries";
@@ -25,6 +25,10 @@ export const handleTookSurvey = async (ctx: MyContext, bot: Bot<MyContext>) => {
             const operator = await findOperator(operator_id, null, null)
             if (!operator) return
 
+            if(!operator.can_take_multiple_surveys){
+                const hasActiveSurvey = await getActiveSurveyByOperatorId(operator_id)
+                if(hasActiveSurvey) return
+            }
             const active_survey = await getActiveSurveyByMessageID(message_id)
             if (!active_survey) return
 
@@ -35,7 +39,6 @@ export const handleTookSurvey = async (ctx: MyContext, bot: Bot<MyContext>) => {
 
             const updatingSurveyActive = await updateActiveSurveyOperatorId(operator_id, active_survey.survey_active_id, surveyActiveInfo.reservation_time_min)
 
-            console.log(updatingSurveyActive)
             if (updatingSurveyActive?.operator_id.toString() === operator_id.toString()) {
 
                 await ctx.api.deleteMessage(channelId, message_id);
@@ -46,17 +49,16 @@ export const handleTookSurvey = async (ctx: MyContext, bot: Bot<MyContext>) => {
 
                 }
                 if (updatingSurveyActive.code_word) {
-                    messages = `${HANDLER_TOOK_SURVEY.TOOK_IT__NOW_CODE_WORD} <b>${updatingSurveyActive.code_word}</b> `
+                    messages = `${HANDLER_TOOK_SURVEY.TOOK_IT__NOW_CODE_WORD} <b>${updatingSurveyActive.code_word}</b>. `
                 }
 
-                messages += HANDLER_TOOK_SURVEY.CONFIRMATION
+                messages += '\n'+HANDLER_TOOK_SURVEY.CONFIRMATION
                     .replace("{res_time}", `${surveyActiveInfo.reservation_time_min} мин`)
                 await bot.api.sendMessage(operator_id, messages, {
                     parse_mode: 'HTML',
                     reply_markup: IsUserWriteKeyboard(),
                 })
             }
-
         }
     } catch (error) {
         logger.error("Error in handleTookSurvey: " + error);

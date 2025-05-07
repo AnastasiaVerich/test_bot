@@ -1,16 +1,22 @@
 import logger from "../../../lib/logger";
 import {findPendingPaymentByUserId} from "../../../database/queries/pendingPaymentsQueries";
 import {checkBalance} from "../../../database/queries/userQueries";
-import {curseTon} from "../../../config/env";
 import {HANDLER_BALANCE} from "../../../bot-common/constants/handler_callback_queries";
 import {BalanceMenu} from "../../../bot-common/keyboards/inlineKeyboard";
 import {MyContext} from "../../../bot-common/types/type";
 import {getUserId} from "../../../bot-common/utils/getUserId";
+import {getCommonVariableByLabel} from "../../../database/queries/commonVariablesQueries";
 
 export async function handleBalance(
     ctx: MyContext,
 ): Promise<any | void> {
     try {
+        let curseInfo = await getCommonVariableByLabel('ton_rub_price')
+        if(!curseInfo){
+            return
+        }
+        const curseTon = Number(curseInfo.value)
+
         // Получаем ID текущего пользователя Telegram.
         const userId = await getUserId(ctx);
 
