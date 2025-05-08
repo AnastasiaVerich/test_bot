@@ -10,7 +10,12 @@ import {Conversation} from "@grammyjs/conversations";
 import {findOperator} from "../../database/queries/operatorQueries";
 import {BUTTONS_KEYBOARD} from "../../bot-common/constants/buttons";
 import {FinishSurveyKeyboard} from "../../bot-common/keyboards/inlineKeyboard";
-import {ConfirmCancelButtons, createKeyboardFromWords, YesNoButtons} from "../../bot-common/keyboards/keyboard";
+import {
+    AuthMultiOperKeyboard,
+    ConfirmCancelButtons,
+    createKeyboardFromWords,
+    YesNoButtons
+} from "../../bot-common/keyboards/keyboard";
 import {FINISH_SURVEY_OPERATOR_SCENE} from "../../bot-common/constants/scenes";
 import {MyContext, MyConversation, MyConversationContext} from "../../bot-common/types/type";
 
@@ -104,11 +109,11 @@ export async function finishSurveyScene(
             await completeSurvey(surveyActive.survey_active_id, result);
 
             return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SUCCESS, {
-                reply_markup: {remove_keyboard: true},
+                reply_markup: AuthMultiOperKeyboard(),
             });
         } else {
             return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.CANCELLED, {
-                reply_markup: FinishSurveyKeyboard(),
+                reply_markup: AuthMultiOperKeyboard(),
             });
         }
 

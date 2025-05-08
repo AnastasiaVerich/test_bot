@@ -3,18 +3,22 @@ import {handleStartCommand} from "./callback/command_start";
 import {ScenesOperator} from "../scenes";
 import {handleChatidCommand} from "./callback/command_chatid";
 import {handleTookSurvey} from "./callback/handle_took_survey";
-import {BUTTONS_CALLBACK_QUERIES} from "../../bot-common/constants/buttons";
+import {BUTTONS_CALLBACK_QUERIES, BUTTONS_KEYBOARD} from "../../bot-common/constants/buttons";
 import {MyContext} from "../../bot-common/types/type";
 import logger from "../../lib/logger";
 import {
     deleteSurveyInActive,
-    getActiveSurveyByOperatorId,
+    getActiveSurveyByOperatorId, getActiveSurveyBySurveyActiveId,
     getSurveyActiveInfo,
     getSurveyTasks,
     updateActiveSurveyReservationEnd
 } from "../../database/queries/surveyQueries";
 import {getUserId} from "../../bot-common/utils/getUserId";
 import {FinishSurveyKeyboard} from "../../bot-common/keyboards/inlineKeyboard";
+import {ScenesUser} from "../../bot-user/scenes";
+import {newSurveysHandler} from "./callback/mess_new_surveys";
+import {newSecureWords} from "@ton/crypto";
+import {currentSurveysHandler} from "./callback/mess_current_surveys";
 
 
 export function registerCommands(bot: Bot<MyContext>): void {
@@ -53,22 +57,70 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
         },
     );
 
+
+
     bot.chatType("private").callbackQuery(
-        BUTTONS_CALLBACK_QUERIES.UserWriteButton,
+        /NEW_SURVEY_ACTIVE\d+NEW_SURVEY_ACTIVE/,
         async (ctx: MyContext) => {
+            const callbackData = ctx.callbackQuery?.data; // Получаем данные callback-запроса
+            if (!callbackData) {
+                await ctx.answerCallbackQuery("Ошибка: данные не получены");
+                return;
+            }
 
-            const operatorId = await getUserId(ctx)
-            if (!operatorId) return
+            // Извлекаем survey_active_id (число) из callbackData
+            const match = callbackData.match(/NEW_SURVEY_ACTIVE(\d+)NEW_SURVEY_ACTIVE/);
+            if (!match) {
+                await ctx.answerCallbackQuery("Ошибка: неверный формат данных");
+                return;
+            }
+            const surveyActiveId = parseInt(match[1], 10); // Получаем число из группы захвата
 
-            const active_survey = await getActiveSurveyByOperatorId(operatorId)
+            const newSurveyActive = await  updateActiveSurveyReservationEnd(surveyActiveId)
+            if(newSurveyActive){
+                let message = `Вы отметили, что пользователь `
+                const username = newSurveyActive.tg_account
+                if(username){
+                    message += '@'+username+' написал.'
+                }
+                const codeword = newSurveyActive.code_word
+                if(codeword){
+                    message += 'с кодовым словом '+codeword+' написал.'
+                }
+
+                await ctx.reply(message);
+
+            }
+
+
+        },
+    );
+
+
+    bot.chatType("private").callbackQuery(
+        /CURRENT_SURVEY_ACTIVE\d+CURRENT_SURVEY_ACTIVE/,
+        async (ctx: MyContext) => {
+            const callbackData = ctx.callbackQuery?.data; // Получаем данные callback-запроса
+            if (!callbackData) {
+                await ctx.answerCallbackQuery("Ошибка: данные не получены");
+                return;
+            }
+
+            // Извлекаем survey_active_id (число) из callbackData
+            const match = callbackData.match(/CURRENT_SURVEY_ACTIVE(\d+)CURRENT_SURVEY_ACTIVE/);
+            if (!match) {
+                await ctx.answerCallbackQuery("Ошибка: неверный формат данных");
+                return;
+            }
+            const surveyActiveId = parseInt(match[1], 10); // Получаем число из группы захвата
+
+            const active_survey = await getActiveSurveyBySurveyActiveId(surveyActiveId)
             if (!active_survey) return
 
             const surveyActiveInfo = await getSurveyActiveInfo(active_survey.survey_active_id)
             if (!surveyActiveInfo) return
 
             const surveyActiveTasks = await getSurveyTasks(active_survey.survey_id)
-            await  updateActiveSurveyReservationEnd(active_survey.survey_active_id)
-
             let message = [
                 `<b>📋 Опрос</b>`,
                 //`<b>📋 Опрос: ${surveyActive.topic}</b>`,
@@ -88,9 +140,9 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
 
             await ctx.reply('После окончания опроса нажми на кнопку завершения.',
                 {reply_markup: FinishSurveyKeyboard()})
-
         },
     );
+
 
     bot.chatType("channel").callbackQuery(
         BUTTONS_CALLBACK_QUERIES.TookButton,
@@ -101,7 +153,15 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
 }
 
 export function registerMessage(bot: Bot<MyContext>): void {
+    bot.on("message:text", async (ctx) => {
 
+        if (ctx.message.text === BUTTONS_KEYBOARD.NewSurveys) {
+            await newSurveysHandler(ctx)
+        } else if (ctx.message.text === BUTTONS_KEYBOARD.CurrentSurveys) {
+            await currentSurveysHandler(ctx)
+
+        }
+    });
 }
 //ОБЯЗАТЕЛЬНО ДЛЯ БОТА СДЛЕАТЬ НАСТРОЙКУ Group Privacy
 export function registerChatEvents(bot: Bot<MyContext>): void {

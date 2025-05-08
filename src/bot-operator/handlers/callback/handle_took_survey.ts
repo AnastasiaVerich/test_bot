@@ -7,7 +7,6 @@ import {
     updateActiveSurveyOperatorId
 } from "../../../database/queries/surveyQueries";
 import {findOperator} from "../../../database/queries/operatorQueries";
-import {IsUserWriteKeyboard} from "../../../bot-common/keyboards/inlineKeyboard";
 import {HANDLER_TOOK_SURVEY} from "../../../bot-common/constants/handler_callback_queries";
 import logger from "../../../lib/logger";
 
@@ -42,21 +41,10 @@ export const handleTookSurvey = async (ctx: MyContext, bot: Bot<MyContext>) => {
             if (updatingSurveyActive?.operator_id.toString() === operator_id.toString()) {
 
                 await ctx.api.deleteMessage(channelId, message_id);
-                let messages = ''
-                if (updatingSurveyActive.tg_account) {
-                    messages = `${HANDLER_TOOK_SURVEY.TOOK_IT__NOW_TG_ACC}`
-                        .replace("{tg_account}", updatingSurveyActive.tg_account)
+                let messages = HANDLER_TOOK_SURVEY.TOOK_IT
 
-                }
-                if (updatingSurveyActive.code_word) {
-                    messages = `${HANDLER_TOOK_SURVEY.TOOK_IT__NOW_CODE_WORD} <b>${updatingSurveyActive.code_word}</b>. `
-                }
-
-                messages += '\n'+HANDLER_TOOK_SURVEY.CONFIRMATION
-                    .replace("{res_time}", `${surveyActiveInfo.reservation_time_min} мин`)
                 await bot.api.sendMessage(operator_id, messages, {
                     parse_mode: 'HTML',
-                    reply_markup: IsUserWriteKeyboard(),
                 })
             }
         }

@@ -105,7 +105,7 @@ export const COMMAND_USER_HELP = {
         "<i>Примечание:</i> Все операции, включая начисление и вывод средств, осуществляются через Telegram-бот.",
 
     LastQuestionButton: "help_no_my_questions",
-    LastQuestionButtonText: "Нет ответа на мой вопрос",
+    LastQuestionButtonText: "Поддержка",
     LastQuestionAnswer:
         "Можете связаться с нашим администратором (@кто-то)",
 

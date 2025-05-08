@@ -1,4 +1,4 @@
-import {InlineKeyboard} from "grammy";
+import {InlineKeyboard, Keyboard} from "grammy";
 import {BUTTONS_CALLBACK_QUERIES} from "../constants/buttons";
 import {COMMAND_USER_HELP} from "../constants/handler_command";
 
@@ -22,22 +22,22 @@ export const IdentificationKeyboard = (): InlineKeyboard => new InlineKeyboard()
 );
 
 export const BalanceMenu = (): InlineKeyboard => new InlineKeyboard()
-        .text(
-            BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButtonText,
-            BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButton
-        )
-        .row()
-        .text(
-            BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButtonText,
-            BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButton
-        )
-        .row()
-        .text(
-            BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButtonText,
-            BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButton
-        )
+    .text(
+        BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButtonText,
+        BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButton
+    )
+    .row()
+    .text(
+        BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButtonText,
+        BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButton
+    )
+    .row()
+    .text(
+        BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButtonText,
+        BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButton
+    )
 
-export const HelpKeyboard = (): InlineKeyboard  => {
+export const HelpKeyboard = (): InlineKeyboard => {
     return new InlineKeyboard()
         .text(COMMAND_USER_HELP.FirstQuestionButtonText, COMMAND_USER_HELP.FirstQuestionButton)
         .row()
@@ -48,17 +48,22 @@ export const HelpKeyboard = (): InlineKeyboard  => {
         .text(COMMAND_USER_HELP.LastQuestionButtonText, COMMAND_USER_HELP.LastQuestionButton);
 };
 
-export const HelpBackKeyboard = (): InlineKeyboard  => {
+export const NewSurveysKeyboard = (arr: { label: string, value: string }[]): InlineKeyboard => {
+    const keyboard = new InlineKeyboard();
+
+    for (const el of arr) {
+        keyboard.text(el.label, el.value).row()
+    }
+    return keyboard;
+};
+
+export const HelpBackKeyboard = (): InlineKeyboard => {
     return new InlineKeyboard()
         .text(COMMAND_USER_HELP.BackButtonText, COMMAND_USER_HELP.BackButton)
 };
 
-export const TookKeyboard = (): InlineKeyboard  => {
+export const TookKeyboard = (): InlineKeyboard => {
     return new InlineKeyboard()
         .text(BUTTONS_CALLBACK_QUERIES.TookButtonText, BUTTONS_CALLBACK_QUERIES.TookButton)
 };
 
-export const IsUserWriteKeyboard = (): InlineKeyboard  => {
-    return new InlineKeyboard()
-        .text(BUTTONS_CALLBACK_QUERIES.UserWriteButtonText, BUTTONS_CALLBACK_QUERIES.UserWriteButton)
-};

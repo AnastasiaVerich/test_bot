@@ -30,10 +30,9 @@ export const HANDLER_HISTORY_WITHDRAWAL = {
 };
 
 export const HANDLER_TOOK_SURVEY = {
-    TOOK_IT__NOW_TG_ACC: 'Пользователь @{tg_account} будет уведомлен о том, что ему нужно написать вам.',
-    TOOK_IT__NOW_CODE_WORD: 'Пользователь будет уведомлен о том, что ему нужно написать вам. Кодовая комбинация:',
-    CONFIRMATION: `Если пользователь написал вам, то нажмите на ${BUTTONS_CALLBACK_QUERIES.UserWriteButtonText}. Если не написал, то в течении {res_time} резервация будет снята.`,
 
+    TOOK_IT: 'Вы взяли новый опрос.',
     SOME_ERROR: "Бот временно недоступен",
 
 };
+

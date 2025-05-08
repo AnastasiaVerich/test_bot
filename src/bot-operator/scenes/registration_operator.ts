@@ -2,7 +2,7 @@ import logger from "../../lib/logger";
 import {getUserId} from "../../bot-common/utils/getUserId";
 import {registerOperator} from "../../database/queries/operatorQueries";
 import {RegistrationKeyboard} from "../../bot-common/keyboards/inlineKeyboard";
-import {sendUserPhone} from "../../bot-common/keyboards/keyboard";
+import {AuthMultiOperKeyboard, sendUserPhone} from "../../bot-common/keyboards/keyboard";
 import {REGISTRATION_OPERATOR_SCENE} from "../../bot-common/constants/scenes";
 import {MyConversation, MyConversationContext} from "../../bot-common/types/type";
 import {getUserAccount} from "../../bot-common/utils/getUserTgAccount";
@@ -29,7 +29,7 @@ export async function registrationOperatorScene(
         const operator = await registerOperator(userId,userPhone,userAccount)
         await ctx.reply(`${REGISTRATION_OPERATOR_SCENE.SUCCESS}`, {
             parse_mode:'HTML',
-            reply_markup: {remove_keyboard: true},
+            reply_markup: AuthMultiOperKeyboard(),
         });
         return
 

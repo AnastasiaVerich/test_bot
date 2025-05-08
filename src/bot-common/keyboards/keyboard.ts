@@ -24,10 +24,6 @@ export const ConfirmButton = ():Keyboard=> new Keyboard()
     .resized()
     .oneTime()
 
-export const SkipButton = ():Keyboard=> new Keyboard()
-    .text(BUTTONS_KEYBOARD.SkipButton)
-    .resized()
-    .oneTime()
 
 export const EmptyKeyboard = (): Keyboard => new Keyboard().resized().oneTime();
 
@@ -44,6 +40,14 @@ export const AuthUserKeyboard = (): Keyboard =>
         .row()
         .text(BUTTONS_KEYBOARD.InviteButton)
         .text(BUTTONS_KEYBOARD.BalanceButton)
+        .resized();
+
+
+export const AuthMultiOperKeyboard = (): Keyboard =>
+    new Keyboard()
+        .text(BUTTONS_KEYBOARD.NewSurveys)
+        .row()
+        .text(BUTTONS_KEYBOARD.CurrentSurveys)
         .resized();
 
 

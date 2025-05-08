@@ -5,6 +5,7 @@ import {RegistrationKeyboard} from "../../../bot-common/keyboards/inlineKeyboard
 import {MyContext} from "../../../bot-common/types/type";
 import logger from "../../../lib/logger";
 import {getUserAccount} from "../../../bot-common/utils/getUserTgAccount";
+import {AuthMultiOperKeyboard} from "../../../bot-common/keyboards/keyboard";
 
 export const handleStartCommand = async (
     ctx: MyContext,
@@ -31,7 +32,7 @@ export const handleStartCommand = async (
             });
         }
         return ctx.reply(COMMAND_OPERATOR_START.WELCOME_OLD_OPERATOR, {
-            reply_markup: {remove_keyboard: true},
+            reply_markup: AuthMultiOperKeyboard(),
         });
 
 

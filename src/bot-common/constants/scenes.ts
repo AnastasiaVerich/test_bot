@@ -31,7 +31,7 @@ export const FINISH_SURVEY_OPERATOR_SCENE = {
 
     SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.FinishSurveyButtonText}'.`,
 
-    CANCELLED: `Отменено. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.FinishSurveyButtonText}'.`,
+    CANCELLED: `Отменено. Начните заново.`,
 
     SUCCESS: "Прохождение опроса подтверждено!",
 }

@@ -192,6 +192,7 @@ export const getActiveSurveyByUserId = async (
         throw new Error("Error getActiveSurveyByUserId: " + shortError);
     }
 };
+
 export const getActiveSurveyByOperatorId = async (
     operator_id: number
 ): Promise<SurveyActive | undefined> => {
@@ -213,6 +214,77 @@ export const getActiveSurveyByOperatorId = async (
             shortError = String(error).substring(0, 50);
         }
         throw new Error("Error getActiveSurveyByUserId: " + shortError);
+    }
+};
+
+export const getActiveSurveyBySurveyActiveId = async (
+    survey_active_id: number
+): Promise<SurveyActive | undefined> => {
+    try {
+        const query = `
+      SELECT *
+      FROM survey_active
+      WHERE survey_active_id = $1;
+    `;
+
+        const result: QueryResult<SurveyActive> = await db.query(query, [survey_active_id]);
+
+        return result.rows[0];
+    } catch (error) {
+        let shortError = "";
+        if (error instanceof Error) {
+            shortError = error.message.substring(0, 50);
+        } else {
+            shortError = String(error).substring(0, 50);
+        }
+        throw new Error("Error getActiveSurveyBySurveyActiveId: " + shortError);
+    }
+};
+
+export const getNewActiveSurveysByOperatorId = async (
+    operator_id: number
+): Promise<SurveyActive[]> => {
+    try {
+        const query = `
+      SELECT *
+      FROM survey_active
+      WHERE operator_id = $1 AND reservation_end IS NOT NULL;
+    `;
+
+        const result: QueryResult<SurveyActive> = await db.query(query, [operator_id]);
+
+        return result.rows;
+    } catch (error) {
+        let shortError = "";
+        if (error instanceof Error) {
+            shortError = error.message.substring(0, 50);
+        } else {
+            shortError = String(error).substring(0, 50);
+        }
+        throw new Error("Error getNewActiveSurveysByOperatorId: " + shortError);
+    }
+};
+export const getCurrentActiveSurveysByOperatorId = async (
+    operator_id: number
+): Promise<SurveyActive[]> => {
+    try {
+        const query = `
+      SELECT *
+      FROM survey_active
+      WHERE operator_id = $1 AND reservation_end IS NULL;
+    `;
+
+        const result: QueryResult<SurveyActive> = await db.query(query, [operator_id]);
+
+        return result.rows;
+    } catch (error) {
+        let shortError = "";
+        if (error instanceof Error) {
+            shortError = error.message.substring(0, 50);
+        } else {
+            shortError = String(error).substring(0, 50);
+        }
+        throw new Error("Error getCurrentActiveSurveysByOperatorId: " + shortError);
     }
 };
 
@@ -266,7 +338,7 @@ export const updateActiveSurveyReservationEnd = async (
 ): Promise<SurveyActive | undefined> => {
     try {
         const query =
-            `UPDATE survey_active SET reservation_end = NULL  WHERE survey_active_id = $1`;
+            `UPDATE survey_active SET reservation_end = NULL  WHERE survey_active_id = $1 RETURNING *`;
 
         const result: QueryResult<SurveyActive> = await db.query(query, [survey_active_id]);
 
