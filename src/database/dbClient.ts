@@ -7,6 +7,8 @@ import {
   DB_USER,
 } from "../config/env";
 import logger from "../lib/logger";
+import {Kysely, PostgresDialect} from "kysely";
+import {Database} from "./db-types";
 
 export const pgConfig: ClientConfig = {
   user: DB_USER,
@@ -16,6 +18,16 @@ export const pgConfig: ClientConfig = {
   port: Number(DB_PORT),
 };
 
+const dialect = new PostgresDialect({
+  pool: new Pool({
+    user: DB_USER,
+    host: DB_HOST,
+    database: DB_DATABASE,
+    password: DB_PASSWORD,
+    port: Number(DB_PORT),
+  }),
+});
+export const pool = new Kysely<Database>({ dialect });
 
 export const db = new Pool(pgConfig);
 export const client = new Client(pgConfig);

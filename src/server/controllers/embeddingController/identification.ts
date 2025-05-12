@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { detectFaces, findDistance } from "../../services/embeddingService";
 import { InterfaceResponse } from "../../types/type";
-import { checkExistInBlockUser } from "../../../database/queries/blacklistUsersQueries";
 import { findOperator } from "../../../database/queries/operatorQueries";
 import { getFaceEmbeddingByUserId } from "../../../database/queries/faceEmbeddingsQueries";
 import { IdentificationResponseText } from "../../../config/common_types";
 import logger from "../../../lib/logger";
+import {isUserInBlacklist} from "../../../database/queries_kysely/blacklist_users";
 
 // Интерфейс для тела запроса
 interface IdentificationRequestBody extends Request {
@@ -38,7 +38,7 @@ export const identification = async (
       });
     }
 
-    const isBlockUser = await checkExistInBlockUser(userId, null);
+    const isBlockUser = await isUserInBlacklist(userId, null);
     const isOperator = await findOperator(userId, null, null);
 
     // Если пользователь с таким ID заблокирован

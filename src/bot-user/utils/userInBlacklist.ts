@@ -1,13 +1,13 @@
-import { checkExistInBlockUser } from "../../database/queries/blacklistUsersQueries";
 import {RESPONSES} from "../../bot-common/constants/responses";
 import {MyContext} from "../../bot-common/types/type";
+import {isUserInBlacklist} from "../../database/queries_kysely/blacklist_users";
 
 export const userInBlacklist = async (
   accountId: number | null,
   phoneNumber: string | null,
   ctx: MyContext,
 ): Promise<boolean> => {
-  const blackList = await checkExistInBlockUser(accountId, phoneNumber);
+  const blackList = await isUserInBlacklist(accountId, phoneNumber);
 
   if (blackList) {
     await ctx.reply(RESPONSES.YOU_IN_BLACKLIST, {

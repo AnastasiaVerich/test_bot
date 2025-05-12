@@ -455,7 +455,7 @@ export const completeSurvey = async (
         for (const item of result) {
             if (item.isCompleted) {
                 const insertResult = await client.query(insertQuery, [
-                    1,
+                    survey_id,
                     item.survey_task_id,
                     user_id,
                     operator_id,

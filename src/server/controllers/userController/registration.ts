@@ -1,21 +1,14 @@
-import { Request, Response } from "express";
-import { detectFaces, findDistance } from "../../services/embeddingService";
-import { InterfaceResponse } from "../../types/type";
-import { checkExistInBlockUser } from "../../../database/queries/blacklistUsersQueries";
-import { findOperator } from "../../../database/queries/operatorQueries";
-import {
-  addUser,
-  findUserByPhone,
-  findUserByTelegramId,
-} from "../../../database/queries/userQueries";
-import {
-  addFaceEmbedding,
-  getAllFaceEmbeddings,
-} from "../../../database/queries/faceEmbeddingsQueries";
-import { addPhoto } from "../../../database/queries/photoQueries";
-import { db } from "../../../database/dbClient";
-import { RegistrationResponseText } from "../../../config/common_types";
+import {Request, Response} from "express";
+import {detectFaces, findDistance} from "../../services/embeddingService";
+import {InterfaceResponse} from "../../types/type";
+import {findOperator} from "../../../database/queries/operatorQueries";
+import {addUser, findUserByPhone, findUserByTelegramId,} from "../../../database/queries/userQueries";
+import {addFaceEmbedding, getAllFaceEmbeddings,} from "../../../database/queries/faceEmbeddingsQueries";
+import {addPhoto} from "../../../database/queries/photoQueries";
+import {db} from "../../../database/dbClient";
+import {RegistrationResponseText} from "../../../config/common_types";
 import logger from "../../../lib/logger";
+import {isUserInBlacklist} from "../../../database/queries_kysely/blacklist_users";
 
 // Интерфейс для тела запроса на регистрацию
 interface RegistrationRequestBody {
@@ -63,7 +56,7 @@ export const registration = async (
       // Проверяем существование пользователя по номеру телефона и ID
       const isHasSomeNumberUser = await findUserByPhone(userPhone);
       const isHasSomeIdUser = await findUserByTelegramId(userId);
-      const isBlockUser = await checkExistInBlockUser(userId, userPhone);
+      const isBlockUser = await isUserInBlacklist(userId, userPhone);
       const isOperator = await findOperator(
         userId,
         userPhone,
