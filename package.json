@@ -32,6 +32,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "grammy": "^1.35.1",
+    "kysely": "^0.28.2",
     "multer": "^1.4.5-lts.1",
     "node-cache": "^5.1.2",
     "node-schedule": "^2.1.1",
