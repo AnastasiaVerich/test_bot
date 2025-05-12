@@ -1,7 +1,6 @@
 import {db} from "../dbClient";
 import logger from "../../lib/logger";
 import {QueryResult} from "pg";
-import {SurveyActive} from "./surveyQueries";
 
 type CommonVariablesLabelType = "ton_rub_price" ;
 
