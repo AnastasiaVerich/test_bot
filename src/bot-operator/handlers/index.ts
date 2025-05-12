@@ -19,6 +19,7 @@ import {ScenesUser} from "../../bot-user/scenes";
 import {newSurveysHandler} from "./callback/mess_new_surveys";
 import {newSecureWords} from "@ton/crypto";
 import {currentSurveysHandler} from "./callback/mess_current_surveys";
+import {xls_parser} from "../../services/xls_parser";
 
 
 export function registerCommands(bot: Bot<MyContext>): void {
@@ -161,6 +162,12 @@ export function registerMessage(bot: Bot<MyContext>): void {
             await currentSurveysHandler(ctx)
 
         }
+    });
+
+    bot.on('message:document', async (ctx) => {
+        console.log('message:document')
+        await xls_parser(ctx, bot)
+
     });
 }
 //ОБЯЗАТЕЛЬНО ДЛЯ БОТА СДЛЕАТЬ НАСТРОЙКУ Group Privacy

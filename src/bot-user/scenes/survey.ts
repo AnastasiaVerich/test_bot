@@ -5,7 +5,7 @@ import {getUserId} from "../../bot-common/utils/getUserId";
 import {findUser} from "../utils/findUser";
 import {
     addSurveyInActive,
-    getAvailableSurveyForRegion,
+    getAvailableSurveyForRegion, getAvailableSurveyWithoutRegion,
     isUserInSurveyActive
 } from "../../database/queries/surveyQueries";
 import {formatTimestamp} from "../../lib/date";
@@ -85,8 +85,8 @@ export async function surveyScene(
 
 
         // Шаг 3:  Ищем опрос
-        const survey = {survey_id: 1}//await stepSearchSurvey(ctx, region);
-        if (!survey) {
+        const survey_id = await stepSearchSurvey(ctx);
+        if (!survey_id) {
             await ctx.reply(SURVEY_USER_SCENE.SOME_ERROR, {
                 reply_markup: AuthUserKeyboard(),
             });
@@ -94,7 +94,7 @@ export async function surveyScene(
         }
 
         //Шаг 5: меняем статус пользователю, оператору и запросу.
-        const isSuccess = await reservationStep(userId, survey.survey_id, userAccount, codeWord, location_string);
+        const isSuccess = await reservationStep(userId, survey_id, userAccount, codeWord, location_string);
         logger.info('isSuccess' + isSuccess)
 
         if (isSuccess) {
@@ -169,18 +169,24 @@ async function stepLocation(
 
 async function stepSearchSurvey(
     ctx: MyConversationContext,
-    region: RegionSettings,
-): Promise<{ surveyId: number } | null> {
+    region?: RegionSettings,
+): Promise< number | undefined | null> {
     try {
-        const survey = await getAvailableSurveyForRegion(region.region_id);
+        let surveyId
+        if(region){
+            surveyId = await getAvailableSurveyForRegion(region.region_id);
+        } else {
+            surveyId = await getAvailableSurveyWithoutRegion();
 
-        if (!survey) {
+        }
+
+        if (!surveyId) {
             await ctx.reply(SURVEY_USER_SCENE.SURVEY_NOT_FOUND, {
                 reply_markup: AuthUserKeyboard(),
             });
         }
 
-        return survey
+        return surveyId
     } catch (err) {
         return null
     }

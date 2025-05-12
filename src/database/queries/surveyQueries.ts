@@ -60,13 +60,14 @@ export interface SurveyTasks {
 //Поиск свободного опроса
 export const getAvailableSurveyForRegion = async (
     regionId: number
-): Promise<{ surveyId: number } | null> => {
+): Promise<number | null | undefined> => {
     try {
         const query = `
       SELECT survey_id
       FROM surveys
       WHERE region_id = $1
       AND completion_limit - active_and_completed_count > 0
+      ORDER BY active_and_completed_count ASC
       LIMIT 1;
     `;
 
@@ -76,9 +77,35 @@ export const getAvailableSurveyForRegion = async (
             return null;
         }
 
-        return {
-            surveyId: result.rows[0].survey_id
-        };
+        return  result.rows[0].survey_id;
+    } catch (error) {
+        let shortError = "";
+        if (error instanceof Error) {
+            shortError = error.message.substring(0, 50);
+        } else {
+            shortError = String(error).substring(0, 50);
+        }
+        throw new Error("Error getAvailableSurveyForRegion: " + shortError);
+    }
+};
+export const getAvailableSurveyWithoutRegion = async (
+): Promise<number | null | undefined> => {
+    try {
+        const query = `
+      SELECT survey_id
+      FROM surveys
+      WHERE completion_limit - active_and_completed_count > 0
+      ORDER BY active_and_completed_count ASC
+      LIMIT 1;
+    `;
+
+        const result = await db.query(query, []);
+
+        if (result.rows.length === 0) {
+            return null;
+        }
+
+        return result.rows[0].survey_id;
     } catch (error) {
         let shortError = "";
         if (error instanceof Error) {
@@ -717,5 +744,66 @@ WHERE
             shortError = String(error).substring(0, 50);
         }
         throw new Error("Error getSurveyById: " + shortError);
+    }
+};
+
+
+export const addSurvey = async (
+    region_id: number,
+    survey_type: SurveyType,
+    topic: string,
+    description: string,
+    completion_limit: number,
+    active_and_completed_count: number,
+    task_price: number,
+    tasks:{
+        description: string;
+        data: string;
+    }[]
+): Promise<number | null> => {
+    const client = await db.connect(); // Получаем клиента для транзакции
+
+    try {
+        await client.query('BEGIN'); // Начинаем транзакцию
+
+        const queryInsertSurvey = 'INSERT INTO surveys' +
+            ' (region_id, survey_type, topic, description, completion_limit, active_and_completed_count, task_price)' +
+            ' VALUES ($1,$2,$3,$4,$5,$6,$7)' +
+            ' RETURNING survey_id;';
+        const resultInsertSurvey:QueryResult<Survey> = await db.query(queryInsertSurvey,
+            [region_id, survey_type, topic, description, completion_limit, active_and_completed_count, task_price]);
+
+        if (resultInsertSurvey.rowCount === 0) {
+            throw new Error('Survey insert failed');
+        }
+
+        const {survey_id} = resultInsertSurvey.rows[0];
+
+        const queryInsertSurveyTask = 'INSERT INTO survey_tasks ' +
+            ' (survey_id, description, data)' +
+            ' VALUES ($1, $2, $3)' +
+            ' RETURNING survey_task_id;';
+
+        for (const task of tasks) {
+            const insertTask = await client.query(queryInsertSurveyTask, [
+                survey_id,
+                task.description,
+                task.data
+                ]);
+            if (insertTask.rowCount === 0) {
+                throw new Error('Survey task insert failed');
+            }
+        }
+        await client.query('COMMIT'); // Завершаем транзакцию
+
+        return survey_id
+
+    } catch (error) {
+        await client.query('ROLLBACK'); // Откатываем при ошибке
+        logger.error("Error addSurvey: " + error)
+        return null
+
+    } finally {
+        client.release(); // Освобождаем клиента
     }
 };
