@@ -51,7 +51,6 @@ export async function xls_parser(ctx: MyContext, bot: Bot<MyContext>): Promise<v
         const errorRow = []
         const regions = await getAllRegions()
         for (const row of rows) {
-            console.log(row)
 
             const regionId = regions.find(region => region.region_name.trim() === row.region.trim())?.region_id
             if (!regionId) {
@@ -170,7 +169,6 @@ function parseExcel(filePath: string): Record[] {
             });
         }
 
-        console.log(row)
 
         records.push({
             region: String(row[columnMap.region] || ''),

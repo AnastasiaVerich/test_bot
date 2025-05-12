@@ -16,12 +16,7 @@ export const addPhoto = async (
     const query = "INSERT INTO photos (user_id, image) VALUES ($1, $2)";
     await db.query(query, [userId, image]);
   } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error addPhoto: " + shortError);
+
+    throw new Error("Error addPhoto: " + error);
   }
 };

@@ -42,13 +42,8 @@ export async function inviteScene(
             ),
         });
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        logger.error("Error in invite: " + shortError);
+
+        logger.error("Error in invite: " + error);
         await ctx.reply(RESPONSES.SOME_ERROR);
         return;
     }
@@ -70,13 +65,8 @@ class ReferralService {
         try {
             return await QRCode.toBuffer(link);
         } catch (error) {
-            let shortError = "";
-            if (error instanceof Error) {
-                shortError = error.message.substring(0, 50);
-            } else {
-                shortError = String(error).substring(0, 50);
-            }
-            throw new Error("Ошибка при генерации QR-кода: " + shortError);
+
+            throw new Error("Ошибка при генерации QR-кода: " + error);
         }
     }
 }

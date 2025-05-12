@@ -48,8 +48,7 @@ export async function registrationUserScene(
         return
 
     } catch (error) {
-        let shortError = error instanceof Error ? error.message.substring(0, 50) : String(error).substring(0, 50);
-        logger.error("Error in registrationScene: " + shortError);
+        logger.error("Error in registrationScene: " + error);
         await ctx.reply(REGISTRATION_USER_SCENE.SOME_ERROR, {
             reply_markup: RegistrationKeyboard(),
         });

@@ -51,13 +51,8 @@ export const findOperator = async (
         ]);
         return result.rows[0];
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error findOperatorByTelegramId: " + shortError);
+
+        throw new Error("Error findOperatorByTelegramId: " + error);
     }
 };
 
@@ -77,13 +72,7 @@ export const registerOperator = async (
         ]);
         return result.rows[0];
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error registerOperator: " + shortError);
+        throw new Error("Error registerOperator: " + error);
     }
 }
 
@@ -98,13 +87,8 @@ export const addAllowedOperator = async (
         ]);
         return result.rows[0];
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error addAllowedOperator: " + shortError);
+
+        throw new Error("Error addAllowedOperator: " + error);
     }
 }
 export const findOperatorByTgAccount = async (
@@ -122,13 +106,8 @@ export const findOperatorByTgAccount = async (
         ]);
         return result.rows[0];
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error findAllowedOperator: " + shortError);
+
+        throw new Error("Error findAllowedOperator: " + error);
     }
 };
 

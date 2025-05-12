@@ -24,13 +24,8 @@ export const checkInitMiddleware: MiddlewareFn<MyContext> = async (ctx, next) =>
         //если не нужна инициализация, переходим к следующему middleware
         return next();
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        logger.error("Error checkInitMiddleware: " + shortError);
+
+        logger.error("Error checkInitMiddleware: " + error);
         await ctx.reply(RESPONSES.SOME_ERROR, {
             reply_markup: { remove_keyboard: true },
         });

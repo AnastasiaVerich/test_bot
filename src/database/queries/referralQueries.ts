@@ -33,13 +33,8 @@ export async function addReferral(
     ]);
     return result.rows[0];
   } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error addReferral: " + shortError);
+
+    throw new Error("Error addReferral: " + error);
   }
 }
 
@@ -67,13 +62,8 @@ export const completeReferralBonus = async (
 
     await db.query(query, [referredUserId, bonusAmount]);
   } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error completeReferralBonus: " + shortError);
+
+    throw new Error("Error completeReferralBonus: " + error);
   }
 };
 
@@ -94,12 +84,7 @@ export const getReferralAccrualHistory = async (userId: number): Promise<any[]> 
     return result.rows;
   } catch (error) {
     logger.info(error);
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error getReferralAccrualHistory: " + shortError);
+
+    throw new Error("Error getReferralAccrualHistory: " + error);
   }
 };

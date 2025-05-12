@@ -93,13 +93,8 @@ export async function withdrawalScene(
             });
         }
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        logger.error("Error in withdrawal: " + shortError);
+
+        logger.error("Error in withdrawal: " + error);
         await ctx.reply(WITHDRAWAL_USER_SCENE.SOME_ERROR, {
             reply_markup: BalanceMenu(),
         });

@@ -33,13 +33,7 @@ export async function identificationScene(
     } catch (error) {
         const userId = await returnUserId(ctx);
 
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        logger.error(userId + ": Error in identification: " + shortError);
+        logger.error(userId + ": Error in identification: " + error);
         await ctx.reply(RESPONSES.SOME_ERROR);
         return;
     }

@@ -28,13 +28,8 @@ export const upsertCommonVariable = async (
         await db.query(query, [label, value]);
     } catch (error) {
         logger.info(error)
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error upsertCommonVariable: " + shortError);
+
+        throw new Error("Error upsertCommonVariable: " + error);
     }
 };
 

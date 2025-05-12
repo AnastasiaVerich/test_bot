@@ -39,13 +39,7 @@ export const handleStartCommand = async (
   } catch (error) {
     const userId = await returnUserId(ctx);
 
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    logger.error(userId + ": Error in command /start: " + shortError);
+    logger.error(userId + ": Error in command /start: " + error);
     return ctx.reply(COMMAND_USER_START.SOME_ERROR, {
       reply_markup: { remove_keyboard: true },
     });

@@ -165,7 +165,6 @@ export function registerMessage(bot: Bot<MyContext>): void {
     });
 
     bot.on('message:document', async (ctx) => {
-        console.log('message:document')
         await xls_parser(ctx, bot)
 
     });

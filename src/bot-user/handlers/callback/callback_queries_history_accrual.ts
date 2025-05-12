@@ -67,13 +67,8 @@ export async function handler_history_accrual(
         );
 
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        logger.error("Error in keyboard balance: " + shortError);
+
+        logger.error("Error in keyboard balance: " + error);
         await ctx.reply(HANDLER_HISTORY_ACCRUAL.SOME_ERROR);
     }
 }

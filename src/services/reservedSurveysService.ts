@@ -19,12 +19,7 @@ export async function resetReservedSurveysService(): Promise<void> {
 
 
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        logger.error("Error resetReservedSurveysService: " + shortError);
+
+        logger.error("Error resetReservedSurveysService: " + error);
     }
 }

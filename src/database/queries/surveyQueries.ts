@@ -79,13 +79,8 @@ export const getAvailableSurveyForRegion = async (
 
         return  result.rows[0].survey_id;
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error getAvailableSurveyForRegion: " + shortError);
+
+        throw new Error("Error getAvailableSurveyForRegion: " + error);
     }
 };
 export const getAvailableSurveyWithoutRegion = async (
@@ -107,13 +102,8 @@ export const getAvailableSurveyWithoutRegion = async (
 
         return result.rows[0].survey_id;
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error getAvailableSurveyForRegion: " + shortError);
+
+        throw new Error("Error getAvailableSurveyForRegion: " + error);
     }
 };
 
@@ -134,13 +124,8 @@ export const isUserInSurveyActive = async (
 
         return result.rows[0].in_active;
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error isUserInSurveyActive: " + shortError);
+
+        throw new Error("Error isUserInSurveyActive: " + error);
     }
 };
 
@@ -161,13 +146,8 @@ export const isOperatorInSurveyActive = async (
 
         return result.rows[0].in_active;
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error isOperatorInSurveyActive: " + shortError);
+
+        throw new Error("Error isOperatorInSurveyActive: " + error);
     }
 };
 
@@ -186,13 +166,8 @@ export const getActiveSurveyByMessageID = async (
 
         return result.rows[0];
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error isOperatorInSurveyActive: " + shortError);
+
+        throw new Error("Error isOperatorInSurveyActive: " + error);
     }
 };
 
@@ -210,13 +185,8 @@ export const getActiveSurveyByUserId = async (
 
         return result.rows[0];
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error getActiveSurveyByUserId: " + shortError);
+
+        throw new Error("Error getActiveSurveyByUserId: " + error);
     }
 };
 
@@ -234,13 +204,8 @@ export const getActiveSurveyByOperatorId = async (
 
         return result.rows[0];
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error getActiveSurveyByUserId: " + shortError);
+
+        throw new Error("Error getActiveSurveyByUserId: " + error);
     }
 };
 
@@ -258,13 +223,8 @@ export const getActiveSurveyBySurveyActiveId = async (
 
         return result.rows[0];
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error getActiveSurveyBySurveyActiveId: " + shortError);
+
+        throw new Error("Error getActiveSurveyBySurveyActiveId: " + error);
     }
 };
 
@@ -282,13 +242,8 @@ export const getNewActiveSurveysByOperatorId = async (
 
         return result.rows;
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error getNewActiveSurveysByOperatorId: " + shortError);
+
+        throw new Error("Error getNewActiveSurveysByOperatorId: " + error);
     }
 };
 export const getCurrentActiveSurveysByOperatorId = async (
@@ -305,13 +260,8 @@ export const getCurrentActiveSurveysByOperatorId = async (
 
         return result.rows;
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error getCurrentActiveSurveysByOperatorId: " + shortError);
+
+        throw new Error("Error getCurrentActiveSurveysByOperatorId: " + error);
     }
 };
 
@@ -327,13 +277,8 @@ export const updateActiveSurveyMessageID = async (
 
         return result.rows[0];
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error updateActiveSurveyMessageID: " + shortError);
+
+        throw new Error("Error updateActiveSurveyMessageID: " + error);
     }
 };
 
@@ -350,13 +295,8 @@ export const updateActiveSurveyOperatorId = async (
 
         return result.rows[0];
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error updateActiveSurveyOperatorId: " + shortError);
+
+        throw new Error("Error updateActiveSurveyOperatorId: " + error);
     }
 };
 
@@ -371,13 +311,8 @@ export const updateActiveSurveyReservationEnd = async (
 
         return result.rows[0];
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error updateActiveSurveyReservationEnd: " + shortError);
+
+        throw new Error("Error updateActiveSurveyReservationEnd: " + error);
     }
 };
 export const updateActiveSurveyIsJoinedToChat = async (
@@ -392,13 +327,8 @@ export const updateActiveSurveyIsJoinedToChat = async (
 
         return result.rows[0];
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error updateActiveSurveyIsJoinedToChat: " + shortError);
+
+        throw new Error("Error updateActiveSurveyIsJoinedToChat: " + error);
     }
 };
 
@@ -434,13 +364,8 @@ export const addSurveyInActive = async (
     } catch (error) {
         await client.query('ROLLBACK'); // Откатываем при ошибке
         logger.info(error);
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error addSurveyInActive: " + shortError);
+
+        throw new Error("Error addSurveyInActive: " + error);
     } finally {
         client.release(); // Освобождаем клиента
     }
@@ -475,13 +400,8 @@ export const deleteSurveyInActive = async (
     } catch (error) {
         await client.query('ROLLBACK'); // Откатываем при ошибке
         logger.info(error);
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error addSurveyInActive: " + shortError);
+
+        throw new Error("Error addSurveyInActive: " + error);
     } finally {
         client.release(); // Освобождаем клиента
     }
@@ -624,13 +544,8 @@ export const abortSurvey = async (
     } catch (error) {
         await client.query('ROLLBACK'); // Откатываем при ошибке
         logger.info(error);
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error abortSurvey: " + shortError);
+
+        throw new Error("Error abortSurvey: " + error);
     } finally {
         client.release(); // Освобождаем клиента
     }
@@ -651,13 +566,8 @@ export const getSurveyAccrualHistory = async (userId: number): Promise<any[]> =>
         return result.rows;
     } catch (error) {
         logger.info(error);
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error getSurveyAccrualHistory: " + shortError);
+
+        throw new Error("Error getSurveyAccrualHistory: " + error);
     }
 };
 
@@ -691,13 +601,8 @@ WHERE
         return result.rows[0];
     } catch (error) {
         logger.info(error);
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error getSurveyActiveInfo: " + shortError);
+
+        throw new Error("Error getSurveyActiveInfo: " + error);
     }
 };
 export const getSurveyTasks = async (survey_id: number): Promise<SurveyTasks[]> => {
@@ -714,13 +619,8 @@ WHERE
         return result.rows;
     } catch (error) {
         logger.info(error);
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error getSurveyInformations: " + shortError);
+
+        throw new Error("Error getSurveyInformations: " + error);
     }
 };
 export const getSurveyById = async (survey_id: number): Promise<Survey | undefined> => {
@@ -737,13 +637,8 @@ WHERE
         return result.rows[0];
     } catch (error) {
         logger.info(error);
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        throw new Error("Error getSurveyById: " + shortError);
+
+        throw new Error("Error getSurveyById: " + error);
     }
 };
 

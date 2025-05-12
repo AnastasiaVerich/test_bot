@@ -109,13 +109,8 @@ export async function surveyScene(
             });
         }
     } catch (error) {
-        let shortError = "";
-        if (error instanceof Error) {
-            shortError = error.message.substring(0, 50);
-        } else {
-            shortError = String(error).substring(0, 50);
-        }
-        logger.error("Error in survey: " + shortError);
+
+        logger.error("Error in survey: " + error);
         await ctx.reply(RESPONSES.SOME_ERROR);
     }
 }
@@ -143,7 +138,6 @@ async function stepLocation(
 
             if (!response.message?.location) break
 
-            console.log(response)
 
             if ('forward_date' in response.message) {
                 await ctx.reply(SURVEY_USER_SCENE.ENTERED_NOT_USER_LOCATION, {

@@ -9,7 +9,6 @@ export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve
 export async function connectPgClient(client: Client, name: string): Promise<void> {
     try {
         await client.connect();
-        logger.info(`Подключен ${name} к PostgreSQL`);
     } catch (err) {
         logger.info(`Ошибка подключения ${name} к PostgreSQL:`, err);
         throw err;

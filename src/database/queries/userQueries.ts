@@ -30,13 +30,8 @@ export async function findUserByTelegramId(
 
     return result.rows[0];
   } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error findUserByTelegramId: " + shortError);
+
+    throw new Error("Error findUserByTelegramId: " + error);
   }
 }
 
@@ -54,13 +49,8 @@ export async function findUserByPhone(
 
     return result.rows[0];
   } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error findUserByPhone: " + shortError);
+
+    throw new Error("Error findUserByPhone: " + error);
   }
 }
 
@@ -73,13 +63,8 @@ export async function addUser(
       "INSERT INTO users (user_id, phone, balance) VALUES ($1, $2, 0)";
     await db.query(query, [userId, userPhone]);
   } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error addUser: " + shortError);
+
+    throw new Error("Error addUser: " + error);
   }
 }
 
@@ -89,13 +74,8 @@ export async function updateUserLastInit(userId: number): Promise<void> {
     const query = `UPDATE users SET last_init = NOW() WHERE user_id = $1;`;
     await db.query(query, [userId]);
   } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error updateUserLastInit: " + shortError);
+
+    throw new Error("Error updateUserLastInit: " + error);
   }
 }
 export async function updateUserNotifyReason(userId: number, notify_reason:NotifyReasonType ): Promise<void> {
@@ -103,13 +83,8 @@ export async function updateUserNotifyReason(userId: number, notify_reason:Notif
     const query = `UPDATE users SET notify_reason = $2 WHERE user_id = $1;`;
     await db.query(query, [userId, notify_reason]);
   } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error updateUserNotifyReason: " + shortError);
+
+    throw new Error("Error updateUserNotifyReason: " + error);
   }
 }
 
@@ -123,13 +98,8 @@ export async function checkBalance(
     const result: QueryResult<User> = await db.query(query, [userId]);
     return result?.rows[0]?.balance ?? undefined;
   } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error checkBalance: " + shortError);
+
+    throw new Error("Error checkBalance: " + error);
   }
 }
 
@@ -141,13 +111,8 @@ export async function updateMinusUserBalance(
     const query = `UPDATE users SET balance = balance - $1 WHERE user_id = $2`;
     await db.query(query, [amount, userId]);
   } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error updateMinusUserBalance: " + shortError);
+
+    throw new Error("Error updateMinusUserBalance: " + error);
   }
 }
 export async function updatePlusUserBalance(
@@ -158,13 +123,8 @@ export async function updatePlusUserBalance(
     const query = `UPDATE users SET balance = balance + $1 WHERE user_id = $2`;
     await db.query(query, [amount, userId]);
   } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error updatePlusUserBalance: " + shortError);
+
+    throw new Error("Error updatePlusUserBalance: " + error);
   }
 }
 

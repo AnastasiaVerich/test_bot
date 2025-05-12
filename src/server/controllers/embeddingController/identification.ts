@@ -79,13 +79,8 @@ export const identification = async (
       .status(200)
       .send({ status: 0, text: "similarity_not_confirmed" });
   } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    logger.error("Error Identification: " + shortError);
+
+    logger.error("Error Identification: " + error);
     return res.status(500).send({ status: 2, text: "server_error" });
   }
 };

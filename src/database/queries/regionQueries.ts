@@ -17,13 +17,8 @@ export async function getAllRegions(): Promise<RegionSettings[]> {
     const result: QueryResult<RegionSettings> = await db.query(query);
     return result.rows;
   } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error getAllRegions: " + shortError);
+
+    throw new Error("Error getAllRegions: " + error);
   }
 }
 
@@ -35,12 +30,7 @@ export async function getRegionById(
     const result: QueryResult<RegionSettings> = await db.query(query, [region_id]);
     return result.rows[0];
   } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error getRegionById: " + shortError);
+
+    throw new Error("Error getRegionById: " + error);
   }
 }

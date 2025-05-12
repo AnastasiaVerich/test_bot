@@ -131,26 +131,16 @@ export const registration = async (
       await client.query("COMMIT"); // Фиксируем транзакцию
       return res.status(200).send({ status: 1, text: "success" });
     } catch (error) {
-      let shortError = "";
-      if (error instanceof Error) {
-        shortError = error.message.substring(0, 50);
-      } else {
-        shortError = String(error).substring(0, 50);
-      }
-      logger.error("Error registration 2: " + shortError);
+
+      logger.error("Error registration 2: " + error);
       await client.query("ROLLBACK"); // Откатываем транзакцию в случае ошибки
       return res.status(500).send({ status: 2, text: "server_error" });
     } finally {
       client.release(); // Освобождаем клиента
     }
   } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    logger.error("Error registration 1: " + shortError);
+
+    logger.error("Error registration 1: " + error);
     return res.status(500).send({ status: 2, text: "server_error" });
   }
 };

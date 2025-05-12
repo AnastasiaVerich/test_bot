@@ -31,12 +31,7 @@ export async function checkExistInBlockUser(
     ]);
     return result.rows[0];
   } catch (error) {
-    let shortError = "";
-    if (error instanceof Error) {
-      shortError = error.message.substring(0, 50);
-    } else {
-      shortError = String(error).substring(0, 50);
-    }
-    throw new Error("Error checkExistInBlockUser: " + shortError);
+
+    throw new Error("Error checkExistInBlockUser: " + error);
   }
 }
