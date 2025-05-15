@@ -161,11 +161,16 @@ export interface ReferralBonusesEntity {
 export interface SessionsEntity {
     key: number;
     value: string;
+    created_at: Generated<string>;
+    updated_at: Generated<string>;
+
 }
 
 export interface SessionOperatorEntity {
     key: number;
     value: string;
+    created_at: Generated<string>;
+    updated_at: Generated<string>;
 }
 
 export interface Database {

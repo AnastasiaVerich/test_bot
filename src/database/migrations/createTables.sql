@@ -251,7 +251,10 @@ GRANT ALL PRIVILEGES ON TABLE referral_bonuses TO admin_vadim;
 
 CREATE TABLE sessions (
     key VARCHAR(255) PRIMARY KEY,
-    value TEXT
+    value TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+
 );
 GRANT ALL PRIVILEGES ON TABLE sessions TO admin_vadim;
 
@@ -262,10 +265,39 @@ ALTER TABLE sessions OWNER TO admin_vadim;
 
 CREATE TABLE sessions_operator (
     key VARCHAR(255) PRIMARY KEY,
-    value TEXT
+    value TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 GRANT ALL PRIVILEGES ON TABLE sessions_operator TO admin_vadim;
 ALTER TABLE sessions_operator OWNER TO admin_vadim;
+
+
+-- функция для обновления даты в сессиях
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+-- тригер для обновления updated_at в sessions
+CREATE TRIGGER trigger_update_updated_at_sessions
+BEFORE UPDATE ON sessions
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+-- тригер для обновления updated_at в sessions_operator
+CREATE TRIGGER trigger_update_updated_at_sessions_operator
+BEFORE UPDATE ON sessions_operator
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+--это может и не надо, так как уже дали такие права, но пусть будет
+GRANT ALL PRIVILEGES ON TABLE sessions TO admin_vadim;
+GRANT ALL PRIVILEGES ON TABLE sessions_operator TO admin_vadim;
+
+
+
+
+
 
 -- Функция для отправки в канал операторов нового опроса
 CREATE OR REPLACE FUNCTION notify_survey_active() RETURNS TRIGGER AS $$

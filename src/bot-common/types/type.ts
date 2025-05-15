@@ -5,6 +5,7 @@ export interface SessionData {
     [key: string]: any; // Для хранения состояния сцен
 }
 
+
 // Внутренний контекст для сцен (с сессией, без разговоров)
 export type MyConversationContext = Context & SessionFlavor<SessionData>;
 

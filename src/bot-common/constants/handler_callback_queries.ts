@@ -1,5 +1,3 @@
-import {BUTTONS_CALLBACK_QUERIES} from "./buttons";
-
 export const HANDLER_BALANCE = {
     USER_ID_UNDEFINED: "Произошла ошибка. Начните заново с команды /start.",
     NO_PENDING_PAYMENT:"Нет ожидающих платежей",
