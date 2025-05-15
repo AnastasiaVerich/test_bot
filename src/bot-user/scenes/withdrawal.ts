@@ -1,16 +1,15 @@
 import {Message} from "grammy/types";
-import {addPendingPayment, findPendingPaymentByUserId,} from "../../database/queries/pendingPaymentsQueries";
 import logger from "../../lib/logger";
 import {getUserId} from "../../bot-common/utils/getUserId";
-import {checkBalance, updateMinusUserBalance} from "../../database/queries/userQueries";
-
 import {Conversation} from "@grammyjs/conversations";
 import {BUTTONS_KEYBOARD} from "../../bot-common/constants/buttons";
 import {AuthUserKeyboard, ConfirmCancelButtons, EmptyKeyboard} from "../../bot-common/keyboards/keyboard";
 import {BalanceMenu} from "../../bot-common/keyboards/inlineKeyboard";
 import {WITHDRAWAL_USER_SCENE} from "../../bot-common/constants/scenes";
 import {MyContext, MyConversation, MyConversationContext} from "../../bot-common/types/type";
-import {getCommonVariableByLabel} from "../../database/queries/commonVariablesQueries";
+import {getCommonVariableByLabel} from "../../database/queries_kysely/common_variables";
+import {addPendingPayment, getAllPendingPaymentByUserId} from "../../database/queries_kysely/pending_payments";
+import {getUserBalance, updateUserByUserId} from "../../database/queries_kysely/users";
 
 export async function withdrawalScene(
     conversation: MyConversation,
@@ -18,7 +17,7 @@ export async function withdrawalScene(
 ): Promise<Message.TextMessage | void> {
     try {
         let curseInfo = await getCommonVariableByLabel('ton_rub_price')
-        if(!curseInfo){
+        if (!curseInfo) {
             return
         }
         const curseTon = Number(curseInfo.value)
@@ -26,13 +25,13 @@ export async function withdrawalScene(
         if (!userId) return
 
         // Проверка на наличие ожидающего платежа
-        const pendingPayment = await conversation.external(() => findPendingPaymentByUserId(userId));
+        const pendingPayment = await conversation.external(() => getAllPendingPaymentByUserId(userId));
         if (pendingPayment.length > 0) {
             return ctx.reply(WITHDRAWAL_USER_SCENE.HAS_PENDING_PAYMENT);
         }
 
         // Проверка баланса пользователя
-        const balance = await conversation.external(() => checkBalance(userId));
+        const balance = await conversation.external(() => getUserBalance(userId));
 
         if (!balance) {
             await ctx.reply(WITHDRAWAL_USER_SCENE.SOME_ERROR, {
@@ -77,17 +76,19 @@ export async function withdrawalScene(
 
         if (resultConfirm === BUTTONS_KEYBOARD.ConfirmButton) {
             // Добавляем платеж в список ожидающих
-            await addPendingPayment(userId, amountTON, recipientAddress);
-            await updateMinusUserBalance(userId, amountTON * curseTon);
+            await addPendingPayment({
+                userId: userId,
+                amount: amountTON,
+                address: recipientAddress
+            });
+            await updateUserByUserId(userId, {
+                add_balance: -amountTON * curseTon
+            });
 
-            logger.info(
-                `Пользователь ${userId} инициировал вывод ${amountTON} TON на адрес ${recipientAddress}`,
-            );
             return ctx.reply(WITHDRAWAL_USER_SCENE.SUCCESS, {
                 reply_markup: AuthUserKeyboard(),
             });
         } else {
-            logger.info(`Пользователь ${userId} отменил снятие средств.`);
             return ctx.reply(WITHDRAWAL_USER_SCENE.CANCELLED, {
                 reply_markup: AuthUserKeyboard(),
             });

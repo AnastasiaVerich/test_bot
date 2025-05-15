@@ -1,12 +1,12 @@
 import {Conversation} from "@grammyjs/conversations";
 import logger from "../../lib/logger";
 import {getUserId} from "../../bot-common/utils/getUserId";
-import {findUserByTelegramId} from "../../database/queries/userQueries";
 
 import {IdentificationKeyboard, RegistrationKeyboard} from "../../bot-common/keyboards/inlineKeyboard";
 import {AuthUserKeyboard, sendUserPhone, WebAppKeyboard} from "../../bot-common/keyboards/keyboard";
 import {REGISTRATION_USER_SCENE} from "../../bot-common/constants/scenes";
 import {MyContext, MyConversation, MyConversationContext} from "../../bot-common/types/type";
+import {getUser} from "../../database/queries_kysely/users";
 
 
 export async function registrationUserScene(
@@ -17,7 +17,7 @@ export async function registrationUserScene(
         const userId = await conversation.external(() => getUserId(ctx));
         if (!userId) return
 
-        const user = await conversation.external(() => findUserByTelegramId(userId));
+        const user = await conversation.external(() => getUser({user_id:userId}));
         if (user) {
             await ctx.reply(REGISTRATION_USER_SCENE.USER_EXIST, {
                 reply_markup: IdentificationKeyboard(),
@@ -131,7 +131,6 @@ async function photoStep(
         if (message_web_app_data.message?.web_app_data) {
             const data = JSON.parse(message_web_app_data.message.web_app_data.data);
             result = data.text
-            logger.info(data)
             switch (result) {
                 case "user_exist_number":
                 case "user_exist_id":

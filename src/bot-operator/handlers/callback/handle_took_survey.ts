@@ -1,14 +1,11 @@
 import {channelId} from "../../../config/env";
 import {Bot} from "grammy";
 import {MyContext} from "../../../bot-common/types/type";
-import {
-    getActiveSurveyByMessageID, getActiveSurveyByOperatorId,
-    getSurveyActiveInfo,
-    updateActiveSurveyOperatorId
-} from "../../../database/queries/surveyQueries";
-import {findOperator} from "../../../database/queries/operatorQueries";
 import {HANDLER_TOOK_SURVEY} from "../../../bot-common/constants/handler_callback_queries";
 import logger from "../../../lib/logger";
+import {getOperatorByIdPhoneOrTg} from "../../../database/queries_kysely/operators";
+import {getActiveSurvey} from "../../../database/queries_kysely/survey_active";
+import {getInfoAboutSurvey, reservationSurveyActiveByOperator} from "../../../database/services/surveyService";
 
 
 export const handleTookSurvey = async (ctx: MyContext, bot: Bot<MyContext>) => {
@@ -21,32 +18,38 @@ export const handleTookSurvey = async (ctx: MyContext, bot: Bot<MyContext>) => {
         if (
             chat_id.toString() === channelId
         ) {
-            const operator = await findOperator(operator_id, null, null)
+            const operator = await getOperatorByIdPhoneOrTg({operator_id: operator_id})
             if (!operator) return
 
-            if(!operator.can_take_multiple_surveys){
-                const hasActiveSurvey = await getActiveSurveyByOperatorId(operator_id)
-                if(hasActiveSurvey) return
+            if (!operator.can_take_multiple_surveys) {
+                const hasActiveSurvey = await getActiveSurvey({operatorId: operator_id})
+                if (hasActiveSurvey) return
             }
-            const active_survey = await getActiveSurveyByMessageID(message_id)
+            const active_survey = await getActiveSurvey({messageId: message_id})
             if (!active_survey) return
 
-            const surveyActiveInfo = await getSurveyActiveInfo(active_survey.survey_active_id)
-            if (!surveyActiveInfo) return
+            const surveyInfo = await getInfoAboutSurvey(active_survey.survey_id)
+            if (!surveyInfo) return
 
             if (active_survey.operator_id) return
 
-            const updatingSurveyActive = await updateActiveSurveyOperatorId(operator_id, active_survey.survey_active_id, surveyActiveInfo.reservation_time_min)
+            const isReservation = await reservationSurveyActiveByOperator(
+                {
+                    operatorId: operator_id,
+                    surveyActiveId: active_survey.survey_active_id,
+                    reservationMinutes: surveyInfo.reservation_time_min
+                }
+            )
+            if (!isReservation) return
 
-            if (updatingSurveyActive?.operator_id.toString() === operator_id.toString()) {
 
-                await ctx.api.deleteMessage(channelId, message_id);
-                let messages = HANDLER_TOOK_SURVEY.TOOK_IT
+            await ctx.api.deleteMessage(channelId, message_id);
+            let messages = HANDLER_TOOK_SURVEY.TOOK_IT
 
-                await bot.api.sendMessage(operator_id, messages, {
-                    parse_mode: 'HTML',
-                })
-            }
+            await bot.api.sendMessage(operator_id, messages, {
+                parse_mode: 'HTML',
+            })
+
         }
     } catch (error) {
         logger.error("Error in handleTookSurvey: " + error);

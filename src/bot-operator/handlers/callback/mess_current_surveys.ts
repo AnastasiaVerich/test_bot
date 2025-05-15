@@ -1,9 +1,9 @@
 import {MyContext} from "../../../bot-common/types/type";
-import {getCurrentActiveSurveysByOperatorId} from "../../../database/queries/surveyQueries";
 import logger from "../../../lib/logger";
 import {getUserId} from "../../../bot-common/utils/getUserId";
 import {HANDLER_CURRENT_SURVEYS} from "../../../bot-common/constants/handler_messages";
 import {NewSurveysKeyboard} from "../../../bot-common/keyboards/inlineKeyboard";
+import {getAllActiveSurveysUnreservedByOperatorId} from "../../../database/queries_kysely/survey_active";
 
 
 export const currentSurveysHandler = async (ctx: MyContext) => {
@@ -12,7 +12,7 @@ export const currentSurveysHandler = async (ctx: MyContext) => {
         const operator_id = await getUserId(ctx)
         if (!operator_id) return
 
-        const currentActiveSurveys = await getCurrentActiveSurveysByOperatorId(operator_id)
+        const currentActiveSurveys = await getAllActiveSurveysUnreservedByOperatorId(operator_id)
 
         if (currentActiveSurveys.length === 0) {
             await ctx.reply(HANDLER_CURRENT_SURVEYS.NO_CURRENT_SURVEYS)

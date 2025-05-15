@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { detectFaces, findDistance } from "../../services/embeddingService";
 import { InterfaceResponse } from "../../types/type";
-import { findOperator } from "../../../database/queries/operatorQueries";
-import { getFaceEmbeddingByUserId } from "../../../database/queries/faceEmbeddingsQueries";
 import { IdentificationResponseText } from "../../../config/common_types";
 import logger from "../../../lib/logger";
 import {isUserInBlacklist} from "../../../database/queries_kysely/blacklist_users";
+import {getFaceEmbeddingByUserId} from "../../../database/queries_kysely/face_embedding";
+import {getOperatorByIdPhoneOrTg} from "../../../database/queries_kysely/operators";
 
 // Интерфейс для тела запроса
 interface IdentificationRequestBody extends Request {
@@ -38,8 +38,8 @@ export const identification = async (
       });
     }
 
-    const isBlockUser = await isUserInBlacklist(userId, null);
-    const isOperator = await findOperator(userId, null, null);
+    const isBlockUser = await isUserInBlacklist({account_id: userId});
+    const isOperator = await getOperatorByIdPhoneOrTg({operator_id:userId});
 
     // Если пользователь с таким ID заблокирован
     if (isBlockUser || isOperator) {
@@ -67,7 +67,7 @@ export const identification = async (
     // Рассчитываем расстояние между эмбеддингом с изображения и эмбеддингом из базы
     const distance = findDistance(
       faceEmbedding,
-      Object.values(JSON.parse(embeddingFromDB.embedding)),
+      Object.values(JSON.parse(JSON.stringify(embeddingFromDB.embedding))),
     );
 
     // Если расстояние между эмбеддингами меньше порогового значения (0.6), то считаем, что лицо совпало

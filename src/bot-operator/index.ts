@@ -49,10 +49,7 @@ async function bootstrap() {
         });
 
         // Запуск бота
-        logger.info("7: Запуск бота");
-        await bot.start().then((res) => {
-            logger.info("Бот запущен:", res);
-        });
+        await bot.start().then((res) => {});
     } catch (err) {
         logger.info("Ошибка в bootstrap:", err);
     }

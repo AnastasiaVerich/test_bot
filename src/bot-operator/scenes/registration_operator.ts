@@ -1,11 +1,11 @@
 import logger from "../../lib/logger";
 import {getUserId} from "../../bot-common/utils/getUserId";
-import {registerOperator} from "../../database/queries/operatorQueries";
 import {RegistrationKeyboard} from "../../bot-common/keyboards/inlineKeyboard";
 import {AuthMultiOperKeyboard, sendUserPhone} from "../../bot-common/keyboards/keyboard";
 import {REGISTRATION_OPERATOR_SCENE} from "../../bot-common/constants/scenes";
 import {MyConversation, MyConversationContext} from "../../bot-common/types/type";
 import {getUserAccount} from "../../bot-common/utils/getUserTgAccount";
+import {updateOperatorByTgAccount} from "../../database/queries_kysely/operators";
 
 export async function registrationOperatorScene(
     conversation: MyConversation,
@@ -26,7 +26,7 @@ export async function registrationOperatorScene(
             return;
         }
 
-        const operator = await registerOperator(userId,userPhone,userAccount)
+        await updateOperatorByTgAccount(userAccount,{operator_id:userId, phone:userPhone});
         await ctx.reply(`${REGISTRATION_OPERATOR_SCENE.SUCCESS}`, {
             parse_mode:'HTML',
             reply_markup: AuthMultiOperKeyboard(),
@@ -99,9 +99,7 @@ async function link(
 
     try {
         const botId = ctx.me.id; // ID бота
-        logger.info('botId',botId)
         const member = await ctx.api.getChatMember(chatId, botId);
-        logger.info(member)
 
         if (member.status !== "administrator") {
             await ctx.reply("У бота нет доступа к вашей группе, напишите в поддержку.!");

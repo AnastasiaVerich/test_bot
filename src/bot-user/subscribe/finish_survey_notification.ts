@@ -1,20 +1,13 @@
 import {Bot} from "grammy";
-import {
-    deleteSurveyInActive,
-    SurveyActive,
-    SurveyCompletions,
-    updateActiveSurveyIsJoinedToChat
-} from "../../database/queries/surveyQueries";
 import {MyContext} from "../../bot-common/types/type";
-import {findOperator} from "../../database/queries/operatorQueries";
 import {sendMessageWithRetry, subscribeToChannel} from "../../bot-common/utils/pgNotifyUtils";
-import {updateUserNotifyReason, User} from "../../database/queries/userQueries";
 import {formatTimestamp} from "../../lib/date";
+import {updateUserByUserId} from "../../database/queries_kysely/users";
+import {UsersType} from "../../database/db-types";
 import logger from "../../lib/logger";
 
 
-
-async function processRecord(bot: Bot<MyContext>, record: User): Promise<void> {
+async function processRecord(bot: Bot<MyContext>, record: UsersType): Promise<void> {
     const { user_id, survey_lock_until } = record;
     const lockUntilTimespan = survey_lock_until?Number(new Date(survey_lock_until)):null
 
@@ -25,14 +18,13 @@ async function processRecord(bot: Bot<MyContext>, record: User): Promise<void> {
     try {
         const messageId = await sendMessageWithRetry(bot,message,user_id);
         if (messageId !== null) {
-            await updateUserNotifyReason(user_id, null)
-
+            await updateUserByUserId(user_id, {notifyReason:null})
 
         } else {
         }
 
     } catch (error) {
-        console.error(`Ошибка при обработке записи ${user_id}:`, error);
+        logger.error(`Ошибка при обработке записи ${user_id}:`, error);
     }
 }
 

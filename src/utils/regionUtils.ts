@@ -1,13 +1,12 @@
 import * as turf from "@turf/turf";
-import {
-  getAllRegions,
-  RegionSettings,
-} from "../database/queries/regionQueries";
+
 import {LocationType} from "../server/types/type";
+import {getAllRegions} from "../database/queries_kysely/region_settings";
+import {RegionSettingsType} from "../database/db-types";
 
 export async function findRegionByLocation(
   location_coordinate: LocationType,
-): Promise<RegionSettings | null> {
+): Promise<RegionSettingsType | null> {
   if (
     typeof location_coordinate.latitude !== "number" ||
     typeof location_coordinate.longitude !== "number"
@@ -16,10 +15,10 @@ export async function findRegionByLocation(
   }
 
   try {
-    const regionsSettings: RegionSettings[] = await getAllRegions();
+    const regionsSettings: RegionSettingsType[] = await getAllRegions();
 
     // Переменная для хранения найденного региона
-    let region: RegionSettings | null = null;
+    let region: RegionSettingsType | null = null;
 
     for (const regionSetting of regionsSettings) {
       // Полигон региона в формате GeoJSON

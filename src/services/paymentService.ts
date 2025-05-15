@@ -1,13 +1,14 @@
 import { Cell, internal, TonClient, WalletContractV4 } from "@ton/ton";
 import { mnemonicToPrivateKey } from "@ton/crypto";
+
+import { seed_phrase } from "../config/env";
+import logger from "../lib/logger";
 import {
   deletePendingPayment,
   getAllPendingPayment,
-  updateAttemptPendingPayment,
-} from "../database/queries/pendingPaymentsQueries";
-import { seed_phrase } from "../config/env";
-import logger from "../lib/logger";
-import {addWithdrawalLog} from "../database/queries/withdrawalLogsQueries";
+  updateAttemptPendingPayment
+} from "../database/queries_kysely/pending_payments";
+import {addWithdrawalLog} from "../database/queries_kysely/withdrawal_logs";
 
 export async function executePendingPayments(): Promise<void> {
   let pass = false;
@@ -24,14 +25,16 @@ export async function executePendingPayments(): Promise<void> {
       }
       if (!pass) {
 
-        await updateAttemptPendingPayment(payment.user_id, payment.attempts + 1);
+        await updateAttemptPendingPayment(payment.user_id, {attempts:payment.attempts + 1});
 
         const result = await make_payment(payment.amount, payment.address);
-        logger.info(result)
         if (result.isSuccess) {
-          logger.info(payment)
           await deletePendingPayment(payment.user_id);
-          await addWithdrawalLog(payment.user_id,payment.amount,payment.address);
+          await addWithdrawalLog({
+            userId:payment.user_id,
+            amount:payment.amount,
+            wallet:payment.address,
+          });
 
         } else {
           switch (result.reason) {
@@ -84,7 +87,6 @@ export async function make_payment(
 
   const estimateSumGas = await estimateFee(client, recipientAddress, amountTON);
 
-  logger.info(estimateSumGas)
   if (true/*estimateSumGas <= maxGas*/) {
     const balanceNano = await client.getBalance(wallet.address);
     const balanceTON = Number(balanceNano) / 1e9; // Преобразуем в number и делим

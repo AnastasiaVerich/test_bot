@@ -30,7 +30,6 @@ function initialSession(): SessionData {
 
 
 async function bootstrap() {
-    logger.info("1: Начало bootstrap");
     try {
 
         await client.connect();
@@ -43,7 +42,6 @@ async function bootstrap() {
             initial: initialSession,
             storage: storageAdapter,
         }));
-        logger.info("6: Сессии настроены");
         bot.use(conversations());
         // bot.use(errorMiddleware);
 
@@ -61,10 +59,7 @@ async function bootstrap() {
         });
 
         // Запуск бота
-        logger.info("7: Запуск бота");
-        await bot.start().then((res) => {
-            logger.info("Бот запущен:", res);
-        });
+        await bot.start().then((res) => {});
     } catch (err) {
         logger.info("Ошибка в bootstrap:", err);
     }

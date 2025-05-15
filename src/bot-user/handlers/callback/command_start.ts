@@ -1,11 +1,11 @@
 import {Message} from "grammy/types";
-import {findUserByTelegramId} from "../../../database/queries/userQueries";
-import {addReferral} from "../../../database/queries/referralQueries";
 import logger from "../../../lib/logger";
 import {COMMAND_USER_START} from "../../../bot-common/constants/handler_command";
 import {IdentificationKeyboard, RegistrationKeyboard} from "../../../bot-common/keyboards/inlineKeyboard";
 import {MyContext} from "../../../bot-common/types/type";
 import {getUserId, returnUserId} from "../../../bot-common/utils/getUserId";
+import {addReferral} from "../../../database/queries_kysely/referral_bonuses";
+import {getUser} from "../../../database/queries_kysely/users";
 
 export const handleStartCommand = async (
   ctx: MyContext,
@@ -19,7 +19,7 @@ export const handleStartCommand = async (
     if (!userId) return;
 
     // Проверяем, существует ли пользователь в базе данных
-    const user = await findUserByTelegramId(userId);
+    const user = await getUser({user_id:userId});
 
     if (user) {
       return ctx.reply(COMMAND_USER_START.WELCOME_OLD_USER, {
@@ -28,7 +28,10 @@ export const handleStartCommand = async (
     } else {
       if (referral) {
         // Сохраняем реферальный код, если еще нет записи по текущему юзеру
-        await addReferral(userId, Number(referral));
+        await addReferral({
+          userId:userId,
+          referredId:Number(referral)
+        });
       }
 
       return ctx.reply(COMMAND_USER_START.WELCOME_MENU_USER, {

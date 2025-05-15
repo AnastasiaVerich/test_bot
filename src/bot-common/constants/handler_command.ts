@@ -107,7 +107,7 @@ export const COMMAND_USER_HELP = {
     LastQuestionButton: "help_no_my_questions",
     LastQuestionButtonText: "Поддержка",
     LastQuestionAnswer:
-        "Можете связаться с нашим администратором (@кто-то)",
+        "Можете связаться с нашим администратором @Ivan_gr_1",
 
     BackButton: "help_back",
     BackButtonText: "Назад",

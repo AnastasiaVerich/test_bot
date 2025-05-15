@@ -1,14 +1,7 @@
 import axios from 'axios';
 import {convertApiKey} from "../config/env";
-import {
-    deletePendingPayment,
-    getAllPendingPayment,
-    updateAttemptPendingPayment
-} from "../database/queries/pendingPaymentsQueries";
 import logger from "../lib/logger";
-import {addWithdrawalLog} from "../database/queries/withdrawalLogsQueries";
-import {make_payment} from "./paymentService";
-import {upsertCommonVariable} from "../database/queries/commonVariablesQueries";
+import {upsertCommonVariable} from "../database/queries_kysely/common_variables";
 
 // Конфигурация
 
@@ -20,8 +13,7 @@ export async function cryptoCurrency(): Promise<void> {
             await upsertCommonVariable('ton_rub_price',res?.toFixed(2).toString() )
         }
     } catch (error) {
-        logger.info(error);
-
+        logger.info('Error cryptoCurrency',error);
     }
 }
 
@@ -34,7 +26,6 @@ async function getTonRubPrice(): Promise<number | null> {
             headers: { 'X-CMC_PRO_API_KEY': convertApiKey },
         });
         const data = response.data;
-        logger.info('Запроса:', data);
 
         if (data.status.error_code === 0) {
             return data.data.TON.quote.RUB.price;

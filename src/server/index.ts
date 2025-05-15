@@ -21,6 +21,4 @@ void initializeModels();
 // Маршруты
 configureRoutes(app);
 
-app.listen(port, () => {
-  logger.info(`Server is running at http://localhost:${port}`);
-});
+app.listen(port, () => {});

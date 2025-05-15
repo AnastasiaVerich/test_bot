@@ -1,11 +1,11 @@
 import logger from "../../../lib/logger";
-import {findPendingPaymentByUserId} from "../../../database/queries/pendingPaymentsQueries";
-import {checkBalance} from "../../../database/queries/userQueries";
 import {HANDLER_BALANCE} from "../../../bot-common/constants/handler_callback_queries";
 import {BalanceMenu} from "../../../bot-common/keyboards/inlineKeyboard";
 import {MyContext} from "../../../bot-common/types/type";
 import {getUserId} from "../../../bot-common/utils/getUserId";
-import {getCommonVariableByLabel} from "../../../database/queries/commonVariablesQueries";
+import {getCommonVariableByLabel} from "../../../database/queries_kysely/common_variables";
+import {getAllPendingPaymentByUserId} from "../../../database/queries_kysely/pending_payments";
+import {getUserBalance} from "../../../database/queries_kysely/users";
 
 export async function handleBalance(
     ctx: MyContext,
@@ -22,12 +22,12 @@ export async function handleBalance(
 
         if (!userId) return;
 
-        const balance = await checkBalance(userId);
+        const balance = await getUserBalance(userId);
         if (!balance) {
             return ctx.reply(HANDLER_BALANCE.USER_ID_UNDEFINED);
         }
         const balanceTon = Number((balance / curseTon).toFixed(2))
-        const pendingPayment = await findPendingPaymentByUserId(userId);
+        const pendingPayment = await getAllPendingPaymentByUserId(userId);
 
 
         // Форматируем ожидающие платежи

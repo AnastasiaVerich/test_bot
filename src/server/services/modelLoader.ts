@@ -15,7 +15,6 @@ export async function loadModels(): Promise<void> {
 export const initializeModels = async (): Promise<void> => {
   try {
     await loadModels();
-    logger.info("Модели успешно загружены");
   } catch (error) {
 
     logger.error("Ошибка при загрузке моделей: " + error);

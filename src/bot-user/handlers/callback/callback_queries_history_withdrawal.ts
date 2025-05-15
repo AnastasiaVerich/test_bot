@@ -1,13 +1,12 @@
 import {InlineKeyboard} from "grammy";
 import {Message} from "grammy/types";
-import {selectWithdrawalLogByUserId} from "../../../database/queries/withdrawalLogsQueries";
 import {formatTimestamp} from "../../../lib/date";
 import logger from "../../../lib/logger";
-import {getUserId} from "../../../bot-common/utils/getUserId"
-;
+import {getUserId} from "../../../bot-common/utils/getUserId";
 import {BUTTONS_CALLBACK_QUERIES} from "../../../bot-common/constants/buttons";
 import {HANDLER_HISTORY_WITHDRAWAL} from "../../../bot-common/constants/handler_callback_queries";
 import {MyContext} from "../../../bot-common/types/type";
+import {getAllWithdrawalLogByUserId} from "../../../database/queries_kysely/withdrawal_logs";
 
 export async function handler_history_withdrawal(
     ctx: MyContext,
@@ -18,7 +17,7 @@ export async function handler_history_withdrawal(
 
         if (!userId) return;
 
-        const logs = await selectWithdrawalLogByUserId(userId);
+        const logs = await getAllWithdrawalLogByUserId(userId);
 
         // Форматируем завершенные платежи
         const logs_show = logs.length > 0

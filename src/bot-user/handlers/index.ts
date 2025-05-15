@@ -26,7 +26,6 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     bot.callbackQuery(
         BUTTONS_CALLBACK_QUERIES.RegistrationButton,
         async (ctx: MyContext) => {
-            logger.info("Сессия перед входом в сцену:", ctx.session); // Должно вывести объект
             await ctx.conversation.enter(ScenesUser.RegisterScene);
         },
     );
@@ -97,11 +96,6 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
 }
 
 export function registerMessage(bot: Bot<MyContext>): void {
-    async function catchUserActions(ctx: any) {
-        const conversationState = await ctx.conversation.active();
-        logger.info(`User ${ctx.from?.id} sent text: ${ctx.message.text}, active conversations: ${JSON.stringify(conversationState)}`);
-
-    }
 
     bot.on("message:text", blacklistMiddleware, authMiddleware, checkInitMiddleware, async (ctx) => {
 

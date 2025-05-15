@@ -1,11 +1,11 @@
 import logger from "../../lib/logger";
 import {getUserId, returnUserId} from "../../bot-common/utils/getUserId";
-import {findUserByTelegramId, updateUserLastInit} from "../../database/queries/userQueries";
 import {RESPONSES} from "../../bot-common/constants/responses";
 import {IdentificationKeyboard, RegistrationKeyboard} from "../../bot-common/keyboards/inlineKeyboard";
 import {AuthUserKeyboard, WebAppKeyboard} from "../../bot-common/keyboards/keyboard";
 import {IDENTIFICATION_USER_SCENE} from "../../bot-common/constants/scenes";
 import {MyConversation, MyConversationContext} from "../../bot-common/types/type";
+import {getUser, updateUserByUserId} from "../../database/queries_kysely/users";
 
 export async function identificationScene(
     conversation: MyConversation,
@@ -15,7 +15,7 @@ export async function identificationScene(
         const userId = await conversation.external(() => getUserId(ctx));
         if (!userId) return
 
-        const user = await conversation.external(() => findUserByTelegramId(userId));
+        const user = await conversation.external(() => getUser({user_id:userId}));
         if (!user) {
             await ctx.reply(IDENTIFICATION_USER_SCENE.USER_NOT_EXIST, {
                 reply_markup: RegistrationKeyboard(),
@@ -78,7 +78,7 @@ export async function photoStep(
                     await ctx.reply(IDENTIFICATION_USER_SCENE.SUCCESS, {
                         reply_markup: AuthUserKeyboard(),
                     });
-                    await updateUserLastInit(userId)
+                    await updateUserByUserId(userId,{last_init:'update'})
                 }
                     break;
                 default: {

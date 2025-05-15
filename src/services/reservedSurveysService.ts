@@ -3,7 +3,6 @@ import {db} from "../database/dbClient";
 
 export async function resetReservedSurveysService(): Promise<void> {
 
-    logger.info("Запуск задачи освобождения зарезервированных опросов");
     try {
         // SQL-запрос для удаления записей, у которых reservation_end истёк
         const query = `

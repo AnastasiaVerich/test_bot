@@ -3,21 +3,17 @@ import {Message} from "grammy/types";
 import logger from "../../lib/logger";
 import {getUserId} from "../../bot-common/utils/getUserId";
 import {findUser} from "../utils/findUser";
-import {
-    addSurveyInActive,
-    getAvailableSurveyForRegion, getAvailableSurveyWithoutRegion,
-    isUserInSurveyActive
-} from "../../database/queries/surveyQueries";
 import {formatTimestamp} from "../../lib/date";
 import {Conversation} from "@grammyjs/conversations";
-import {RegionSettings} from "../../database/queries/regionQueries";
-import {Operator} from "../../database/queries/operatorQueries";
 import {RESPONSES} from "../../bot-common/constants/responses";
 import {AuthUserKeyboard, sendLocation} from "../../bot-common/keyboards/keyboard";
 import {SURVEY_USER_SCENE} from "../../bot-common/constants/scenes";
-import {MyContext, MyConversation, MyConversationContext, LocationType} from "../../bot-common/types/type";
+import {LocationType, MyContext, MyConversation, MyConversationContext} from "../../bot-common/types/type";
 import {getUserAccount} from "../../bot-common/utils/getUserTgAccount";
 import {formatLocation, GeocodeResponse, reverseGeocode} from "../../services/getDataLocation";
+import {RegionSettingsType, SurveysType} from "../../database/db-types";
+import {getLeastCompletedSurvey, getLeastCompletedSurveyForRegion} from "../../database/queries_kysely/surveys";
+import {checkCanUserTakeSurvey, takeSurveyByUser} from "../../database/services/surveyService";
 
 export async function surveyScene(
     conversation: MyConversation,
@@ -37,28 +33,26 @@ export async function surveyScene(
 
         const user = await conversation.external(() => findUser(userId, ctx));
         if (!user) return;
+        const resultCheck = await conversation.external(() => checkCanUserTakeSurvey(user));
 
-        const nowTimespan = await conversation.now();
-        const lockUntilTimespan = user.survey_lock_until ? Number(new Date(user.survey_lock_until)) : null
-
-
-        // Шаг 1: Проверка, может ли пользователь проходить опрос
-        const is_survey_lock_now = lockUntilTimespan ? lockUntilTimespan > nowTimespan : false
-        if (is_survey_lock_now) {
-            await ctx.reply(
-                `${SURVEY_USER_SCENE.USER_LOCK_UNTIL} ${formatTimestamp(lockUntilTimespan ?? 0)}.`,
-                {
-                    reply_markup: AuthUserKeyboard(),
-                },
-            );
-            return
-        }
-
-        const isInProgress = await isUserInSurveyActive(user.user_id);
-        if (isInProgress) {
-            await ctx.reply(SURVEY_USER_SCENE.USER_BUSY, {
-                reply_markup: AuthUserKeyboard(),
-            });
+        if (!resultCheck.result) {
+            switch (resultCheck.reason) {
+                case 'userInSurveyActive': {
+                    await ctx.reply(SURVEY_USER_SCENE.USER_BUSY, {
+                        reply_markup: AuthUserKeyboard(),
+                    });
+                }
+                    break
+                case 'is_survey_lock': {
+                    await ctx.reply(
+                        `${SURVEY_USER_SCENE.USER_LOCK_UNTIL} ${formatTimestamp(resultCheck.surveyUntil ?? 0)}.`,
+                        {
+                            reply_markup: AuthUserKeyboard(),
+                        },
+                    );
+                }
+                    break
+            }
             return
         }
 
@@ -72,7 +66,7 @@ export async function surveyScene(
             return;
         }
 
-        const location_string =  formatLocation(location)
+        const location_string = formatLocation(location)
 
 
         // const region = await findRegionByLocation(location);
@@ -95,7 +89,6 @@ export async function surveyScene(
 
         //Шаг 5: меняем статус пользователю, оператору и запросу.
         const isSuccess = await reservationStep(userId, survey_id, userAccount, codeWord, location_string);
-        logger.info('isSuccess' + isSuccess)
 
         if (isSuccess) {
             return ctx.reply(
@@ -163,63 +156,50 @@ async function stepLocation(
 
 async function stepSearchSurvey(
     ctx: MyConversationContext,
-    region?: RegionSettings,
-): Promise< number | undefined | null> {
+    region?: RegionSettingsType,
+): Promise<number | undefined | null> {
     try {
-        let surveyId
-        if(region){
-            surveyId = await getAvailableSurveyForRegion(region.region_id);
+        let survey: SurveysType | null
+        if (region) {
+            survey = await getLeastCompletedSurveyForRegion(region.region_id);
         } else {
-            surveyId = await getAvailableSurveyWithoutRegion();
+            survey = await getLeastCompletedSurvey();
 
         }
 
-        if (!surveyId) {
+        if (!survey) {
             await ctx.reply(SURVEY_USER_SCENE.SURVEY_NOT_FOUND, {
                 reply_markup: AuthUserKeyboard(),
             });
+            return
         }
 
-        return surveyId
+        return survey.survey_id
     } catch (err) {
         return null
     }
 }
 
-async function stepSearchOperator(
-    ctx: MyContext,
-    region: RegionSettings,
-): Promise<Operator | null> {
-    const freeOperator: any = []// await getOperatorsByRegionAndStatus(region.region_id, "free",);
-    if (freeOperator.length === 0) {
-        await ctx.reply(SURVEY_USER_SCENE.OPERATOR_NOT_FOUND, {
-            reply_markup: AuthUserKeyboard(),
-        });
-        return null;
-    }
-    return freeOperator[0];
-}
 
 async function reservationStep(
     userId: number,
     survey_id: number,
     tg_account: string | null,
     code_word: string | null,
-    location_string: string ,
+    location_string: string,
 ): Promise<boolean> {
-    logger.info('start reserv')
     try {
 
-        // Обновляем опрос
-        await addSurveyInActive(
-            survey_id,
-            userId,
-            tg_account,
-            code_word,
-            location_string
-        );
+        await takeSurveyByUser({
+            surveyId: survey_id,
+            userId: userId,
+            tg_account: tg_account,
+            code_word: code_word,
+            location_string: location_string
+        })
         return true;
     } catch (error) {
+        logger.error(error)
 
 
         return false;

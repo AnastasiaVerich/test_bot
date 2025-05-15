@@ -6,20 +6,14 @@ import {handleTookSurvey} from "./callback/handle_took_survey";
 import {BUTTONS_CALLBACK_QUERIES, BUTTONS_KEYBOARD} from "../../bot-common/constants/buttons";
 import {MyContext} from "../../bot-common/types/type";
 import logger from "../../lib/logger";
-import {
-    deleteSurveyInActive,
-    getActiveSurveyByOperatorId, getActiveSurveyBySurveyActiveId,
-    getSurveyActiveInfo,
-    getSurveyTasks,
-    updateActiveSurveyReservationEnd
-} from "../../database/queries/surveyQueries";
 import {getUserId} from "../../bot-common/utils/getUserId";
 import {FinishSurveyKeyboard} from "../../bot-common/keyboards/inlineKeyboard";
-import {ScenesUser} from "../../bot-user/scenes";
 import {newSurveysHandler} from "./callback/mess_new_surveys";
-import {newSecureWords} from "@ton/crypto";
 import {currentSurveysHandler} from "./callback/mess_current_surveys";
 import {xls_parser} from "../../services/xls_parser";
+import {getActiveSurvey, updateActiveSurvey} from "../../database/queries_kysely/survey_active";
+import {getAllSurveyTasks} from "../../database/queries_kysely/survey_tasks";
+import {cancelTakeSurveyByUser, getInfoAboutSurvey} from "../../database/services/surveyService";
 
 
 export function registerCommands(bot: Bot<MyContext>): void {
@@ -37,23 +31,21 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     bot.chatType("private").callbackQuery(
         BUTTONS_CALLBACK_QUERIES.FinishSurveyButton,
         async (ctx: MyContext) => {
-            logger.info(111)
             await ctx.conversation.enter(ScenesOperator.FinishSurveyScene);
         },
     );
     bot.chatType("private").callbackQuery(
         BUTTONS_CALLBACK_QUERIES.CancelSurveyButton,
         async (ctx: MyContext) => {
-            logger.info(222)
 
             const operatorId = await getUserId(ctx)
             if(!operatorId)return
 
-            const activeSurvey =await getActiveSurveyByOperatorId(operatorId)
+            const activeSurvey =await getActiveSurvey({operatorId:operatorId})
 
             if(!activeSurvey) return
-            await deleteSurveyInActive(activeSurvey.survey_active_id)
-            ctx.reply('Опрос успешно отменен')
+            await cancelTakeSurveyByUser(activeSurvey.survey_active_id, activeSurvey.survey_id)
+            await ctx.reply('Опрос успешно отменен')
 
         },
     );
@@ -77,8 +69,13 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
             }
             const surveyActiveId = parseInt(match[1], 10); // Получаем число из группы захвата
 
-            const newSurveyActive = await  updateActiveSurveyReservationEnd(surveyActiveId)
-            if(newSurveyActive){
+            const resultUpdate = await  updateActiveSurvey(surveyActiveId,{reservationMinutes:null})
+            if(resultUpdate){
+                const newSurveyActive = await getActiveSurvey({
+                    surveyActiveId:surveyActiveId
+                })
+                if(!newSurveyActive) return
+
                 let message = `Вы отметили, что пользователь `
                 const username = newSurveyActive.tg_account
                 if(username){
@@ -115,19 +112,19 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
             }
             const surveyActiveId = parseInt(match[1], 10); // Получаем число из группы захвата
 
-            const active_survey = await getActiveSurveyBySurveyActiveId(surveyActiveId)
+            const active_survey = await getActiveSurvey({surveyActiveId:surveyActiveId})
             if (!active_survey) return
 
-            const surveyActiveInfo = await getSurveyActiveInfo(active_survey.survey_active_id)
-            if (!surveyActiveInfo) return
+            const surveyInfo = await getInfoAboutSurvey(active_survey.survey_id)
+            if (!surveyInfo) return
 
-            const surveyActiveTasks = await getSurveyTasks(active_survey.survey_id)
+            const surveyActiveTasks = await getAllSurveyTasks(active_survey.survey_id)
             let message = [
                 `<b>📋 Опрос</b>`,
                 //`<b>📋 Опрос: ${surveyActive.topic}</b>`,
                 //`<b>Тип:</b> ${surveyActive.survey_type}`,
                 //`<b>Описание:</b> ${surveyActive.description}`,
-                `<b>Геолокация опроса:</b> ${surveyActiveInfo.region_name}`,
+                `<b>Геолокация опроса:</b> ${surveyInfo.region_name}`,
                 `<b>Геолокация пользователя:</b> ${active_survey.user_location}`,
                 `` // Empty line for spacing
             ].join('\n');

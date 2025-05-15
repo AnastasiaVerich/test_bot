@@ -16,6 +16,7 @@ export const checkInitMiddleware: MiddlewareFn<MyContext> = async (ctx, next) =>
 
         const user = await findUser(userId, ctx);
         if (!user) return;
+        if (!user.last_init) return next();
         if (isDateDifferenceAtLeast(nowDateTime.toString(), user.last_init, 7)) {
             await ctx.conversation.enter(ScenesUser.IdentificationScene);
             return

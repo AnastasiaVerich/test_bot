@@ -1,13 +1,6 @@
 import logger from "../../lib/logger";
 import {getUserId} from "../../bot-common/utils/getUserId";
-import {
-    completeSurvey,
-    getActiveSurveyByOperatorId,
-    getSurveyTasks,
-    SurveyTasks
-} from "../../database/queries/surveyQueries";
 import {Conversation} from "@grammyjs/conversations";
-import {findOperator} from "../../database/queries/operatorQueries";
 import {BUTTONS_KEYBOARD} from "../../bot-common/constants/buttons";
 import {FinishSurveyKeyboard} from "../../bot-common/keyboards/inlineKeyboard";
 import {
@@ -18,6 +11,11 @@ import {
 } from "../../bot-common/keyboards/keyboard";
 import {FINISH_SURVEY_OPERATOR_SCENE} from "../../bot-common/constants/scenes";
 import {MyContext, MyConversation, MyConversationContext} from "../../bot-common/types/type";
+import {getOperatorByIdPhoneOrTg} from "../../database/queries_kysely/operators";
+import {getActiveSurvey} from "../../database/queries_kysely/survey_active";
+import {getAllSurveyTasks} from "../../database/queries_kysely/survey_tasks";
+import {getInfoAboutSurvey, userCompletedSurvey} from "../../database/services/surveyService";
+import {SurveyTasksType} from "../../database/db-types";
 
 export async function finishSurveyScene(
     conversation: MyConversation,
@@ -27,6 +25,7 @@ export async function finishSurveyScene(
         const result:{
             survey_task_id: number;
             isCompleted:boolean,
+            reward?: number;
             result?: string,
             result_positions?: string,
         }[] = await conversation.external(() => [])
@@ -34,17 +33,22 @@ export async function finishSurveyScene(
         const operator_id = await conversation.external(() => getUserId(ctx));
         if (!operator_id) return
 
-        const operator = await findOperator(operator_id, null, null)
+        const operator = await getOperatorByIdPhoneOrTg({operator_id:operator_id})
         if (!operator) {
             return
             //что-то придумать.
         }
 
-        const surveyActive = await getActiveSurveyByOperatorId(operator_id)
+        const surveyActive = await getActiveSurvey({operatorId:operator_id})
         if (!surveyActive) {
             return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SURVEY_ACTIVE_NOT_FOUND, {reply_markup: {remove_keyboard: true}})
         }
-        const survey_tasks = await conversation.external(() => getSurveyTasks(surveyActive.survey_id));
+
+        const surveyData = await getInfoAboutSurvey(surveyActive.survey_id)
+        if (!surveyData) {
+            return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SURVEY_ACTIVE_NOT_FOUND, {reply_markup: {remove_keyboard: true}})
+        }
+        const survey_tasks = await conversation.external(() => getAllSurveyTasks(surveyActive.survey_id));
 
         //скиньте видео
         //сколько выполнил заданий
@@ -61,7 +65,8 @@ export async function finishSurveyScene(
             if (isCompleted === BUTTONS_KEYBOARD.YesButton) {
                 result[index]={
                     isCompleted:true,
-                    survey_task_id:survey_task.survey_task_id
+                    survey_task_id:survey_task.survey_task_id,
+                    reward:surveyData.task_price
                 }
 
                 const result_position = await countResultStep(conversation, ctx)
@@ -106,7 +111,16 @@ export async function finishSurveyScene(
 
         if (resultConfirm === BUTTONS_KEYBOARD.ConfirmButton) {
             // Добавляем платеж в список ожидающих
-            await completeSurvey(surveyActive.survey_active_id, result);
+            await userCompletedSurvey(
+                {
+                    surveyActiveId:surveyActive.survey_active_id,
+                    user_id:surveyActive.user_id,
+                    survey_id:surveyActive.survey_id,
+                    operator_id:operator_id,
+                    survey_interval:surveyData.survey_interval
+                },
+                result
+            )
 
             return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SUCCESS, {
                 reply_markup: AuthMultiOperKeyboard(),
@@ -130,7 +144,7 @@ export async function finishSurveyScene(
 async function completedOrNotStep(
     conversation: MyConversation,
     ctx: MyConversationContext,
-    survey_task: SurveyTasks
+    survey_task: SurveyTasksType
 ) {
 
     try {

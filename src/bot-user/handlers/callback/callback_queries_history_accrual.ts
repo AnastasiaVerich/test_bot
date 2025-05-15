@@ -2,13 +2,12 @@ import {InlineKeyboard} from "grammy";
 import {Message} from "grammy/types";
 import {formatTimestamp} from "../../../lib/date";
 import logger from "../../../lib/logger";
-import {getUserId} from "../../../bot-common/utils/getUserId"
-;
-import {getSurveyAccrualHistory} from "../../../database/queries/surveyQueries";
-import {getReferralAccrualHistory} from "../../../database/queries/referralQueries";
+import {getUserId} from "../../../bot-common/utils/getUserId";
 import {BUTTONS_CALLBACK_QUERIES} from "../../../bot-common/constants/buttons";
 import {HANDLER_HISTORY_ACCRUAL} from "../../../bot-common/constants/handler_callback_queries";
 import {MyContext} from "../../../bot-common/types/type";
+import {getAllReferralByrReferrerIdAndStatus} from "../../../database/queries_kysely/referral_bonuses";
+import {getSurveyCompletionsByUserId} from "../../../database/queries_kysely/survey_completions";
 
 export async function handler_history_accrual(
     ctx: MyContext,
@@ -19,19 +18,19 @@ export async function handler_history_accrual(
 
         if (!userId) return;
 
-        const surveyAccrualHistory = await getSurveyAccrualHistory(userId);
+        const surveyAccrualHistory = await getSurveyCompletionsByUserId(userId);
         // Форматируем завершенные платежи
         const surveyAccrualHistory_show = surveyAccrualHistory.length > 0
             ? surveyAccrualHistory
                 .slice(0, 20) // Ограничиваем до 5 последних операций
                 .map((e) => {
-                    const amount = e.amount
-                    return `💸 *${amount} ${HANDLER_HISTORY_ACCRUAL.RUB}.* — ${formatTimestamp(Number(e.accrual_date))}`;
+                    const amount = e.reward
+                    return `💸 *${amount} ${HANDLER_HISTORY_ACCRUAL.RUB}.* — ${formatTimestamp(Number(e.completed_at))}`;
                 })
                 .join('\n')
             : HANDLER_HISTORY_ACCRUAL.NO_ACCRUAL;
 
-        const accrualReferralHistory = await getReferralAccrualHistory(userId);
+        const accrualReferralHistory = await getAllReferralByrReferrerIdAndStatus(userId, 'completed');
         // Форматируем завершенные платежи
         const accrualReferralHistory_show = accrualReferralHistory.length > 0
             ? accrualReferralHistory
@@ -39,7 +38,7 @@ export async function handler_history_accrual(
                 .map((e) => {
                     const amount = e.amount
                     const referred_user_id = e.referred_user_id
-                    return `💸 *${amount} ${HANDLER_HISTORY_ACCRUAL.RUB}.* — ${formatTimestamp(Number(e.accrual_date))}`;
+                    return `💸 *${amount} ${HANDLER_HISTORY_ACCRUAL.RUB}.* — ${formatTimestamp(Number(e.completed_at))}`;
                 })
                 .join('\n')
             : HANDLER_HISTORY_ACCRUAL.NO_REFERRAL_ACCRUAL;

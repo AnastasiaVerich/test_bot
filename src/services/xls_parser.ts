@@ -3,8 +3,9 @@ import {Bot} from "grammy";
 import * as fs from "node:fs";
 import path from "path";
 import * as XLSX from 'xlsx';
-import {getAllRegions} from "../database/queries/regionQueries";
-import {addSurvey} from "../database/queries/surveyQueries";
+import {getAllRegions} from "../database/queries_kysely/region_settings";
+import {addNewSurveyWithTasks} from "../database/services/surveyService";
+import logger from "../lib/logger";
 
 
 // Тип для задачи
@@ -58,17 +59,17 @@ export async function xls_parser(ctx: MyContext, bot: Bot<MyContext>): Promise<v
                 continue;
             }
 
-            const id = await addSurvey(
-                regionId,
-                'test_site',
-                '',
-                '',
-                row.completion_limit,
-                0,
-                row.task_price,
-                row.tasks
-            )
-            if(!id){
+            const isAdd = await addNewSurveyWithTasks({
+                region_id:regionId,
+                survey_type:'test_site',
+                topic:'',
+                description:'',
+                completion_limit: row.completion_limit,
+                task_price: row.task_price,
+                tasks:row.tasks,
+            })
+
+            if(!isAdd){
                 errorRow.push(row.rowNumber)
             }
 
@@ -84,7 +85,7 @@ export async function xls_parser(ctx: MyContext, bot: Bot<MyContext>): Promise<v
             await ctx.reply(`Не сохранены строки ${errorRow.join(', ')}`);
         }
     } catch (error) {
-        console.error('Ошибка:', error);
+        logger.error('Ошибка:', error);
         await ctx.reply('Произошла ошибка при обработке файла.');
     }
 }

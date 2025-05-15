@@ -29,12 +29,10 @@ export async function sendMessageWithRetry(
                 parse_mode:'HTML',
                 reply_markup:keyboard
             });
-            logger.info(`Сообщение отправлено, message_id: ${result.message_id}, попытка: ${attempt}`);
             return result.message_id;
         } catch (error) {
             logger.info(`Попытка ${attempt} не удалась: ${error}`);
             if (attempt === maxAttempts) {
-                logger.info("Не удалось отправить сообщение");
                 return null;
             }
             await sleep(1000);
@@ -47,7 +45,6 @@ export async function sendMessageWithRetry(
 export async function subscribeToNotifications(client: Client, channel: string): Promise<void> {
     try {
         await client.query(`LISTEN ${channel}`);
-        logger.info(`Подписка на ${channel} установлена`);
     } catch (err) {
         logger.info(`Ошибка при подписке на ${channel}:`, err);
         throw err;
@@ -63,7 +60,6 @@ export async function checkMissedRecords<T>(
     try {
         const result = await client.query(query);
         for (const record of result.rows as T[]) {
-            logger.info(`Обработка пропущенной записи`);
             await processRecord(bot, record);
         }
     } catch (error) {
@@ -99,7 +95,6 @@ export async function reconnectNotifyClient<T>(
     channel: string,
     processRecord: (bot: Bot<MyContext>, record: T) => Promise<void>
 ): Promise<void> {
-    logger.info("Соединение с PostgreSQL закрыто. Переподключение...");
     try {
         await connectPgClient(client, "клиент уведомлений");
         await subscribeToNotifications(client, channel);

@@ -68,7 +68,7 @@ CREATE TABLE operators (
     id SERIAL PRIMARY KEY,
     operator_id BIGINT UNIQUE NOT NULL DEFAULT nextval('operator_default_id_seq'),
     tg_account VARCHAR(255) NOT NULL,
-    phone VARCHAR(15),
+    phone VARCHAR(15) DEFAULT NULL,
     can_take_multiple_surveys BOOLEAN NOT NULL DEFAULT FALSE,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -119,8 +119,8 @@ CREATE TABLE surveys (
     topic VARCHAR(255) NOT NULL,            -- Тематика/название опроса
     description VARCHAR(255),               -- Описание
     completion_limit INT NOT NULL,        -- Столько раз его можно пройти
-    active_and_completed_count INT NOT NULL,        -- Столько раз его уже прошли
-    task_price DECIMAL(10, 2) NOT NULL DEFAULT 0.0, -- Оплата за задание
+    active_and_completed_count INT NOT NULL DEFAULT 0,        -- Столько раз его уже прошли
+    task_price DECIMAL(10, 2) NOT NULL DEFAULT 50, -- Оплата за задание
 
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -215,6 +215,7 @@ CREATE TABLE common_variables(
     value VARCHAR(100) NOT NULL,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    update_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 GRANT ALL PRIVILEGES ON TABLE common_variables TO admin_vadim;
@@ -224,7 +225,7 @@ GRANT USAGE, SELECT, UPDATE ON SEQUENCE common_variables_common_vars_id_seq TO a
 CREATE TABLE pending_payments (
     user_id BIGINT PRIMARY KEY,
     amount DECIMAL(10, 2) NOT NULL,               -- Сумма платежа
-    attempts INT DEFAULT 3 NOT NULL,              -- Количество попыток проведения платежа
+    attempts INT DEFAULT 0 NOT NULL,              -- Количество попыток проведения платежа
     address TEXT NOT NULL,                        -- Адрес для платежа
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -241,7 +242,7 @@ CREATE TABLE referral_bonuses (
     status referral_bonuses_status_enum DEFAULT 'pending', -- когда меняется на completed, то зачисляется на баланс сумма
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    completed_at TIMESTAMP WITH TIME ZONE,
+    completed_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
 
     FOREIGN KEY (referrer_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
