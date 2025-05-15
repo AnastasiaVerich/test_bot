@@ -28,6 +28,7 @@ CREATE TABLE users (
     notify_reason notify_reason_enum DEFAULT NULL,
     survey_lock_until TIMESTAMP WITH TIME ZONE DEFAULT NULL,  --Дата после которой можно проходить опрос
     last_init TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Последний раз его идентификация была в этот день и час
+    skip_photo_verification BOOLEAN DEFAULT FALSE NOT NULL,  -- Пропуск фотоконтроля
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

@@ -13,10 +13,10 @@ async function processRecord(bot: Bot<MyContext>, record: SurveyActiveType): Pro
     const operator = await getOperatorByIdPhoneOrTg({operator_id: operator_id})
     let message = ''
     if (tg_account) {
-        message = `Напишите оператору: @${operator?.tg_account}.`
+        message = `Оператор @${operator?.tg_account} проведет с вами опрос. Пожалуйста, напишите ему в Telegram как можно скорее, чтобы подтвердить готовность. Он свяжется с вами, когда будет свободен.`
     }
     if (code_word) {
-        message = `Напишите оператору: @${operator?.tg_account}. Отправьте ему кодовую комбинацию <code>${code_word}</code>`
+        message = `Оператор @${operator?.tg_account} проведет с вами опрос. Пожалуйста, напишите ему в Telegram как можно скорее, чтобы подтвердить готовность. Он свяжется с вами, когда будет свободен. Отправьте ему кодовую комбинацию <code>${code_word}</code>`
     }
     try {
         const messageId = await sendMessageWithRetry(bot, message, user_id);

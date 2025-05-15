@@ -23,6 +23,7 @@ export interface UsersEntity {
     notify_reason: Generated<NotifyReasonType> ;
     survey_lock_until: Generated<string | null>; // Возможно, в ISO строке
     last_init: Generated<string | null>; // Дата и время в ISO формате
+    skip_photo_verification: Generated<boolean>; // -- Пропуск фотоконтроля
 
     created_at: Generated<string>; // Дата и время в ISO формате
 }

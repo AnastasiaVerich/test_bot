@@ -46,12 +46,15 @@ export async function addUser(
     params: {
         userId: UsersType['user_id'];
         userPhone: UsersType['phone'];
+        skip_photo_verification?: UsersType['skip_photo_verification'];
     },
     trx: poolType = pool
 ): Promise<UsersType['user_id'] | null> {
 
     try {
-        const { userId, userPhone } = params;
+        const { userId, userPhone, skip_photo_verification } = params;
+
+        let skip = skip_photo_verification ?? false
 
         const result = await trx
             .insertInto('users')
@@ -59,6 +62,7 @@ export async function addUser(
                 user_id: userId,
                 phone: userPhone,
                 balance: 0,
+                skip_photo_verification:skip
             })
             .returning('user_id')
             .executeTakeFirst();

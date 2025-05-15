@@ -85,6 +85,7 @@ export const IDENTIFICATION_USER_SCENE = {
     NOT_SIMILAR: "Фотоконтроль не пройден.",
 
     SUCCESS: "Отлично! Фотоконтроль пройден. Вы можете приступить к прохождению опросов.",
+    SUCCESS_SKIP_PHOTO: "Отлично! Вы можете приступить к прохождению опросов.",
 
     SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.IdentificationButtonText}'.`,
 

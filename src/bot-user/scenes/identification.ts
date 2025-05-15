@@ -22,6 +22,12 @@ export async function identificationScene(
             });
             return;
         }
+        if (user.skip_photo_verification) {
+            await ctx.reply(IDENTIFICATION_USER_SCENE.SUCCESS_SKIP_PHOTO, {
+                reply_markup: AuthUserKeyboard(),
+            });
+            return;
+        }
 
         const response = await photoStep(conversation, ctx, userId);
         if (!response) {

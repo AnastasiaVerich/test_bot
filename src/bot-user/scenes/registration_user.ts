@@ -6,7 +6,10 @@ import {IdentificationKeyboard, RegistrationKeyboard} from "../../bot-common/key
 import {AuthUserKeyboard, sendUserPhone, WebAppKeyboard} from "../../bot-common/keyboards/keyboard";
 import {REGISTRATION_USER_SCENE} from "../../bot-common/constants/scenes";
 import {MyContext, MyConversation, MyConversationContext} from "../../bot-common/types/type";
-import {getUser} from "../../database/queries_kysely/users";
+import {addUser, getUser} from "../../database/queries_kysely/users";
+import {isUserInBlacklist} from "../../database/queries_kysely/blacklist_users";
+import {getOperatorByIdPhoneOrTg} from "../../database/queries_kysely/operators";
+import {RegistrationResponseText} from "../../config/common_types";
 
 
 export async function registrationUserScene(
@@ -17,7 +20,7 @@ export async function registrationUserScene(
         const userId = await conversation.external(() => getUserId(ctx));
         if (!userId) return
 
-        const user = await conversation.external(() => getUser({user_id:userId}));
+        const user = await conversation.external(() => getUser({user_id: userId}));
         if (user) {
             await ctx.reply(REGISTRATION_USER_SCENE.USER_EXIST, {
                 reply_markup: IdentificationKeyboard(),
@@ -116,45 +119,74 @@ async function photoStep(
     userPhone: any
 ) {
     try {
-        let result = null
+        const skip_photo_verification = true
 
-        await ctx.reply(REGISTRATION_USER_SCENE.VERIFY_BY_PHOTO, {
-            reply_markup: WebAppKeyboard(userId, userPhone, "registration", "1"),
-        });
+        let result: RegistrationResponseText | null = null
 
-        const message_web_app_data = await conversation.waitFor("message:web_app_data", {
-            otherwise: (ctx) => ctx.reply(REGISTRATION_USER_SCENE.VERIFY_BY_PHOTO_OTHERWISE, {
-                reply_markup: WebAppKeyboard(userId, userPhone, "registration", "1"),
-            }),
-        });
+        if (skip_photo_verification) {
+            const isHasSomeNumberUser = await getUser({phone: userPhone});
+            const isHasSomeIdUser = await getUser({user_id: userId});
+            const isBlockUser = await isUserInBlacklist({account_id: userId, phone: userPhone});
+            const isOperator = await getOperatorByIdPhoneOrTg({
+                operator_id: userId,
+                phone: userPhone
+            });
 
-        if (message_web_app_data.message?.web_app_data) {
-            const data = JSON.parse(message_web_app_data.message.web_app_data.data);
-            result = data.text
-            switch (result) {
-                case "user_exist_number":
-                case "user_exist_id":
-                case "user_exist_face":
-                    await ctx.reply(REGISTRATION_USER_SCENE.USER_EXIST, {
-                        reply_markup: IdentificationKeyboard(),
-                    });
-                    break;
-                case "user_is_block":
-                    await ctx.reply(REGISTRATION_USER_SCENE.USER_IN_BLOCK, {
-                        reply_markup: {remove_keyboard: true},
-                    });
-                    break;
-                case "success":
-                    await ctx.reply(REGISTRATION_USER_SCENE.SUCCESS, {
-                        reply_markup: AuthUserKeyboard(),
-                    });
-                    break;
-                default:
-                    result = null
-                    await ctx.reply(REGISTRATION_USER_SCENE.SOME_ERROR, {
-                        reply_markup: RegistrationKeyboard(),
-                    });
+            // Если пользователь с таким номером телефона уже существует
+            if (isHasSomeNumberUser) {
+                result = "user_exist_number"
+            } else if (isHasSomeIdUser) {
+                result = "user_exist_id";
+
+            } else if (isBlockUser || isOperator) {
+                result = "user_is_block";
+            } else {
+                await addUser({
+                    userId: userId,
+                    userPhone: userPhone,
+                    skip_photo_verification:skip_photo_verification
+                });
+                result= 'success'
             }
+
+        } else {
+
+            await ctx.reply(REGISTRATION_USER_SCENE.VERIFY_BY_PHOTO, {
+                reply_markup: WebAppKeyboard(userId, userPhone, "registration", "1"),
+            });
+
+            const message_web_app_data = await conversation.waitFor("message:web_app_data", {
+                otherwise: (ctx) => ctx.reply(REGISTRATION_USER_SCENE.VERIFY_BY_PHOTO_OTHERWISE, {
+                    reply_markup: WebAppKeyboard(userId, userPhone, "registration", "1"),
+                }),
+            });
+            if (message_web_app_data.message?.web_app_data) {
+                const data = JSON.parse(message_web_app_data.message.web_app_data.data);
+                result = data.text
+
+            }
+        }
+
+        switch (result) {
+            case "user_exist_number":
+            case "user_exist_id":
+            case "user_exist_face":
+                await ctx.reply(REGISTRATION_USER_SCENE.USER_EXIST, {
+                    reply_markup: IdentificationKeyboard(),
+                });
+                break;
+            case "user_is_block":
+                await ctx.reply(REGISTRATION_USER_SCENE.USER_IN_BLOCK, {
+                    reply_markup: {remove_keyboard: true},
+                });
+                break;
+            case "success":
+                await ctx.reply(REGISTRATION_USER_SCENE.SUCCESS, {
+                    reply_markup: AuthUserKeyboard(),
+                });
+                break;
+            default:
+                result = null
         }
 
         return result;
