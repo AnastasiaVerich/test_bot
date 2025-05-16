@@ -5,7 +5,6 @@ export const errorMiddleware: MiddlewareFn = async (ctx, next) => {
   try {
     await next();
   } catch (error) {
-
     logger.error("Произошла ошибка: " + error);
 
     // Уведомление пользователя об ошибке

@@ -1,88 +1,82 @@
-import {Keyboard} from "grammy";
-import {BUTTONS_KEYBOARD} from "../constants/buttons";
-import {WEB_APP_URL} from "../../config/env";
+import { Keyboard } from "grammy";
+import { BUTTONS_KEYBOARD } from "../constants/buttons";
+import { WEB_APP_URL } from "../../config/env";
 
-export const sendUserPhone = (): Keyboard => new Keyboard()
+export const sendUserPhone = (): Keyboard =>
+  new Keyboard()
     .requestContact(BUTTONS_KEYBOARD.SendNumberButton)
     .resized()
     .persistent();
 
-export const ConfirmCancelButtons = ():Keyboard=> new Keyboard()
+export const ConfirmCancelButtons = (): Keyboard =>
+  new Keyboard()
     .text(BUTTONS_KEYBOARD.ConfirmButton)
     .text(BUTTONS_KEYBOARD.CancelButton)
     .resized()
-    .oneTime()
+    .oneTime();
 
-export const YesNoButtons = ():Keyboard=> new Keyboard()
+export const YesNoButtons = (): Keyboard =>
+  new Keyboard()
     .text(BUTTONS_KEYBOARD.YesButton)
     .text(BUTTONS_KEYBOARD.NoButton)
     .resized()
-    .oneTime()
+    .oneTime();
 
-export const ConfirmButton = ():Keyboard=> new Keyboard()
-    .text(BUTTONS_KEYBOARD.ConfirmButton)
-    .resized()
-    .oneTime()
-
+export const ConfirmButton = (): Keyboard =>
+  new Keyboard().text(BUTTONS_KEYBOARD.ConfirmButton).resized().oneTime();
 
 export const EmptyKeyboard = (): Keyboard => new Keyboard().resized().oneTime();
 
-
-export const sendLocation = (): Keyboard => new Keyboard()
+export const sendLocation = (): Keyboard =>
+  new Keyboard()
     .requestLocation(BUTTONS_KEYBOARD.GeolocationButton)
     .resized()
-    .oneTime()
-
+    .oneTime();
 
 export const AuthUserKeyboard = (): Keyboard =>
-    new Keyboard()
-        .text(BUTTONS_KEYBOARD.SurveyButton)
-        .row()
-        .text(BUTTONS_KEYBOARD.InviteButton)
-        .text(BUTTONS_KEYBOARD.BalanceButton)
-        .resized();
-
+  new Keyboard()
+    .text(BUTTONS_KEYBOARD.SurveyButton)
+    .row()
+    .text(BUTTONS_KEYBOARD.InviteButton)
+    .text(BUTTONS_KEYBOARD.BalanceButton)
+    .resized();
 
 export const AuthMultiOperKeyboard = (): Keyboard =>
-    new Keyboard()
-        .text(BUTTONS_KEYBOARD.NewSurveys)
-        .row()
-        .text(BUTTONS_KEYBOARD.CurrentSurveys)
-        .resized();
+  new Keyboard()
+    .text(BUTTONS_KEYBOARD.NewSurveys)
+    .row()
+    .text(BUTTONS_KEYBOARD.CurrentSurveys)
+    .resized();
 
 export const SupervisorSettingKeyboard = (): Keyboard =>
-    new Keyboard()
-        .text(BUTTONS_KEYBOARD.AddAdvertisingCampaign)
-        .row()
-        .resized();
-
+  new Keyboard().text(BUTTONS_KEYBOARD.AddAdvertisingCampaign).row().resized();
 
 export const createKeyboardFromWords = (words: string[]): Keyboard => {
-    const keyboard = new Keyboard();
+  const keyboard = new Keyboard();
 
-    for (const word of words) {
-        keyboard.text(word).row(); // Добавляем кнопку с текстом и переходим на новую строку
-    }
+  for (const word of words) {
+    keyboard.text(word).row(); // Добавляем кнопку с текстом и переходим на новую строку
+  }
 
-    return keyboard.resized(); // Возвращаем адаптивную клавиатуру
+  return keyboard.resized(); // Возвращаем адаптивную клавиатуру
 };
 
 export const WebAppKeyboard = (
-    userId: number,
-    userPhone: string,
-    type: "identification" | "registration",
-    isSavePhoto: "0" | "1",
+  userId: number,
+  userPhone: string,
+  type: "identification" | "registration",
+  isSavePhoto: "0" | "1",
 ): Keyboard =>
-    new Keyboard()
-        .webApp(
-            BUTTONS_KEYBOARD.OpenAppButton,
-            `${WEB_APP_URL}?data=${encodeURIComponent(
-                JSON.stringify({
-                    userId,
-                    userPhone,
-                    type: type,
-                    isSavePhoto: isSavePhoto,
-                }),
-            )}`,
-        )
-        .resized();
+  new Keyboard()
+    .webApp(
+      BUTTONS_KEYBOARD.OpenAppButton,
+      `${WEB_APP_URL}?data=${encodeURIComponent(
+        JSON.stringify({
+          userId,
+          userPhone,
+          type: type,
+          isSavePhoto: isSavePhoto,
+        }),
+      )}`,
+    )
+    .resized();

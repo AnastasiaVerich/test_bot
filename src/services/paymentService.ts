@@ -6,9 +6,9 @@ import logger from "../lib/logger";
 import {
   deletePendingPayment,
   getAllPendingPayment,
-  updateAttemptPendingPayment
+  updateAttemptPendingPayment,
 } from "../database/queries_kysely/pending_payments";
-import {addWithdrawalLog} from "../database/queries_kysely/withdrawal_logs";
+import { addWithdrawalLog } from "../database/queries_kysely/withdrawal_logs";
 
 export async function executePendingPayments(): Promise<void> {
   let pass = false;
@@ -24,18 +24,18 @@ export async function executePendingPayments(): Promise<void> {
         continue;
       }
       if (!pass) {
-
-        await updateAttemptPendingPayment(payment.user_id, {attempts:payment.attempts + 1});
+        await updateAttemptPendingPayment(payment.user_id, {
+          attempts: payment.attempts + 1,
+        });
 
         const result = await make_payment(payment.amount, payment.address);
         if (result.isSuccess) {
           await deletePendingPayment(payment.user_id);
           await addWithdrawalLog({
-            userId:payment.user_id,
-            amount:payment.amount,
-            wallet:payment.address,
+            userId: payment.user_id,
+            amount: payment.amount,
+            wallet: payment.address,
           });
-
         } else {
           switch (result.reason) {
             case "big gas":
@@ -54,7 +54,6 @@ export async function executePendingPayments(): Promise<void> {
     }
   } catch (error) {
     logger.error("Ошибка при выполнении обработки платежей", error);
-
   }
 }
 
@@ -87,7 +86,8 @@ export async function make_payment(
 
   const estimateSumGas = await estimateFee(client, recipientAddress, amountTON);
 
-  if (true/*estimateSumGas <= maxGas*/) {
+  let conditions = true;
+  if (conditions /*estimateSumGas <= maxGas*/) {
     const balanceNano = await client.getBalance(wallet.address);
     const balanceTON = Number(balanceNano) / 1e9; // Преобразуем в number и делим
 

@@ -1,58 +1,58 @@
-import {channelId} from "../../../config/env";
-import {Bot} from "grammy";
-import {MyContext} from "../../../bot-common/types/type";
-import {HANDLER_TOOK_SURVEY} from "../../../bot-common/constants/handler_callback_queries";
+import { Bot } from "grammy";
+import { channelId } from "../../../config/env";
+import { MyContext } from "../../../bot-common/types/type";
+import { HANDLER_TOOK_SURVEY } from "../../../bot-common/constants/handler_callback_queries";
 import logger from "../../../lib/logger";
-import {getOperatorByIdPhoneOrTg} from "../../../database/queries_kysely/operators";
-import {getActiveSurvey} from "../../../database/queries_kysely/survey_active";
-import {getInfoAboutSurvey, reservationSurveyActiveByOperator} from "../../../database/services/surveyService";
-
+import { getOperatorByIdPhoneOrTg } from "../../../database/queries_kysely/operators";
+import { getActiveSurvey } from "../../../database/queries_kysely/survey_active";
+import {
+  getInfoAboutSurvey,
+  reservationSurveyActiveByOperator,
+} from "../../../database/services/surveyService";
 
 export const handleTookSurvey = async (ctx: MyContext, bot: Bot<MyContext>) => {
-    try {
-        const message_id = ctx.update.callback_query?.message?.message_id
-        const chat_id = ctx.update.callback_query?.message?.chat.id
-        const operator_id = ctx.update.callback_query?.from?.id
-        if (!message_id || !chat_id || !operator_id) return
-        // Проверка, что сообщение переслано из определенного чата/канала
-        if (
-            chat_id.toString() === channelId
-        ) {
-            const operator = await getOperatorByIdPhoneOrTg({operator_id: operator_id})
-            if (!operator) return
+  try {
+    const message_id = ctx.update.callback_query?.message?.message_id;
+    const chat_id = ctx.update.callback_query?.message?.chat.id;
+    const operator_id = ctx.update.callback_query?.from?.id;
+    if (!message_id || !chat_id || !operator_id) return;
+    // Проверка, что сообщение переслано из определенного чата/канала
+    if (chat_id.toString() === channelId) {
+      const operator = await getOperatorByIdPhoneOrTg({
+        operator_id: operator_id,
+      });
+      if (!operator) return;
 
-            if (!operator.can_take_multiple_surveys) {
-                const hasActiveSurvey = await getActiveSurvey({operatorId: operator_id})
-                if (hasActiveSurvey) return
-            }
-            const active_survey = await getActiveSurvey({messageId: message_id})
-            if (!active_survey) return
+      if (!operator.can_take_multiple_surveys) {
+        const hasActiveSurvey = await getActiveSurvey({
+          operatorId: operator_id,
+        });
+        if (hasActiveSurvey) return;
+      }
+      const active_survey = await getActiveSurvey({ messageId: message_id });
+      if (!active_survey) return;
 
-            const surveyInfo = await getInfoAboutSurvey(active_survey.survey_id)
-            if (!surveyInfo) return
+      const surveyInfo = await getInfoAboutSurvey(active_survey.survey_id);
+      if (!surveyInfo) return;
 
-            if (active_survey.operator_id) return
+      if (active_survey.operator_id) return;
 
-            const isReservation = await reservationSurveyActiveByOperator(
-                {
-                    operatorId: operator_id,
-                    surveyActiveId: active_survey.survey_active_id,
-                    reservationMinutes: surveyInfo.reservation_time_min
-                }
-            )
-            if (!isReservation) return
+      const isReservation = await reservationSurveyActiveByOperator({
+        operatorId: operator_id,
+        surveyActiveId: active_survey.survey_active_id,
+        reservationMinutes: surveyInfo.reservation_time_min,
+      });
+      if (!isReservation) return;
 
+      await ctx.api.deleteMessage(channelId, message_id);
+      let messages = HANDLER_TOOK_SURVEY.TOOK_IT;
 
-            await ctx.api.deleteMessage(channelId, message_id);
-            let messages = HANDLER_TOOK_SURVEY.TOOK_IT
-
-            await bot.api.sendMessage(operator_id, messages, {
-                parse_mode: 'HTML',
-            })
-
-        }
-    } catch (error) {
-        logger.error("Error in handleTookSurvey: " + error);
-        await ctx.reply(HANDLER_TOOK_SURVEY.SOME_ERROR);
+      await bot.api.sendMessage(operator_id, messages, {
+        parse_mode: "HTML",
+      });
     }
-}
+  } catch (error) {
+    logger.error("Error in handleTookSurvey: " + error);
+    await ctx.reply(HANDLER_TOOK_SURVEY.SOME_ERROR);
+  }
+};

@@ -1,8 +1,8 @@
 import * as turf from "@turf/turf";
 
-import {LocationType} from "../server/types/type";
-import {getAllRegions} from "../database/queries_kysely/region_settings";
-import {RegionSettingsType} from "../database/db-types";
+import { LocationType } from "../server/types/type";
+import { getAllRegions } from "../database/queries_kysely/region_settings";
+import { RegionSettingsType } from "../database/db-types";
 
 export async function findRegionByLocation(
   location_coordinate: LocationType,
@@ -40,7 +40,6 @@ export async function findRegionByLocation(
 
     return region;
   } catch (error) {
-
     throw new Error("Error findRegionByLocation: " + error);
   }
 }

@@ -1,111 +1,112 @@
-import {pool, poolType} from "../dbClient";
-import {OperatorsType} from "../db-types";
+import { pool, poolType } from "../dbClient";
+import { OperatorsType } from "../db-types";
 
 export async function getOperatorByIdPhoneOrTg(
-    params: {
-        operator_id?: OperatorsType['operator_id'],
-        phone?: OperatorsType['phone'],
-        tg_account?: OperatorsType['tg_account'],
-    },
-    trx: poolType = pool
+  params: {
+    operator_id?: OperatorsType["operator_id"];
+    phone?: OperatorsType["phone"];
+    tg_account?: OperatorsType["tg_account"];
+  },
+  trx: poolType = pool,
 ): Promise<OperatorsType | null> {
-    try {
+  try {
+    const { operator_id, phone, tg_account } = params;
 
-        const {operator_id, phone, tg_account} = params
-
-        if (operator_id === undefined && phone === undefined && tg_account === undefined) {
-            throw new Error(
-                `At least one ( ${Object.keys(params).join(', ')} ) must be provided.`,
-            );
-        }
-
-        const result = await trx
-            .selectFrom('operators')
-            .selectAll()
-            .where((eb) => {
-                const conditions = [];
-                if (operator_id !== undefined) {
-                    conditions.push(eb('operator_id', '=', operator_id));
-                }
-                if (phone !== undefined) {
-                    conditions.push(eb('phone', '=', phone));
-                }
-                if (tg_account !== undefined) {
-                    conditions.push(eb('tg_account', '=', tg_account));
-                }
-                return eb.or(conditions);
-            })
-
-            .executeTakeFirst();
-
-        return result ?? null;
-    } catch (error) {
-        throw new Error('Error getOperatorByIdPhoneOrTg: ' + error);
+    if (
+      operator_id === undefined &&
+      phone === undefined &&
+      tg_account === undefined
+    ) {
+      throw new Error(
+        `At least one ( ${Object.keys(params).join(", ")} ) must be provided.`,
+      );
     }
+
+    const result = await trx
+      .selectFrom("operators")
+      .selectAll()
+      .where((eb) => {
+        const conditions = [];
+        if (operator_id !== undefined) {
+          conditions.push(eb("operator_id", "=", operator_id));
+        }
+        if (phone !== undefined) {
+          conditions.push(eb("phone", "=", phone));
+        }
+        if (tg_account !== undefined) {
+          conditions.push(eb("tg_account", "=", tg_account));
+        }
+        return eb.or(conditions);
+      })
+
+      .executeTakeFirst();
+
+    return result ?? null;
+  } catch (error) {
+    throw new Error("Error getOperatorByIdPhoneOrTg: " + error);
+  }
 }
 
 export async function updateOperatorByTgAccount(
-    tg_account: OperatorsType['tg_account'],
-    params: {
-        operator_id?: OperatorsType['operator_id'],
-        phone?: OperatorsType['phone'],
-        can_take_multiple_surveys?: OperatorsType['can_take_multiple_surveys'],
-    },
-    trx: poolType = pool
-): Promise<OperatorsType['operator_id'] | null> {
+  tg_account: OperatorsType["tg_account"],
+  params: {
+    operator_id?: OperatorsType["operator_id"];
+    phone?: OperatorsType["phone"];
+    can_take_multiple_surveys?: OperatorsType["can_take_multiple_surveys"];
+  },
+  trx: poolType = pool,
+): Promise<OperatorsType["operator_id"] | null> {
+  try {
+    const { operator_id, phone, can_take_multiple_surveys } = params;
 
-
-    try {
-        const {operator_id, phone, can_take_multiple_surveys} = params
-
-        if (operator_id === undefined && phone === undefined && can_take_multiple_surveys === undefined) {
-            throw new Error(
-                `At least one ( ${Object.keys(params).join(', ')} ) must be provided.`,
-            );
-        }
-
-        const set: Partial<OperatorsType> = {};
-
-        if (operator_id !== undefined) {
-            set.operator_id = operator_id;
-        }
-        if (phone !== undefined) {
-            set.phone = phone;
-        }
-        if (can_take_multiple_surveys !== undefined) {
-            set.can_take_multiple_surveys = can_take_multiple_surveys;
-        }
-        const result = await trx
-            .updateTable('operators')
-            .set(set)
-            .where('tg_account', '=', tg_account)
-            .returning('operator_id')
-            .executeTakeFirst();
-        return result?.operator_id ?? null
-
-    } catch (error) {
-
-        throw new Error('Error updateOperatorByTgAccount: ' + error);
+    if (
+      operator_id === undefined &&
+      phone === undefined &&
+      can_take_multiple_surveys === undefined
+    ) {
+      throw new Error(
+        `At least one ( ${Object.keys(params).join(", ")} ) must be provided.`,
+      );
     }
+
+    const set: Partial<OperatorsType> = {};
+
+    if (operator_id !== undefined) {
+      set.operator_id = operator_id;
+    }
+    if (phone !== undefined) {
+      set.phone = phone;
+    }
+    if (can_take_multiple_surveys !== undefined) {
+      set.can_take_multiple_surveys = can_take_multiple_surveys;
+    }
+    const result = await trx
+      .updateTable("operators")
+      .set(set)
+      .where("tg_account", "=", tg_account)
+      .returning("operator_id")
+      .executeTakeFirst();
+    return result?.operator_id ?? null;
+  } catch (error) {
+    throw new Error("Error updateOperatorByTgAccount: " + error);
+  }
 }
 
 export async function addOperator(
-    tg_account: OperatorsType['tg_account'],
-    trx: poolType = pool
-): Promise<OperatorsType['operator_id']|null> {
+  tg_account: OperatorsType["tg_account"],
+  trx: poolType = pool,
+): Promise<OperatorsType["operator_id"] | null> {
+  try {
+    const result = await trx
+      .insertInto("operators")
+      .values({
+        tg_account,
+      })
+      .returning("operator_id")
+      .executeTakeFirst();
 
-    try {
-
-        const result =await trx
-            .insertInto('operators')
-            .values({
-                tg_account,
-            })
-            .returning('operator_id')
-            .executeTakeFirst();
-
-        return result?.operator_id ?? null
-    } catch (error) {
-        throw new Error('Error addOperator: ' + error);
-    }
+    return result?.operator_id ?? null;
+  } catch (error) {
+    throw new Error("Error addOperator: " + error);
+  }
 }

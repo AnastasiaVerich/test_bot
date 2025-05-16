@@ -5,7 +5,6 @@ import { corsOptions } from "./config/corsConfig";
 import { configureExpress } from "./config/expressConfig";
 import { initializeModels } from "./services/modelLoader";
 import { PORT } from "../config/env";
-import logger from "../lib/logger";
 
 // Создаём приложение Express
 const app = express();

@@ -24,7 +24,7 @@ export async function detectFaces(imageBuffer: Buffer): Promise<
 
 export function findDistance(
   faceEmbedding_first: Float32Array | number[],
-  faceEmbedding_second: Float32Array| number[],
+  faceEmbedding_second: Float32Array | number[],
 ): number {
   return faceapi.euclideanDistance(faceEmbedding_first, faceEmbedding_second);
 }

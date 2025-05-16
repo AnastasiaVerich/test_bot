@@ -1,4 +1,5 @@
-import {Client, ClientConfig, Pool, types} from "pg";
+import { Client, ClientConfig, Pool, types } from "pg";
+import { Kysely, PostgresDialect } from "kysely";
 import {
   DB_DATABASE,
   DB_HOST,
@@ -7,8 +8,7 @@ import {
   DB_USER,
 } from "../config/env";
 import logger from "../lib/logger";
-import {Kysely, PostgresDialect} from "kysely";
-import {Database} from "./db-interface";
+import { Database } from "./db-interface";
 
 export const pgConfig: ClientConfig = {
   user: DB_USER,
@@ -30,20 +30,15 @@ const dialect = new PostgresDialect({
     port: Number(DB_PORT),
   }),
 });
-export type poolType = Kysely<Database>
+export type poolType = Kysely<Database>;
 
 export const pool = new Kysely<Database>({ dialect });
 
 export const db = new Pool(pgConfig);
 export const client = new Client(pgConfig);
 
-
-
-db.on("connect", () => {
-});
+db.on("connect", () => {});
 
 db.on("error", (error) => {
-
-
   logger.error("Ошибка подключения к базе данных: " + error);
 });

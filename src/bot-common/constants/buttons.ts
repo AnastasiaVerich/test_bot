@@ -1,49 +1,47 @@
 export const BUTTONS_CALLBACK_QUERIES = {
-    RegistrationButton: "REGISTRATION",
-    RegistrationButtonText: "Регистрация",
+  RegistrationButton: "REGISTRATION",
+  RegistrationButtonText: "Регистрация",
 
-    IdentificationButton: "IDENTIFICATION",
-    IdentificationButtonText: "Идентификация",
+  IdentificationButton: "IDENTIFICATION",
+  IdentificationButtonText: "Идентификация",
 
+  WithdrawalOfMoneyButton: "WITHDRAWAL_OF_MONEY",
+  WithdrawalOfMoneyButtonText: "Вывод средств",
 
-    WithdrawalOfMoneyButton: "WITHDRAWAL_OF_MONEY",
-    WithdrawalOfMoneyButtonText: "Вывод средств",
+  HistoryMoneyInputButton: "HISTORY_MONEY_INPUT",
+  HistoryMoneyInputButtonText: "История зачисления",
 
+  HistoryWithdrawalOfMoneyButton: "HISTORY_WITHDRAWAL_OF_MONEY",
+  HistoryWithdrawalOfMoneyButtonText: "История снятия",
 
-    HistoryMoneyInputButton: "HISTORY_MONEY_INPUT",
-    HistoryMoneyInputButtonText: "История зачисления",
+  SourceTgWalletTonButton: "SOURCE_TG_WALLET_TON",
+  SourceTgWalletTonButtonText: "Кошелек телеграм / TON",
 
-    HistoryWithdrawalOfMoneyButton: "HISTORY_WITHDRAWAL_OF_MONEY",
-    HistoryWithdrawalOfMoneyButtonText: "История снятия",
+  FinishSurveyButton: "FINISH_SURVEY",
+  FinishSurveyButtonText: "Опрос окончен",
 
-    SourceTgWalletTonButton: "SOURCE_TG_WALLET_TON",
-    SourceTgWalletTonButtonText: "Кошелек телеграм / TON",
+  CancelSurveyButton: "CANCEL_SURVEY",
+  CancelSurveyButtonText: "Опрос отменен",
 
-    FinishSurveyButton:"FINISH_SURVEY",
-    FinishSurveyButtonText:"Опрос окончен",
-
-    CancelSurveyButton:"CANCEL_SURVEY",
-    CancelSurveyButtonText:"Опрос отменен",
-
-    TookButton:"TookButton",
-    TookButtonText:"Провести опрос",
+  TookButton: "TookButton",
+  TookButtonText: "Провести опрос",
 };
 export const BUTTONS_KEYBOARD = {
-    SendNumberButton: "Отправить номер",
-    ConfirmButton: "Подтвердить",
-    CancelButton: "Отмена",
-    SurveyButton: "Пройти опрос",
-    InviteButton: "Пригласить друга",
-    BalanceButton: "Баланс",
-    GeolocationButton: "Геолокация",
-    OpenAppButton: "Пройти фотоконтроль",
-    ShareButton: "Поделиться",
-    SkipButton: "Пропустить",
-    YesButton: "Да",
-    NoButton: "Нет",
+  SendNumberButton: "Отправить номер",
+  ConfirmButton: "Подтвердить",
+  CancelButton: "Отмена",
+  SurveyButton: "Пройти опрос",
+  InviteButton: "Пригласить друга",
+  BalanceButton: "Баланс",
+  GeolocationButton: "Геолокация",
+  OpenAppButton: "Пройти фотоконтроль",
+  ShareButton: "Поделиться",
+  SkipButton: "Пропустить",
+  YesButton: "Да",
+  NoButton: "Нет",
 
-    NewSurveys: "Новые опросы",
-    CurrentSurveys: "Текущее опросы",
+  NewSurveys: "Новые опросы",
+  CurrentSurveys: "Текущее опросы",
 
-    AddAdvertisingCampaign: "Добавить рекламную компанию",
-}
+  AddAdvertisingCampaign: "Добавить рекламную компанию",
+};

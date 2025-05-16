@@ -21,7 +21,6 @@ export const DB_DATABASE = process.env.DB_DATABASE ?? "";
 export const DB_PASSWORD = process.env.DB_PASSWORD ?? "";
 export const DB_PORT = process.env.DB_PORT ?? "";
 
-
 export const PORT = process.env.SERVER_PORT || 3000;
 export const NODE_ENV = (process.env.NODE_ENV as "dev" | "prod") || "dev";
 export const CORS_URL = process.env.SERVER_CORS_URL

@@ -3,9 +3,9 @@ import { detectFaces, findDistance } from "../../services/embeddingService";
 import { InterfaceResponse } from "../../types/type";
 import { IdentificationResponseText } from "../../../config/common_types";
 import logger from "../../../lib/logger";
-import {isUserInBlacklist} from "../../../database/queries_kysely/blacklist_users";
-import {getFaceEmbeddingByUserId} from "../../../database/queries_kysely/face_embedding";
-import {getOperatorByIdPhoneOrTg} from "../../../database/queries_kysely/operators";
+import { isUserInBlacklist } from "../../../database/queries_kysely/blacklist_users";
+import { getFaceEmbeddingByUserId } from "../../../database/queries_kysely/face_embedding";
+import { getOperatorByIdPhoneOrTg } from "../../../database/queries_kysely/operators";
 
 // Интерфейс для тела запроса
 interface IdentificationRequestBody extends Request {
@@ -38,8 +38,8 @@ export const identification = async (
       });
     }
 
-    const isBlockUser = await isUserInBlacklist({account_id: userId});
-    const isOperator = await getOperatorByIdPhoneOrTg({operator_id:userId});
+    const isBlockUser = await isUserInBlacklist({ account_id: userId });
+    const isOperator = await getOperatorByIdPhoneOrTg({ operator_id: userId });
 
     // Если пользователь с таким ID заблокирован
     if (isBlockUser || isOperator) {
@@ -79,7 +79,6 @@ export const identification = async (
       .status(200)
       .send({ status: 0, text: "similarity_not_confirmed" });
   } catch (error) {
-
     logger.error("Error Identification: " + error);
     return res.status(500).send({ status: 2, text: "server_error" });
   }
