@@ -2,7 +2,7 @@ import { Bot, session } from "grammy";
 import * as dotenv from "dotenv";
 dotenv.config();
 import { conversations } from "@grammyjs/conversations";
-import {token, token_operator} from "../config/env";
+import {token_user, token_operator} from "../config/env";
 import { registerScenes } from "./scenes";
 import {registerCallbackQueries, registerChatEvents, registerCommands, registerMessage} from "./handlers";
 import logger from "../lib/logger";

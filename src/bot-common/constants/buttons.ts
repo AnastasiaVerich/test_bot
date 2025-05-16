@@ -44,4 +44,6 @@ export const BUTTONS_KEYBOARD = {
 
     NewSurveys: "Новые опросы",
     CurrentSurveys: "Текущее опросы",
+
+    AddAdvertisingCampaign: "Добавить рекламную компанию",
 }

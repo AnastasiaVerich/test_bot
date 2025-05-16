@@ -1,30 +1,21 @@
 import {Bot, session} from "grammy";
 import * as dotenv from "dotenv";
 import {conversations} from "@grammyjs/conversations";
-import {token_user} from "../config/env";
-import {registerScenes} from "./scenes";
+import {token_supervisor} from "../config/env";
 import {registerCallbackQueries, registerCommands, registerMessage} from "./handlers";
 import logger from "../lib/logger";
 import {client} from "../database/dbClient";
 import {PsqlAdapter} from "@grammyjs/storage-psql";
 import {MyContext, SessionData} from "../bot-common/types/type";
-import {subscribeReservationEnded} from "./subscribe/reservation_ended";
-import {subscribeOperatorAssigned} from "./subscribe/operator_assigned";
-import {subscribeFinishSurveyNotification} from "./subscribe/finish_survey_notification";
+import {errorMiddleware} from "../bot-common/middleware/errorMiddleware";
+import {registerScenes} from "./scenes";
 
 dotenv.config();
 
 // Начальные данные сессии
 function initialSession(): SessionData {
     return {
-        conversation: {},
-        register:{
-            phoneNumber: undefined,
-        },
-        withdrawal:{
-            amountTON: undefined,
-            amountTonWallet: undefined,
-        },
+
     };
 }
 
@@ -34,8 +25,8 @@ async function bootstrap() {
 
         await client.connect();
 
-        const bot = new Bot<MyContext>(`${token_user}`);
-        const storageAdapter = await PsqlAdapter.create({ tableName: 'sessions', client })
+        const bot = new Bot<MyContext>(`${token_supervisor}`);
+        const storageAdapter = await PsqlAdapter.create({ tableName: 'sessions_supervisor', client })
 
             // Инициализация сессий и разговоров
         bot.use(session({
@@ -43,15 +34,12 @@ async function bootstrap() {
             storage: storageAdapter,
         }));
         bot.use(conversations());
-        // bot.use(errorMiddleware);
+        bot.use(errorMiddleware);
 
         registerScenes(bot);
         registerCommands(bot);
-        registerCallbackQueries(bot);
         registerMessage(bot);
-        subscribeOperatorAssigned(bot);
-        subscribeReservationEnded(bot);
-        subscribeFinishSurveyNotification(bot);
+        registerCallbackQueries(bot);
 
         // Обработчик ошибок
         bot.catch((err) => {

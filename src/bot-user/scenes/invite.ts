@@ -5,8 +5,8 @@ import {getUserId} from "../../bot-common/utils/getUserId";
 import {BUTTONS_KEYBOARD} from "../../bot-common/constants/buttons";
 import {RESPONSES} from "../../bot-common/constants/responses";
 import {INVITE_USER_SCENE} from "../../bot-common/constants/scenes";
-import QRCode from "qrcode";
 import {MyConversation, MyConversationContext} from "../../bot-common/types/type";
+import {ReferralService} from "../../services/referralService";
 
 export async function inviteScene(
     conversation: MyConversation,
@@ -46,27 +46,5 @@ export async function inviteScene(
         logger.error("Error in invite: " + error);
         await ctx.reply(RESPONSES.SOME_ERROR);
         return;
-    }
-}
-
-class ReferralService {
-    private botUsername: string;
-
-    constructor(botUsername: string) {
-        this.botUsername = botUsername;
-    }
-    // Генерация реферальной ссылки
-    generateReferralLink(userId: string): string {
-        return `https://t.me/${this.botUsername}?start=${userId}`;
-    }
-
-    // Генерация QR-кода
-    async generateQRCode(link: string): Promise<Buffer> {
-        try {
-            return await QRCode.toBuffer(link);
-        } catch (error) {
-
-            throw new Error("Ошибка при генерации QR-кода: " + error);
-        }
     }
 }

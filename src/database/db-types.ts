@@ -1,13 +1,14 @@
 import {Generated} from "kysely";
 import {
-    BlacklistUsersEntity,
+    AdvertisingCampaignsEntity,
+    BlacklistUsersEntity, BotUserLogsEntity,
     CommonVariablesEntity,
     FaceEmbeddingsEntity,
     OperatorsEntity,
     PendingPaymentsEntity,
     PhotosEntity,
     ReferralBonusesEntity,
-    RegionSettingsEntity, SurveyActiveEntity, SurveyCompletionsEntity, SurveysEntity,
+    RegionSettingsEntity, SupervisorEntity, SurveyActiveEntity, SurveyCompletionsEntity, SurveysEntity,
     SurveyTasksEntity,
     UsersEntity,
     WithdrawalLogsEntity
@@ -23,6 +24,9 @@ export type BlacklistUsersType = UnwrapGeneratedEntity<BlacklistUsersEntity>
 export type CommonVariablesType = UnwrapGeneratedEntity<CommonVariablesEntity>
 export type FaceEmbeddingsType = UnwrapGeneratedEntity<FaceEmbeddingsEntity>
 export type OperatorsType = UnwrapGeneratedEntity<OperatorsEntity>
+export type SupervisorType = UnwrapGeneratedEntity<SupervisorEntity>
+export type AdvertisingCampaignsType = UnwrapGeneratedEntity<AdvertisingCampaignsEntity>
+export type BotUserLogsType = UnwrapGeneratedEntity<BotUserLogsEntity>
 export type PendingPaymentsType = UnwrapGeneratedEntity<PendingPaymentsEntity>
 export type PhotosType = UnwrapGeneratedEntity<PhotosEntity>
 export type RegionSettingsType = UnwrapGeneratedEntity<RegionSettingsEntity>

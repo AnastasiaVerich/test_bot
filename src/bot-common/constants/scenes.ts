@@ -190,5 +190,38 @@ export const WITHDRAWAL_USER_SCENE = {
 
 }
 
+export const REGISTRATION_SUPERVISOR_SCENE = {
+    ENTER_PHONE:
+        "Для регистрации пришлите свой номер телефона." +
+        "\n" +
+        "\n" +
+        `Нажмите на кнопку '${BUTTONS_KEYBOARD.SendNumberButton}', которая появилась внизу экрана.`,
+    ENTER_PHONE_OTHERWISE: `Пожалуйста, отправьте номер, нажав на кнопку '${BUTTONS_KEYBOARD.SendNumberButton}'.`,
+
+    ENTERED_NOT_USER_PHONE: "Пожалуйста, отправьте свой собственный номер.",
+
+    ENTERED_USER_PHONE: "Ваш номер:",
+
+    SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.RegistrationButtonText}'.`,
+
+    SUCCESS: "Регистрация пройдена.",
+}
+export const ADD_ADV_CAMPAIGN_SCENE = {
+    ENTER_NAME: "Введите название рекламной компании, используя только числа, латинский буквы и нижнее подчеркивание ( Прим: Promo_X123 ).",
+    ENTER_NAME_OTHERWISE: `Пожалуйста, введите название рекламной компании.`,
+    ENTER_NAME_INVALID: `Пожалуйста, введите название рекламной компании, используя только числа, латинский буквы и нижнее подчеркивание.`,
+    ENTER_NAME_EXIST: `Пожалуйста, введите другое название рекламной компании, такая уже существует.`,
+
+    CONFIRMATION: "Сохранить рекламную компанию с названием {campaign_name}?",
+    CONFIRMATION_OTHERWISE:
+        "Нажмите на соответсвующую кнопку для подтверждения или отклонения сохранения новой рекламной компании.",
+    CANCELLED: `Отменено.`,
+
+
+    SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.AddAdvertisingCampaign}'.`,
+
+    SUCCESS: "Сохранено!\n\nСсылка:\n",
+}
+
 
 

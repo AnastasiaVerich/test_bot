@@ -50,6 +50,12 @@ export const AuthMultiOperKeyboard = (): Keyboard =>
         .text(BUTTONS_KEYBOARD.CurrentSurveys)
         .resized();
 
+export const SupervisorSettingKeyboard = (): Keyboard =>
+    new Keyboard()
+        .text(BUTTONS_KEYBOARD.AddAdvertisingCampaign)
+        .row()
+        .resized();
+
 
 export const createKeyboardFromWords = (words: string[]): Keyboard => {
     const keyboard = new Keyboard();

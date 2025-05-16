@@ -54,6 +54,32 @@ export interface OperatorsEntity {
     created_at: Generated<string>; // Дата и время в ISO формате
 }
 
+export interface SupervisorEntity {
+    id: Generated<number>;
+    supervisor_id: Generated<number>;
+    tg_account: string;
+    phone: Generated<string | null>;
+
+    created_at: Generated<string>; // Дата и время в ISO формате
+}
+
+export interface AdvertisingCampaignsEntity {
+    id: Generated<number>;
+    name: string;
+    referral_link: string;
+
+    created_at: Generated<string>; // Дата и время в ISO формате
+}
+
+export interface BotUserLogsEntity {
+    id: Generated<number>;
+    user_id: number;
+    event_type: string;
+    event_data: any;
+
+    logged_at: Generated<string>; // Дата и время в ISO формате
+}
+
 export interface RegionSettingsEntity {
     region_id: Generated<number>;
     region_name: string;
@@ -174,6 +200,13 @@ export interface SessionOperatorEntity {
     updated_at: Generated<string>;
 }
 
+export interface SessionSupervisorEntity {
+    key: number;
+    value: string;
+    created_at: Generated<string>;
+    updated_at: Generated<string>;
+}
+
 export interface Database {
     blacklist_users: BlacklistUsersEntity;
     users: UsersEntity;
@@ -192,4 +225,8 @@ export interface Database {
     referral_bonuses: ReferralBonusesEntity;
     sessions: SessionsEntity;
     sessions_operator: SessionOperatorEntity;
+    sessions_supervisor: SessionSupervisorEntity;
+    supervisor: SupervisorEntity;
+    advertising_campaigns: AdvertisingCampaignsEntity;
+    bot_user_logs: BotUserLogsEntity;
 }

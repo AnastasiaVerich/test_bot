@@ -10,6 +10,7 @@ import {addUser, getUser} from "../../database/queries_kysely/users";
 import {isUserInBlacklist} from "../../database/queries_kysely/blacklist_users";
 import {getOperatorByIdPhoneOrTg} from "../../database/queries_kysely/operators";
 import {RegistrationResponseText} from "../../config/common_types";
+import {getAllUserLogsByEvent} from "../../database/queries_kysely/bot_user_logs";
 
 
 export async function registrationUserScene(
@@ -119,7 +120,17 @@ async function photoStep(
     userPhone: any
 ) {
     try {
-        const skip_photo_verification = true
+        let skip_photo_verification = false
+
+        const user_start_logs = await conversation.external(()=>getAllUserLogsByEvent({
+            user_id:userId,
+            event_type:'start'
+        }))
+        if(user_start_logs.length >0){
+            const event_data = user_start_logs[0].event_data
+            skip_photo_verification = event_data.referral_start.startsWith("campaign__")
+
+        }
 
         let result: RegistrationResponseText | null = null
 
@@ -188,6 +199,7 @@ async function photoStep(
             default:
                 result = null
         }
+
 
         return result;
     } catch (error) {

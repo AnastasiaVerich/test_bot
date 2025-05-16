@@ -80,6 +80,44 @@ GRANT USAGE, SELECT, UPDATE ON SEQUENCE operators_id_seq TO admin_vadim;
 GRANT ALL PRIVILEGES ON TABLE operators TO admin_vadim;
 
 
+
+
+
+-- Таблица руководителей
+CREATE SEQUENCE supervisor_default_id_seq;
+CREATE TABLE supervisor (
+    id SERIAL PRIMARY KEY,
+    supervisor_id BIGINT UNIQUE NOT NULL DEFAULT nextval('supervisor_default_id_seq'),
+    tg_account VARCHAR(255) NOT NULL,
+    phone VARCHAR(15) DEFAULT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE supervisor_default_id_seq TO admin_vadim;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE supervisor_id_seq TO admin_vadim;
+GRANT ALL PRIVILEGES ON TABLE supervisor TO admin_vadim;
+
+CREATE TABLE advertising_campaigns (
+    id SERIAL PRIMARY KEY,  -- Уникальный идентификатор бонусной программы
+    name VARCHAR(255) NOT NULL,  -- Название бонусной программы
+    referral_link VARCHAR(2048) NOT NULL UNIQUE,  -- Реферальная ссылка, уникальная
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP  -- Дата создания записи
+);
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE advertising_campaigns_id_seq TO admin_vadim;
+GRANT ALL PRIVILEGES ON TABLE advertising_campaigns TO admin_vadim;
+
+CREATE TABLE bot_user_logs (
+    id BIGSERIAL PRIMARY KEY,  -- Уникальный идентификатор записи лога
+    user_id BIGINT NOT NULL,  -- ID пользователя
+    event_type VARCHAR(50) NOT NULL,  -- Тип события (например, START, REGISTRATION_STEP, REGISTRATION_STOP)
+    event_data JSONB DEFAULT '{}',  -- Дополнительные данные события (например, шаг регистрации, введенные данные)
+    logged_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP  -- Время события
+);
+GRANT ALL PRIVILEGES ON TABLE bot_user_logs TO admin_vadim;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE bot_user_logs_id_seq TO admin_vadim;
+
+
+
 -- Таблица настроек регионов
 CREATE TABLE region_settings (
     region_id SERIAL PRIMARY KEY,
@@ -273,6 +311,15 @@ CREATE TABLE sessions_operator (
 GRANT ALL PRIVILEGES ON TABLE sessions_operator TO admin_vadim;
 ALTER TABLE sessions_operator OWNER TO admin_vadim;
 
+CREATE TABLE sessions_supervisor (
+    key VARCHAR(255) PRIMARY KEY,
+    value TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+GRANT ALL PRIVILEGES ON TABLE sessions_supervisor TO admin_vadim;
+ALTER TABLE sessions_supervisor OWNER TO admin_vadim;
+
 
 -- функция для обновления даты в сессиях
 RETURNS TRIGGER AS $$
@@ -289,6 +336,11 @@ EXECUTE FUNCTION update_updated_at_column();
 -- тригер для обновления updated_at в sessions_operator
 CREATE TRIGGER trigger_update_updated_at_sessions_operator
 BEFORE UPDATE ON sessions_operator
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+-- тригер для обновления updated_at в sessions_supervisor
+CREATE TRIGGER trigger_update_updated_at_sessions_supervisor
+BEFORE UPDATE ON sessions_supervisor
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
 --это может и не надо, так как уже дали такие права, но пусть будет
