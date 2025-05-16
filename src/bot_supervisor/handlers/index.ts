@@ -4,10 +4,14 @@ import {handleStartCommand} from "./command_start";
 import {BUTTONS_CALLBACK_QUERIES, BUTTONS_KEYBOARD} from "../../bot-common/constants/buttons";
 import {ScenesSupervisor} from "../scenes";
 import {authSupervisorMiddleware} from "../middleware/authMiddleware";
+import {cancelCurrentConversation} from "../../bot-common/utils/cancelCurrentConversation";
+import {SupervisorSettingKeyboard} from "../../bot-common/keyboards/keyboard";
 
 export function registerCommands(bot: Bot<MyContext>): void {
     bot.command("start", handleStartCommand);
+    bot.command("clean", (ctx)=>cancelCurrentConversation(ctx, SupervisorSettingKeyboard()));
 }
+
 export function registerCallbackQueries(bot: Bot<MyContext>): void {
     bot.chatType("private").callbackQuery(
         BUTTONS_CALLBACK_QUERIES.RegistrationButton,

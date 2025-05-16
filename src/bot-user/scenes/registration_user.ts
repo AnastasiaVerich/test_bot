@@ -44,10 +44,6 @@ export async function registrationUserScene(
                 reply_markup: RegistrationKeyboard(),
             });
         }
-        // Сбрасываем сессию
-        await conversation.external((ctx) => {
-            delete ctx.session.register.phoneNumber;
-        });
 
         return
 
@@ -101,10 +97,6 @@ async function phoneStep(
 
         await ctx.reply(`${REGISTRATION_USER_SCENE.ENTERED_USER_PHONE} ${phoneNumber}`, {
             reply_markup: {remove_keyboard: true},
-        });
-
-        await conversation.external((ctx) => {
-            ctx.session.register.phoneNumber = phoneNumber;
         });
 
         return phoneNumber;
@@ -204,9 +196,6 @@ async function photoStep(
         return result;
     } catch (error) {
         logger.info("photoFinishStep: Ошибка:", error);
-        await conversation.external((ctx) => {
-            delete ctx.session.register.phoneNumber;
-        });
         return null;
     }
 }

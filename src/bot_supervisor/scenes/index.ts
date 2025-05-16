@@ -8,6 +8,7 @@ export enum ScenesSupervisor {
     RegisterScene = "RegisterScene", // eslint-disable-line no-unused-vars
     AddAdvertisingCampaignScene = "AddAdvertisingCampaignScene", // eslint-disable-line no-unused-vars
 }
+export type ScenesSupervisorType = typeof ScenesSupervisor[keyof typeof ScenesSupervisor];
 
 export function registerScenes(bot: Bot<MyContext>): void {
     // Регистрируем сцену

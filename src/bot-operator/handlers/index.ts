@@ -5,7 +5,6 @@ import {handleChatidCommand} from "./callback/command_chatid";
 import {handleTookSurvey} from "./callback/handle_took_survey";
 import {BUTTONS_CALLBACK_QUERIES, BUTTONS_KEYBOARD} from "../../bot-common/constants/buttons";
 import {MyContext} from "../../bot-common/types/type";
-import logger from "../../lib/logger";
 import {getUserId} from "../../bot-common/utils/getUserId";
 import {FinishSurveyKeyboard} from "../../bot-common/keyboards/inlineKeyboard";
 import {newSurveysHandler} from "./callback/mess_new_surveys";
@@ -14,11 +13,15 @@ import {xls_parser} from "../../services/xls_parser";
 import {getActiveSurvey, updateActiveSurvey} from "../../database/queries_kysely/survey_active";
 import {getAllSurveyTasks} from "../../database/queries_kysely/survey_tasks";
 import {cancelTakeSurveyByUser, getInfoAboutSurvey} from "../../database/services/surveyService";
+import {cancelCurrentConversation} from "../../bot-common/utils/cancelCurrentConversation";
+import {AuthMultiOperKeyboard} from "../../bot-common/keyboards/keyboard";
 
 
 export function registerCommands(bot: Bot<MyContext>): void {
     bot.chatType("private").command("start", handleStartCommand);
     bot.command("chatid", handleChatidCommand);
+    bot.command("clean", (ctx)=>cancelCurrentConversation(ctx, AuthMultiOperKeyboard()));
+
 }
 
 export function registerCallbackQueries(bot: Bot<MyContext>): void {

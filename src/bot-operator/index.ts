@@ -11,13 +11,9 @@ import {PsqlAdapter} from "@grammyjs/storage-psql";
 import {subscribeNotify} from "./subscribe";
 import {MyContext, SessionData} from "../bot-common/types/type";
 import {subscribeReservationEndedOper} from "./subscribe/reservation_ended__oper";
+import {PsqlConversationAdapter} from "../services/psqlConversationAdapter";
+import {errorMiddleware} from "../bot-common/middleware/errorMiddleware";
 
-// Начальные данные сессии
-function initialSession(): SessionData {
-    return {
-
-    };
-}
 
 
 async function bootstrap() {
@@ -26,21 +22,19 @@ async function bootstrap() {
         await client.connect();
 
         const bot = new Bot<MyContext>(`${token_operator}`);
-        const storageAdapter = await PsqlAdapter.create({ tableName: 'sessions_operator', client })
 
-        // Инициализация сессий и разговоров
-        bot.use(session({
-            initial: initialSession,
-            storage: storageAdapter,
-        }));
-        bot.use(conversations());
-        // bot.use(errorMiddleware);
+        const conversationStorage = new PsqlConversationAdapter(client, 'conversations_operator');
+        await conversationStorage.init();
 
-        registerScenes(bot);
+        bot.use(conversations({storage: conversationStorage}));
+        bot.use(errorMiddleware);
+
         registerCommands(bot);
+        registerScenes(bot);
         registerCallbackQueries(bot);
         registerMessage(bot);
         registerChatEvents(bot);
+
         subscribeNotify(bot);
         subscribeReservationEndedOper(bot);
         // Обработчик ошибок

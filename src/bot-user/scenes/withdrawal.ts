@@ -99,10 +99,7 @@ export async function withdrawalScene(
         await ctx.reply(WITHDRAWAL_USER_SCENE.SOME_ERROR, {
             reply_markup: BalanceMenu(),
         });
-        await conversation.external((ctx) => {
-            delete ctx.session.withdrawal.amountTON;
-            delete ctx.session.withdrawal.amountTonWallet;
-        });
+
         return
     }
 }
@@ -154,9 +151,7 @@ async function stepAmount(
             reply_markup: {remove_keyboard: true},
         });
 
-        await conversation.external((ctx) => {
-            ctx.session.withdrawal.amountTON = result;
-        });
+
 
         return result;
     } catch (error) {
@@ -202,10 +197,6 @@ async function stepWallet(
 
         if (!result) return null
 
-
-        await conversation.external((ctx) => {
-            ctx.session.withdrawal.amountTonWallet = result;
-        });
 
         return result;
     } catch (error) {

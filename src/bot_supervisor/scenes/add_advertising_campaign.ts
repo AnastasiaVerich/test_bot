@@ -14,7 +14,6 @@ export async function addAdvertisingCampaignScene(
 ) {
     try {
 
-
         const name = await enterNameStep(conversation, ctx)
         if (!name) {
             await ctx.reply(ADD_ADV_CAMPAIGN_SCENE.SOME_ERROR, {
@@ -64,10 +63,11 @@ export async function addAdvertisingCampaignScene(
         }
 
     } catch (error) {
-        logger.error("Error in registrationScene: " + error);
+        logger.error("Error in addAdvertisingCampaignScene: " + error);
         await ctx.reply(ADD_ADV_CAMPAIGN_SCENE.SOME_ERROR, {
             reply_markup: SupervisorSettingKeyboard(),
         });
+
     }
 }
 
@@ -82,7 +82,7 @@ async function enterNameStep(
         await ctx.reply(ADD_ADV_CAMPAIGN_SCENE.ENTER_NAME);
 
         let result: any = null
-        //Два выхода из цикла — контакт юзера получен либо произошла ошибка(скорее всего на стороне тг)
+
         while (true) {
             const response = await conversation.waitFor("message:text", {
                 otherwise: (ctx) => ctx.reply(ADD_ADV_CAMPAIGN_SCENE.ENTER_NAME_OTHERWISE),
@@ -103,9 +103,11 @@ async function enterNameStep(
 
             break
         }
+
         return result;
     } catch (error) {
         logger.error(error)
+
         return null;
     }
 }
@@ -147,8 +149,12 @@ async function stepConfirm(
         }
 
         if (!result) return null
+        // Сбрасываем сессию после завершения
+
+
         return result;
     } catch (error) {
+
         return null;
     }
 }

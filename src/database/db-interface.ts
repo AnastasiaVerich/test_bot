@@ -185,28 +185,6 @@ export interface ReferralBonusesEntity {
     completed_at: Generated<string>;
 }
 
-export interface SessionsEntity {
-    key: number;
-    value: string;
-    created_at: Generated<string>;
-    updated_at: Generated<string>;
-
-}
-
-export interface SessionOperatorEntity {
-    key: number;
-    value: string;
-    created_at: Generated<string>;
-    updated_at: Generated<string>;
-}
-
-export interface SessionSupervisorEntity {
-    key: number;
-    value: string;
-    created_at: Generated<string>;
-    updated_at: Generated<string>;
-}
-
 export interface Database {
     blacklist_users: BlacklistUsersEntity;
     users: UsersEntity;
@@ -223,9 +201,6 @@ export interface Database {
     common_variables: CommonVariablesEntity;
     pending_payments: PendingPaymentsEntity;
     referral_bonuses: ReferralBonusesEntity;
-    sessions: SessionsEntity;
-    sessions_operator: SessionOperatorEntity;
-    sessions_supervisor: SessionSupervisorEntity;
     supervisor: SupervisorEntity;
     advertising_campaigns: AdvertisingCampaignsEntity;
     bot_user_logs: BotUserLogsEntity;

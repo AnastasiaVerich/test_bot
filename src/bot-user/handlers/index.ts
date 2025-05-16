@@ -14,11 +14,15 @@ import {handleHelpCommand} from "./callback/command_help";
 import {HelpBackKeyboard, HelpKeyboard} from "../../bot-common/keyboards/inlineKeyboard";
 import {COMMAND_USER_HELP} from "../../bot-common/constants/handler_command";
 import {handler_help_btns} from "./callback/callback_queries_help_btns";
+import {cancelCurrentConversation} from "../../bot-common/utils/cancelCurrentConversation";
+import {AuthUserKeyboard, SupervisorSettingKeyboard} from "../../bot-common/keyboards/keyboard";
 
 
 export function registerCommands(bot: Bot<MyContext>): void {
     bot.command("start", handleStartCommand);
     bot.command("help", handleHelpCommand);
+    bot.command("clean", (ctx)=>cancelCurrentConversation(ctx, AuthUserKeyboard()));
+
 }
 
 export function registerCallbackQueries(bot: Bot<MyContext>): void {

@@ -11,22 +11,11 @@ import {MyContext, SessionData} from "../bot-common/types/type";
 import {subscribeReservationEnded} from "./subscribe/reservation_ended";
 import {subscribeOperatorAssigned} from "./subscribe/operator_assigned";
 import {subscribeFinishSurveyNotification} from "./subscribe/finish_survey_notification";
+import {errorMiddleware} from "../bot-common/middleware/errorMiddleware";
+import {PsqlConversationAdapter} from "../services/psqlConversationAdapter";
 
 dotenv.config();
 
-// Начальные данные сессии
-function initialSession(): SessionData {
-    return {
-        conversation: {},
-        register:{
-            phoneNumber: undefined,
-        },
-        withdrawal:{
-            amountTON: undefined,
-            amountTonWallet: undefined,
-        },
-    };
-}
 
 
 async function bootstrap() {
@@ -35,18 +24,15 @@ async function bootstrap() {
         await client.connect();
 
         const bot = new Bot<MyContext>(`${token_user}`);
-        const storageAdapter = await PsqlAdapter.create({ tableName: 'sessions', client })
 
-            // Инициализация сессий и разговоров
-        bot.use(session({
-            initial: initialSession,
-            storage: storageAdapter,
-        }));
-        bot.use(conversations());
-        // bot.use(errorMiddleware);
+        const conversationStorage = new PsqlConversationAdapter(client, 'conversations_user');
+        await conversationStorage.init();
 
-        registerScenes(bot);
+        bot.use(conversations({storage: conversationStorage}));
+        bot.use(errorMiddleware);
+
         registerCommands(bot);
+        registerScenes(bot);
         registerCallbackQueries(bot);
         registerMessage(bot);
         subscribeOperatorAssigned(bot);
