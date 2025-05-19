@@ -21,7 +21,10 @@ import { addUser, getUser } from "../../database/queries_kysely/users";
 import { isUserInBlacklist } from "../../database/queries_kysely/blacklist_users";
 import { getOperatorByIdPhoneOrTg } from "../../database/queries_kysely/operators";
 import { RegistrationResponseText } from "../../config/common_types";
-import { getAllUserLogsByEvent } from "../../database/queries_kysely/bot_user_logs";
+import {
+  addUserLogs,
+  getAllUserLogsByEvent,
+} from "../../database/queries_kysely/bot_user_logs";
 
 export async function registrationUserScene(
   conversation: MyConversation,
@@ -41,8 +44,33 @@ export async function registrationUserScene(
       return;
     }
 
+    await conversation.external(() =>
+      addUserLogs({
+        user_id: userId,
+        event_type: "registration_start",
+        event_data: `{}`,
+      }),
+    );
+
     const userPhone = await phoneStep(conversation, ctx, userId);
+
+    await conversation.external(() =>
+      addUserLogs({
+        user_id: userId,
+        event_type: "registration_phone",
+        event_data: `{"result":"${userPhone}"}`,
+      }),
+    );
+
     if (userPhone === null) {
+      await conversation.external(() =>
+        addUserLogs({
+          user_id: userId,
+          event_type: "registration_failed",
+          event_data: `{}`,
+        }),
+      );
+
       await ctx.reply(REGISTRATION_USER_SCENE.SOME_ERROR, {
         reply_markup: RegistrationKeyboard(),
       });
@@ -51,14 +79,48 @@ export async function registrationUserScene(
 
     const response = await photoStep(conversation, ctx, userId, userPhone);
 
+    await conversation.external(() =>
+      addUserLogs({
+        user_id: userId,
+        event_type: "registration_photo",
+        event_data: `{"result":"${response}"}`,
+      }),
+    );
+
     if (!response) {
+      await conversation.external(() =>
+        addUserLogs({
+          user_id: userId,
+          event_type: "registration_failed",
+          event_data: `{}`,
+        }),
+      );
+
       await ctx.reply(REGISTRATION_USER_SCENE.SOME_ERROR, {
         reply_markup: RegistrationKeyboard(),
       });
+
+      return;
     }
+    await conversation.external(() =>
+      addUserLogs({
+        user_id: userId,
+        event_type: "registration_success",
+        event_data: `{}`,
+      }),
+    );
 
     return;
   } catch (error) {
+    const userId = await conversation.external(() => getUserId(ctx));
+    await conversation.external(() =>
+      addUserLogs({
+        user_id: userId ?? 0,
+        event_type: "registration_failed",
+        event_data: `{}`,
+      }),
+    );
+
     logger.error("Error in registrationScene: " + error);
     await ctx.reply(REGISTRATION_USER_SCENE.SOME_ERROR, {
       reply_markup: RegistrationKeyboard(),
@@ -115,6 +177,8 @@ async function phoneStep(
 
     return phoneNumber;
   } catch (error) {
+    logger.error("Error in registrationScene phoneStep: " + error);
+
     return null;
   }
 }
@@ -219,7 +283,8 @@ async function photoStep(
 
     return result;
   } catch (error) {
-    logger.info("photoFinishStep: Ошибка:", error);
+    logger.error("Error in registrationScene photoStep: " + error);
+
     return null;
   }
 }

@@ -1,7 +1,22 @@
 import { BotUserLogsType } from "../db-types";
 import { pool, poolType } from "../dbClient";
 
-type EventLogType = "start";
+type EventLogType =
+  | "start"
+  | "restart"
+  | "help"
+  | "registration_start"
+  | "registration_photo"
+  | "registration_phone"
+  | "registration_failed"
+  | "registration_success"
+  | "survey_start"
+  | "survey_can_take"
+  | "survey_location"
+  | "survey_search"
+  | "survey_failed"
+  | "survey_success"
+  | "end";
 
 export async function addUserLogs(
   params: {

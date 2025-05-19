@@ -9,7 +9,10 @@ import { MyContext } from "../../../bot-common/types/type";
 import { getUserId, returnUserId } from "../../../bot-common/utils/getUserId";
 import { addReferral } from "../../../database/queries_kysely/referral_bonuses";
 import { getUser } from "../../../database/queries_kysely/users";
-import { addUserLogsUnique } from "../../../database/queries_kysely/bot_user_logs";
+import {
+  addUserLogs,
+  addUserLogsUnique,
+} from "../../../database/queries_kysely/bot_user_logs";
 
 export const handleStartCommand = async (
   ctx: MyContext,
@@ -32,6 +35,12 @@ export const handleStartCommand = async (
     const user = await getUser({ user_id: userId });
 
     if (user) {
+      await addUserLogs({
+        user_id: userId,
+        event_type: "restart",
+        event_data: `{}`,
+      });
+
       return ctx.reply(COMMAND_USER_START.WELCOME_OLD_USER, {
         reply_markup: IdentificationKeyboard(),
       });

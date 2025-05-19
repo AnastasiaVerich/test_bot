@@ -5,7 +5,6 @@ import logger from "../../lib/logger";
 import { getUserId } from "../../bot-common/utils/getUserId";
 import { findUser } from "../utils/findUser";
 import { formatTimestamp } from "../../lib/date";
-import { RESPONSES } from "../../bot-common/constants/responses";
 import {
   AuthUserKeyboard,
   sendLocation,
@@ -32,6 +31,7 @@ import {
   checkCanUserTakeSurvey,
   takeSurveyByUser,
 } from "../../database/services/surveyService";
+import { addUserLogs } from "../../database/queries_kysely/bot_user_logs";
 
 export async function surveyScene(
   conversation: MyConversation,
@@ -41,20 +41,36 @@ export async function surveyScene(
     const userId = await conversation.external(() => getUserId(ctx));
     if (!userId) return;
 
-    let codeWord = null;
+    const user = await conversation.external(() => findUser(userId, ctx));
+    if (!user) return;
+
+    await conversation.external(() =>
+      addUserLogs({
+        user_id: userId,
+        event_type: "survey_start",
+        event_data: `{}`,
+      }),
+    );
+
+    let codeWord: string | null = null;
     const userAccount = await conversation.external(() =>
       getUserAccount(ctx, true),
     );
     if (!userAccount) {
       const randomNumber = Math.floor(Math.random() * (99 - 10 + 1)) + 10;
-
       codeWord = randomNumber.toString();
     }
 
-    const user = await conversation.external(() => findUser(userId, ctx));
-    if (!user) return;
     const resultCheck = await conversation.external(() =>
       checkCanUserTakeSurvey(user),
+    );
+
+    await conversation.external(() =>
+      addUserLogs({
+        user_id: userId,
+        event_type: "survey_can_take",
+        event_data: `${JSON.stringify(resultCheck)}`,
+      }),
     );
 
     if (!resultCheck.result) {
@@ -77,15 +93,37 @@ export async function surveyScene(
           }
           break;
       }
+
+      await conversation.external(() =>
+        addUserLogs({
+          user_id: userId,
+          event_type: "survey_failed",
+          event_data: `{}`,
+        }),
+      );
       return;
     }
 
     // Шаг 2: Ожидаем локацию
     const location = await stepLocation(conversation, ctx);
+    await conversation.external(() =>
+      addUserLogs({
+        user_id: userId,
+        event_type: "survey_location",
+        event_data: `{"result":"${location}"}`,
+      }),
+    );
     if (!location) {
       await ctx.reply(SURVEY_USER_SCENE.SOME_ERROR, {
         reply_markup: AuthUserKeyboard(),
       });
+      await conversation.external(() =>
+        addUserLogs({
+          user_id: userId,
+          event_type: "survey_failed",
+          event_data: `{}`,
+        }),
+      );
       return;
     }
 
@@ -101,10 +139,24 @@ export async function surveyScene(
 
     // Шаг 3:  Ищем опрос
     const survey_id = await stepSearchSurvey(ctx);
+    await conversation.external(() =>
+      addUserLogs({
+        user_id: userId,
+        event_type: "survey_search",
+        event_data: `{"result":"${survey_id}"}`,
+      }),
+    );
     if (!survey_id) {
       await ctx.reply(SURVEY_USER_SCENE.SOME_ERROR, {
         reply_markup: AuthUserKeyboard(),
       });
+      await conversation.external(() =>
+        addUserLogs({
+          user_id: userId,
+          event_type: "survey_failed",
+          event_data: `{}`,
+        }),
+      );
       return;
     }
 
@@ -118,19 +170,44 @@ export async function surveyScene(
     );
 
     if (isSuccess) {
+      await conversation.external(() =>
+        addUserLogs({
+          user_id: userId,
+          event_type: "survey_success",
+          event_data: `{}`,
+        }),
+      );
       return ctx.reply(
         //`Оператор @${'andrei_s086'} ${SURVEY_USER_SCENE.SUCCESS}`,
         `${SURVEY_USER_SCENE.SUCCESS}`,
         { reply_markup: AuthUserKeyboard() },
       );
     } else {
+      await conversation.external(() =>
+        addUserLogs({
+          user_id: userId,
+          event_type: "survey_failed",
+          event_data: `{}`,
+        }),
+      );
       return ctx.reply(SURVEY_USER_SCENE.FAILED, {
         reply_markup: AuthUserKeyboard(),
       });
     }
   } catch (error) {
+    const userId = await conversation.external(() => getUserId(ctx));
+
+    await conversation.external(() =>
+      addUserLogs({
+        user_id: userId ?? 0,
+        event_type: "survey_failed",
+        event_data: `{}`,
+      }),
+    );
     logger.error("Error in survey: " + error);
-    await ctx.reply(RESPONSES.SOME_ERROR);
+    await ctx.reply(SURVEY_USER_SCENE.SOME_ERROR, {
+      reply_markup: AuthUserKeyboard(),
+    });
   }
 }
 
@@ -175,7 +252,7 @@ async function stepLocation(
 
     return response;
   } catch (error) {
-    logger.info("stepRegion: Ошибка:", error);
+    logger.error("Error in surveyScene stepLocation: ", error);
     return null;
   }
 }
@@ -200,7 +277,9 @@ async function stepSearchSurvey(
     }
 
     return survey.survey_id;
-  } catch (err) {
+  } catch (error) {
+    logger.error("Error in surveyScene stepSearchSurvey: ", error);
+
     return null;
   }
 }
@@ -222,7 +301,7 @@ async function reservationStep(
     });
     return true;
   } catch (error) {
-    logger.error(error);
+    logger.error("Error in surveyScene reservationStep: ", error);
 
     return false;
   }
