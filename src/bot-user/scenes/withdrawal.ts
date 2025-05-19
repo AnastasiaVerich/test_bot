@@ -24,25 +24,58 @@ import {
   getUserBalance,
   updateUserByUserId,
 } from "../../database/queries_kysely/users";
+import { addUserLogs } from "../../database/queries_kysely/bot_user_logs";
 
 export async function withdrawalScene(
   conversation: MyConversation,
   ctx: MyConversationContext,
 ): Promise<Message.TextMessage | void> {
   try {
-    let curseInfo = await getCommonVariableByLabel("ton_rub_price");
-    if (!curseInfo) {
-      return;
-    }
-    const curseTon = Number(curseInfo.value);
     const userId = await conversation.external(() => getUserId(ctx));
     if (!userId) return;
+
+    await conversation.external(() => {
+      const data = "";
+      return addUserLogs({
+        user_id: userId,
+        event_type: "withdrawal_start",
+        event_data: JSON.stringify(data),
+      });
+    });
+
+    let curseInfo = await getCommonVariableByLabel("ton_rub_price");
+    if (!curseInfo) {
+      await conversation.external(() => {
+        const data = { result: "curseInfo is null" };
+        return addUserLogs({
+          user_id: userId,
+          event_type: "withdrawal_failed",
+          event_data: JSON.stringify(data),
+        });
+      });
+
+      return ctx.reply(WITHDRAWAL_USER_SCENE.SOME_ERROR, {
+        reply_markup: BalanceMenu(),
+      });
+    }
+
+    const curseTon = Number(curseInfo.value);
 
     // Проверка на наличие ожидающего платежа
     const pendingPayment = await conversation.external(() =>
       getAllPendingPaymentByUserId(userId),
     );
+
     if (pendingPayment.length > 0) {
+      await conversation.external(() => {
+        const data = { result: "has pending payment" };
+        return addUserLogs({
+          user_id: userId,
+          event_type: "withdrawal_failed",
+          event_data: JSON.stringify(data),
+        });
+      });
+
       return ctx.reply(WITHDRAWAL_USER_SCENE.HAS_PENDING_PAYMENT);
     }
 
@@ -50,34 +83,95 @@ export async function withdrawalScene(
     const balance = await conversation.external(() => getUserBalance(userId));
 
     if (!balance) {
-      await ctx.reply(WITHDRAWAL_USER_SCENE.SOME_ERROR, {
+      await conversation.external(() => {
+        const data = { result: "balance is null" };
+        return addUserLogs({
+          user_id: userId,
+          event_type: "withdrawal_failed",
+          event_data: JSON.stringify(data),
+        });
+      });
+      return ctx.reply(WITHDRAWAL_USER_SCENE.SOME_ERROR, {
         reply_markup: BalanceMenu(),
       });
-      return;
     }
 
     const userTonBalance = Number((balance / curseTon).toFixed(2));
+
     if (Number(userTonBalance) === 0) {
-      await ctx.reply(WITHDRAWAL_USER_SCENE.INVALID_BALANCE);
-      return;
+      await conversation.external(() => {
+        const data = { result: "balance in TON is 0" };
+        return addUserLogs({
+          user_id: userId,
+          event_type: "withdrawal_failed",
+          event_data: JSON.stringify(data),
+        });
+      });
+
+      return ctx.reply(WITHDRAWAL_USER_SCENE.INVALID_BALANCE);
     }
+
+    await conversation.external(() => {
+      const data = {
+        balanceRub: balance,
+        balanceTON: userTonBalance,
+      };
+      return addUserLogs({
+        user_id: userId,
+        event_type: "withdrawal_check_balance",
+        event_data: JSON.stringify(data),
+      });
+    });
 
     // Шаг 1: Ожидаем ввода суммы для вывода
     const amountTON = await stepAmount(conversation, ctx, userTonBalance);
+    await conversation.external(() => {
+      const data = { result: amountTON };
+      return addUserLogs({
+        user_id: userId,
+        event_type: "withdrawal_amount",
+        event_data: JSON.stringify(data),
+      });
+    });
     if (!amountTON) {
-      await ctx.reply(WITHDRAWAL_USER_SCENE.SOME_ERROR, {
+      await conversation.external(() => {
+        const data = { result: "amount is null" };
+        return addUserLogs({
+          user_id: userId,
+          event_type: "withdrawal_failed",
+          event_data: JSON.stringify(data),
+        });
+      });
+
+      return ctx.reply(WITHDRAWAL_USER_SCENE.SOME_ERROR, {
         reply_markup: BalanceMenu(),
       });
-      return;
     }
 
     // Шаг 2: Ожидаем ввода адреса для перевода
     const recipientAddress = await stepWallet(conversation, ctx);
+    await conversation.external(() => {
+      const data = { result: recipientAddress };
+      return addUserLogs({
+        user_id: userId,
+        event_type: "withdrawal_wallet",
+        event_data: JSON.stringify(data),
+      });
+    });
+
     if (!recipientAddress) {
-      await ctx.reply(WITHDRAWAL_USER_SCENE.SOME_ERROR, {
+      await conversation.external(() => {
+        const data = { result: "failed enter wallet" };
+        return addUserLogs({
+          user_id: userId,
+          event_type: "withdrawal_failed",
+          event_data: JSON.stringify(data),
+        });
+      });
+
+      return ctx.reply(WITHDRAWAL_USER_SCENE.SOME_ERROR, {
         reply_markup: BalanceMenu(),
       });
-      return;
     }
 
     // Шаг 3: Подтверждение вывода средств
@@ -87,11 +181,20 @@ export async function withdrawalScene(
       recipientAddress,
       amountTON,
     );
+
     if (!resultConfirm) {
-      await ctx.reply(WITHDRAWAL_USER_SCENE.SOME_ERROR, {
+      await conversation.external(() => {
+        const data = { result: "failed confirm" };
+        return addUserLogs({
+          user_id: userId,
+          event_type: "withdrawal_failed",
+          event_data: JSON.stringify(data),
+        });
+      });
+
+      return ctx.reply(WITHDRAWAL_USER_SCENE.SOME_ERROR, {
         reply_markup: BalanceMenu(),
       });
-      return;
     }
 
     if (resultConfirm === BUTTONS_KEYBOARD.ConfirmButton) {
@@ -104,21 +207,47 @@ export async function withdrawalScene(
       await updateUserByUserId(userId, {
         add_balance: -amountTON * curseTon,
       });
+      await conversation.external(() => {
+        const data = {};
+        return addUserLogs({
+          user_id: userId,
+          event_type: "withdrawal_success",
+          event_data: JSON.stringify(data),
+        });
+      });
 
       return ctx.reply(WITHDRAWAL_USER_SCENE.SUCCESS, {
         reply_markup: AuthUserKeyboard(),
       });
     } else {
+      await conversation.external(() => {
+        const data = {};
+        return addUserLogs({
+          user_id: userId,
+          event_type: "withdrawal_cancel",
+          event_data: JSON.stringify(data),
+        });
+      });
+
       return ctx.reply(WITHDRAWAL_USER_SCENE.CANCELLED, {
         reply_markup: AuthUserKeyboard(),
       });
     }
   } catch (error) {
-    logger.error("Error in withdrawal: " + error);
+    const userId = await conversation.external(() => getUserId(ctx));
+    await conversation.external(() => {
+      const data = { result: "error" };
+      return addUserLogs({
+        user_id: userId ?? 0,
+        event_type: "withdrawal_cancel",
+        event_data: JSON.stringify(data),
+      });
+    });
+
+    logger.error("Error in withdrawalScene: " + error);
     await ctx.reply(WITHDRAWAL_USER_SCENE.SOME_ERROR, {
       reply_markup: BalanceMenu(),
     });
-
     return;
   }
 }
@@ -175,6 +304,7 @@ async function stepAmount(
 
     return result;
   } catch (error) {
+    logger.error("Error in withdrawalScene stepAmount: " + error);
     return null;
   }
 }
@@ -219,6 +349,7 @@ async function stepWallet(
 
     return result;
   } catch (error) {
+    logger.error("Error in withdrawalScene stepWallet: " + error);
     return null;
   }
 }
@@ -264,6 +395,7 @@ async function stepConfirm(
     if (!result) return null;
     return result;
   } catch (error) {
+    logger.error("Error in withdrawalScene stepConfirm: " + error);
     return null;
   }
 }

@@ -1,5 +1,6 @@
 import { BotUserLogsType } from "../db-types";
 import { pool, poolType } from "../dbClient";
+import logger from "../../lib/logger";
 
 type EventLogType =
   | "start"
@@ -16,6 +17,13 @@ type EventLogType =
   | "survey_search"
   | "survey_failed"
   | "survey_success"
+  | "withdrawal_start"
+  | "withdrawal_check_balance"
+  | "withdrawal_amount"
+  | "withdrawal_wallet"
+  | "withdrawal_success"
+  | "withdrawal_cancel"
+  | "withdrawal_failed"
   | "end";
 
 export async function addUserLogs(
@@ -40,7 +48,8 @@ export async function addUserLogs(
 
     return result?.id ?? null;
   } catch (error) {
-    throw new Error("Error addUserLogs: " + error);
+    logger.error("Error addUserLogs: " + error);
+    return null;
   }
 }
 
