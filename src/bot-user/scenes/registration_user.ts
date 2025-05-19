@@ -43,26 +43,34 @@ export async function registrationUserScene(
       });
       return;
     }
-
-    await conversation.external(() =>
-      addUserLogs({
+    await conversation.external(() => {
+      const data = {};
+      return addUserLogs({
         user_id: userId,
         event_type: "registration_start",
-        event_data: `{}`,
-      }),
-    );
+        event_data: JSON.stringify(data),
+      });
+    });
 
     const userPhone = await phoneStep(conversation, ctx, userId);
-
-    await conversation.external(() =>
-      addUserLogs({
+    await conversation.external(() => {
+      const data = { result: userPhone };
+      return addUserLogs({
         user_id: userId,
         event_type: "registration_phone",
-        event_data: `{"result":"${userPhone}"}`,
-      }),
-    );
+        event_data: JSON.stringify(data),
+      });
+    });
 
     if (userPhone === null) {
+      await conversation.external(() => {
+        const data = { result: userPhone };
+        return addUserLogs({
+          user_id: userId,
+          event_type: "registration_failed",
+          event_data: JSON.stringify(data),
+        });
+      });
       await conversation.external(() =>
         addUserLogs({
           user_id: userId,

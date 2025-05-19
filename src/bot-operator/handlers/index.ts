@@ -82,6 +82,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
           await ctx.answerCallbackQuery("Ошибка: данные не получены");
           return;
         }
+        console.log(callbackData);
 
         // Извлекаем survey_active_id (число) из callbackData
         const match = callbackData.match(
@@ -127,6 +128,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
           await ctx.answerCallbackQuery("Ошибка: данные не получены");
           return;
         }
+        console.log(callbackData);
 
         // Извлекаем survey_active_id (число) из callbackData
         const match = callbackData.match(
