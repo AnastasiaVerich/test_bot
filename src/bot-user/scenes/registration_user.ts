@@ -137,7 +137,8 @@ async function photoStep(
     if (user_start_logs.length > 0) {
       const event_data = user_start_logs[0].event_data;
       skip_photo_verification =
-        event_data.referral_start.startsWith("campaign__");
+        event_data.referral_start.startsWith("campaign__") ||
+        event_data.referral_start.length === 0;
     }
 
     let result: RegistrationResponseText | null = null;
