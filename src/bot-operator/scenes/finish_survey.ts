@@ -27,7 +27,9 @@ import { SurveyTasksType } from "../../database/db-types";
 export async function finishSurveyScene(
   conversation: MyConversation,
   ctx: MyConversationContext,
+  arg: { state: { surveyActiveId: number } },
 ) {
+  let surveyActiveId = arg.state.surveyActiveId;
   try {
     const result: {
       survey_task_id: number;
@@ -48,7 +50,9 @@ export async function finishSurveyScene(
       //что-то придумать.
     }
 
-    const surveyActive = await getActiveSurvey({ operatorId: operator_id });
+    const surveyActive = await getActiveSurvey({
+      surveyActiveId: surveyActiveId,
+    });
     if (!surveyActive) {
       return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SURVEY_ACTIVE_NOT_FOUND, {
         reply_markup: { remove_keyboard: true },
@@ -77,7 +81,7 @@ export async function finishSurveyScene(
       );
       if (isCompleted === null) {
         await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-          reply_markup: FinishSurveyKeyboard(),
+          reply_markup: FinishSurveyKeyboard(surveyActiveId),
         });
         continue;
       }
@@ -91,7 +95,7 @@ export async function finishSurveyScene(
         const result_position = await countResultStep(conversation, ctx);
         if (!result_position) {
           await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-            reply_markup: FinishSurveyKeyboard(),
+            reply_markup: FinishSurveyKeyboard(surveyActiveId),
           });
           continue;
         }
@@ -104,7 +108,7 @@ export async function finishSurveyScene(
         );
         if (!result_positions) {
           await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-            reply_markup: FinishSurveyKeyboard(),
+            reply_markup: FinishSurveyKeyboard(surveyActiveId),
           });
           continue;
         }
@@ -121,7 +125,7 @@ export async function finishSurveyScene(
 
     if (!resultConfirm) {
       await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-        reply_markup: FinishSurveyKeyboard(),
+        reply_markup: FinishSurveyKeyboard(surveyActiveId),
       });
       return;
     }
@@ -150,7 +154,7 @@ export async function finishSurveyScene(
   } catch (error) {
     logger.error("Error in registrationScene: " + error);
     await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-      reply_markup: FinishSurveyKeyboard(),
+      reply_markup: FinishSurveyKeyboard(surveyActiveId),
     });
   }
 }

@@ -8,15 +8,17 @@ export const RegistrationKeyboard = (): InlineKeyboard =>
     BUTTONS_CALLBACK_QUERIES.RegistrationButton,
   );
 
-export const FinishSurveyKeyboard = (): InlineKeyboard =>
+export const FinishSurveyKeyboard = (
+  survey_active_id: number,
+): InlineKeyboard =>
   new InlineKeyboard()
     .text(
       BUTTONS_CALLBACK_QUERIES.FinishSurveyButtonText,
-      BUTTONS_CALLBACK_QUERIES.FinishSurveyButton,
+      BUTTONS_CALLBACK_QUERIES.FinishSurveyButton + "_" + survey_active_id,
     )
     .text(
       BUTTONS_CALLBACK_QUERIES.CancelSurveyButtonText,
-      BUTTONS_CALLBACK_QUERIES.CancelSurveyButton,
+      BUTTONS_CALLBACK_QUERIES.CancelSurveyButton + "_" + survey_active_id,
     );
 
 export const IdentificationKeyboard = (): InlineKeyboard =>

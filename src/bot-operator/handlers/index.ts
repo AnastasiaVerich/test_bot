@@ -8,7 +8,6 @@ import {
   BUTTONS_KEYBOARD,
 } from "../../bot-common/constants/buttons";
 import { MyContext } from "../../bot-common/types/type";
-import { getUserId } from "../../bot-common/utils/getUserId";
 import { FinishSurveyKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
 import { newSurveysHandler } from "./callback/mess_new_surveys";
 import { currentSurveysHandler } from "./callback/mess_current_surveys";
@@ -48,20 +47,54 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
   bot
     .chatType("private")
     .callbackQuery(
-      BUTTONS_CALLBACK_QUERIES.FinishSurveyButton,
+      new RegExp(`^${BUTTONS_CALLBACK_QUERIES.FinishSurveyButton}_\\d+$`),
       async (ctx: MyContext) => {
-        await ctx.conversation.enter(ScenesOperator.FinishSurveyScene);
+        const callbackData = ctx.callbackQuery?.data; // Получаем данные callback-запроса
+        if (!callbackData) {
+          await ctx.answerCallbackQuery("Ошибка: данные не получены");
+          return;
+        }
+
+        // Извлекаем survey_active_id (число) из callbackData
+        const match = callbackData.match(
+          new RegExp(`^${BUTTONS_CALLBACK_QUERIES.FinishSurveyButton}_(\\d+)$`),
+        );
+
+        if (!match) {
+          await ctx.answerCallbackQuery("Ошибка: неверный формат данных");
+          return;
+        }
+        const surveyActiveId = parseInt(match[1], 10);
+        await ctx.conversation.enter(ScenesOperator.FinishSurveyScene, {
+          state: { surveyActiveId: surveyActiveId },
+        });
       },
     );
   bot
     .chatType("private")
     .callbackQuery(
-      BUTTONS_CALLBACK_QUERIES.CancelSurveyButton,
+      new RegExp(`^${BUTTONS_CALLBACK_QUERIES.CancelSurveyButton}_\\d+$`),
       async (ctx: MyContext) => {
-        const operatorId = await getUserId(ctx);
-        if (!operatorId) return;
+        const callbackData = ctx.callbackQuery?.data; // Получаем данные callback-запроса
+        if (!callbackData) {
+          await ctx.answerCallbackQuery("Ошибка: данные не получены");
+          return;
+        }
 
-        const activeSurvey = await getActiveSurvey({ operatorId: operatorId });
+        // Извлекаем survey_active_id (число) из callbackData
+        const match = callbackData.match(
+          new RegExp(`^${BUTTONS_CALLBACK_QUERIES.CancelSurveyButton}_(\\d+)$`),
+        );
+
+        if (!match) {
+          await ctx.answerCallbackQuery("Ошибка: неверный формат данных");
+          return;
+        }
+        const surveyActiveId = parseInt(match[1], 10);
+
+        const activeSurvey = await getActiveSurvey({
+          surveyActiveId: surveyActiveId,
+        });
 
         if (!activeSurvey) return;
         await cancelTakeSurveyByUser(
@@ -82,7 +115,6 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
           await ctx.answerCallbackQuery("Ошибка: данные не получены");
           return;
         }
-        console.log(callbackData);
 
         // Извлекаем survey_active_id (число) из callbackData
         const match = callbackData.match(
@@ -128,7 +160,6 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
           await ctx.answerCallbackQuery("Ошибка: данные не получены");
           return;
         }
-        console.log(callbackData);
 
         // Извлекаем survey_active_id (число) из callbackData
         const match = callbackData.match(
@@ -169,7 +200,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
         await ctx.reply(`${message}`, { parse_mode: "HTML" });
 
         await ctx.reply("После окончания опроса нажми на кнопку завершения.", {
-          reply_markup: FinishSurveyKeyboard(),
+          reply_markup: FinishSurveyKeyboard(surveyActiveId),
         });
       },
     );
