@@ -4,6 +4,7 @@ import { getUserId } from "../../../bot-common/utils/getUserId";
 import { HANDLER_CURRENT_SURVEYS } from "../../../bot-common/constants/handler_messages";
 import { NewSurveysKeyboard } from "../../../bot-common/keyboards/inlineKeyboard";
 import { getAllActiveSurveysUnreservedByOperatorId } from "../../../database/queries_kysely/survey_active";
+import { BUTTONS_CALLBACK_QUERIES } from "../../../bot-common/constants/buttons";
 
 export const currentSurveysHandler = async (ctx: MyContext) => {
   try {
@@ -22,7 +23,10 @@ export const currentSurveysHandler = async (ctx: MyContext) => {
       label: e.tg_account
         ? `${HANDLER_CURRENT_SURVEYS.TG_ACC} ${e.tg_account}`
         : `${HANDLER_CURRENT_SURVEYS.CODE_WORD} ${e.code_word}`,
-      value: `CURRENT_SURVEY_ACTIVE${e.survey_active_id}CURRENT_SURVEY_ACTIVE`,
+      value:
+        BUTTONS_CALLBACK_QUERIES.ThisUserGetSurveyInfo +
+        "_" +
+        e.survey_active_id,
     }));
 
     await ctx.reply(HANDLER_CURRENT_SURVEYS.HEADER, {

@@ -4,7 +4,7 @@ import { RegistrationKeyboard } from "../../../bot-common/keyboards/inlineKeyboa
 import { MyContext } from "../../../bot-common/types/type";
 import logger from "../../../lib/logger";
 import { getUserAccount } from "../../../bot-common/utils/getUserTgAccount";
-import { AuthMultiOperKeyboard } from "../../../bot-common/keyboards/keyboard";
+import { AuthOperatorKeyboard } from "../../../bot-common/keyboards/keyboard";
 import { getOperatorByIdPhoneOrTg } from "../../../database/queries_kysely/operators";
 
 export const handleStartCommand = async (
@@ -32,7 +32,7 @@ export const handleStartCommand = async (
       });
     }
     return ctx.reply(COMMAND_OPERATOR_START.WELCOME_OLD_OPERATOR, {
-      reply_markup: AuthMultiOperKeyboard(),
+      reply_markup: AuthOperatorKeyboard(),
     });
   } catch (error) {
     logger.info(error);

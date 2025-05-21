@@ -22,6 +22,20 @@ export const YesNoButtons = (): Keyboard =>
     .resized()
     .oneTime();
 
+export const OnButtons = (): Keyboard =>
+  new Keyboard()
+    .text(BUTTONS_KEYBOARD.OnButton)
+    .text(BUTTONS_KEYBOARD.CancelButton)
+    .resized()
+    .oneTime();
+
+export const OffButtons = (): Keyboard =>
+  new Keyboard()
+    .text(BUTTONS_KEYBOARD.OffButton)
+    .text(BUTTONS_KEYBOARD.CancelButton)
+    .resized()
+    .oneTime();
+
 export const ConfirmButton = (): Keyboard =>
   new Keyboard().text(BUTTONS_KEYBOARD.ConfirmButton).resized().oneTime();
 
@@ -41,15 +55,22 @@ export const AuthUserKeyboard = (): Keyboard =>
     .text(BUTTONS_KEYBOARD.BalanceButton)
     .resized();
 
-export const AuthMultiOperKeyboard = (): Keyboard =>
+export const AuthOperatorKeyboard = (): Keyboard =>
   new Keyboard()
     .text(BUTTONS_KEYBOARD.NewSurveys)
     .row()
     .text(BUTTONS_KEYBOARD.CurrentSurveys)
     .resized();
 
-export const SupervisorSettingKeyboard = (): Keyboard =>
-  new Keyboard().text(BUTTONS_KEYBOARD.AddAdvertisingCampaign).row().resized();
+export const AuthSupervisorKeyboard = (): Keyboard =>
+  new Keyboard()
+    .text(BUTTONS_KEYBOARD.AddAdvertisingCampaign)
+    .row()
+    .text(BUTTONS_KEYBOARD.AddNewSurveys)
+    .row()
+    .text(BUTTONS_KEYBOARD.AutoPaymentOnOrOff)
+    .row()
+    .resized();
 
 export const createKeyboardFromWords = (words: string[]): Keyboard => {
   const keyboard = new Keyboard();

@@ -1,7 +1,7 @@
 import { Message } from "grammy/out/types";
 import logger from "../../lib/logger";
 import { MyContext } from "../../bot-common/types/type";
-import { AuthMultiOperKeyboard } from "../../bot-common/keyboards/keyboard";
+import { AuthOperatorKeyboard } from "../../bot-common/keyboards/keyboard";
 import { ScenesOperator, ScenesOperatorType } from "../scenes";
 
 export const cancelOperatorConversation = async (
@@ -19,7 +19,7 @@ export const cancelOperatorConversation = async (
     if (skipReply) return;
     if (activeScenes.length > 0) {
       await ctx.reply("Отменено.", {
-        reply_markup: AuthMultiOperKeyboard(),
+        reply_markup: AuthOperatorKeyboard(),
       });
     }
   } catch (error) {

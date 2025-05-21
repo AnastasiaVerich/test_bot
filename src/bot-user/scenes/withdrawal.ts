@@ -204,8 +204,10 @@ export async function withdrawalScene(
         amount: amountTON,
         address: recipientAddress,
       });
+      const amountRub =
+        amountTON * curseTon > balance ? balance : amountTON * curseTon;
       await updateUserByUserId(userId, {
-        add_balance: -amountTON * curseTon,
+        add_balance: -amountRub,
       });
       await conversation.external(() => {
         const data = {};

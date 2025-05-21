@@ -16,7 +16,6 @@ export const handleTookSurvey = async (ctx: MyContext, bot: Bot<MyContext>) => {
     const chat_id = ctx.update.callback_query?.message?.chat.id;
     const operator_id = ctx.update.callback_query?.from?.id;
     if (!message_id || !chat_id || !operator_id) return;
-    // Проверка, что сообщение переслано из определенного чата/канала
     if (chat_id.toString() === channelId) {
       const operator = await getOperatorByIdPhoneOrTg({
         operator_id: operator_id,

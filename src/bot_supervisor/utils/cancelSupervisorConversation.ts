@@ -1,7 +1,7 @@
 import { Message } from "grammy/out/types";
 import logger from "../../lib/logger";
 import { MyContext } from "../../bot-common/types/type";
-import { SupervisorSettingKeyboard } from "../../bot-common/keyboards/keyboard";
+import { AuthSupervisorKeyboard } from "../../bot-common/keyboards/keyboard";
 import { ScenesSupervisor, ScenesSupervisorType } from "../scenes";
 
 export const cancelSupervisorConversation = async (
@@ -19,7 +19,7 @@ export const cancelSupervisorConversation = async (
     if (skipReply) return;
     if (activeScenes.length > 0) {
       await ctx.reply("Отменено.", {
-        reply_markup: SupervisorSettingKeyboard(),
+        reply_markup: AuthSupervisorKeyboard(),
       });
     }
   } catch (error) {

@@ -5,7 +5,7 @@ import { getSupervisorByIdPhoneOrTg } from "../../database/queries_kysely/superv
 import { COMMAND_SUPERVISOR_START } from "../../bot-common/constants/handler_command";
 import { RegistrationKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
 import logger from "../../lib/logger";
-import { SupervisorSettingKeyboard } from "../../bot-common/keyboards/keyboard";
+import { AuthSupervisorKeyboard } from "../../bot-common/keyboards/keyboard";
 
 export const handleStartCommand = async (
   ctx: MyContext,
@@ -32,7 +32,7 @@ export const handleStartCommand = async (
       });
     }
     return ctx.reply(COMMAND_SUPERVISOR_START.WELCOME_OLD_SUPERVISOR, {
-      reply_markup: SupervisorSettingKeyboard(),
+      reply_markup: AuthSupervisorKeyboard(),
     });
   } catch (error) {
     logger.info(error);

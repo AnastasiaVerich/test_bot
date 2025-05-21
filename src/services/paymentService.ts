@@ -9,45 +9,52 @@ import {
   updateAttemptPendingPayment,
 } from "../database/queries_kysely/pending_payments";
 import { addWithdrawalLog } from "../database/queries_kysely/withdrawal_logs";
+import { getCommonVariableByLabel } from "../database/queries_kysely/common_variables";
 
 export async function executePendingPayments(): Promise<void> {
   let pass = false;
   try {
-    const pendingPayments = await getAllPendingPayment();
+    const autoPayInfo = await getCommonVariableByLabel("auto_payments_enabled");
+    if (!autoPayInfo) {
+      return;
+    }
+    if (autoPayInfo.value === "ON") {
+      const pendingPayments = await getAllPendingPayment();
 
-    for (const payment of pendingPayments) {
-      if (payment.attempts >= 3) {
-        //0 1 2 3
-        logger.info(
-          `Оператору: Все попытки отправки платежа для пользователя ${payment.user_id} исчерпаны.`,
-        );
-        continue;
-      }
-      if (!pass) {
-        await updateAttemptPendingPayment(payment.user_id, {
-          attempts: payment.attempts + 1,
-        });
-
-        const result = await make_payment(payment.amount, payment.address);
-        if (result.isSuccess) {
-          await deletePendingPayment(payment.user_id);
-          await addWithdrawalLog({
-            userId: payment.user_id,
-            amount: payment.amount,
-            wallet: payment.address,
+      for (const payment of pendingPayments) {
+        if (payment.attempts >= 3) {
+          //0 1 2 3
+          logger.info(
+            `Оператору: Все попытки отправки платежа для пользователя ${payment.user_id} исчерпаны.`,
+          );
+          continue;
+        }
+        if (!pass) {
+          await updateAttemptPendingPayment(payment.user_id, {
+            attempts: payment.attempts + 1,
           });
-        } else {
-          switch (result.reason) {
-            case "big gas":
-              {
-                pass = true;
-              }
-              break;
-            case "little balance":
-              {
-                pass = true;
-              }
-              break;
+
+          const result = await make_payment(payment.amount, payment.address);
+          if (result.isSuccess) {
+            await deletePendingPayment(payment.user_id);
+            await addWithdrawalLog({
+              userId: payment.user_id,
+              amount: payment.amount,
+              wallet: payment.address,
+            });
+          } else {
+            switch (result.reason) {
+              case "big gas":
+                {
+                  pass = true;
+                }
+                break;
+              case "little balance":
+                {
+                  pass = true;
+                }
+                break;
+            }
           }
         }
       }

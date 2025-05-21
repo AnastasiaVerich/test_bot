@@ -2,7 +2,7 @@ import logger from "../../lib/logger";
 import { getUserId } from "../../bot-common/utils/getUserId";
 import { RegistrationKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
 import {
-  AuthMultiOperKeyboard,
+  AuthOperatorKeyboard,
   sendUserPhone,
 } from "../../bot-common/keyboards/keyboard";
 import { REGISTRATION_OPERATOR_SCENE } from "../../bot-common/constants/scenes";
@@ -38,7 +38,7 @@ export async function registrationOperatorScene(
     });
     await ctx.reply(`${REGISTRATION_OPERATOR_SCENE.SUCCESS}`, {
       parse_mode: "HTML",
-      reply_markup: AuthMultiOperKeyboard(),
+      reply_markup: AuthOperatorKeyboard(),
     });
     return;
   } catch (error) {

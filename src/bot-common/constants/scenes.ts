@@ -225,3 +225,28 @@ export const ADD_ADV_CAMPAIGN_SCENE = {
 
   SUCCESS: "Сохранено!\n\nСсылка:\n",
 };
+
+export const ADD_NEW_SURVEYS_SCENES = {
+  ENTER_DOCUMENT: `Отправьте exel документ с новыми рекламными компаниями.`,
+  ENTER_DOCUMENT_OTHERWISE: `Пожалуйста, отправьте документ.`,
+  ENTER_DOCUMENT_INVALID: `Пожалуйста, отправьте файл в формате .xlsx или .xls.`,
+  DOCUMENT_IS_EMPTY: `Файл пуст или не содержит данных в первом столбце.`,
+
+  FINISH: `Обработка завершена.`,
+  NOT_SAVE: `Не сохранены строки`,
+
+  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.AddNewSurveys}'.`,
+};
+
+export const AUTO_PAYMENT_SCENES = {
+  STATE_NOW:
+    "На данный момент автоматическое проведение платежей {status}.\n\nЕсли хотите {action}, нажмите на соответствующую кнопку.",
+
+  ENTER_ON_OR_OFF_OTHERWISE: `Нажмите на соответствующую кнопку`,
+
+  SUCCESS_ON: "Автоматическое проведение платежей включено.",
+  SUCCESS_OFF: "Автоматическое проведение платежей отключено.",
+  CANCELLED: "Ничего не изменили.",
+
+  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.AutoPaymentOnOrOff}'.`,
+};

@@ -3,7 +3,7 @@ import { getUserId } from "../../bot-common/utils/getUserId";
 import { RegistrationKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
 import {
   sendUserPhone,
-  SupervisorSettingKeyboard,
+  AuthSupervisorKeyboard,
 } from "../../bot-common/keyboards/keyboard";
 import {
   MyConversation,
@@ -40,7 +40,7 @@ export async function registrationSupervisorScene(
     );
     await ctx.reply(`${REGISTRATION_SUPERVISOR_SCENE.SUCCESS}`, {
       parse_mode: "HTML",
-      reply_markup: SupervisorSettingKeyboard(),
+      reply_markup: AuthSupervisorKeyboard(),
     });
     return;
   } catch (error) {

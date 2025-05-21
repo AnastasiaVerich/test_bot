@@ -2,7 +2,7 @@
 CREATE TYPE survey_type_enum AS ENUM ('test_site');
 CREATE TYPE referral_bonuses_status_enum AS ENUM ('pending', 'completed');
 CREATE TYPE notify_reason_enum AS ENUM ('finish_survey');
-CREATE TYPE common_variable_label AS ENUM ('ton_rub_price');
+CREATE TYPE common_variable_label AS ENUM ('ton_rub_price', 'auto_payments_enabled');
 
 -- Таблица чёрного списка пользователей
 CREATE TABLE blacklist_users (

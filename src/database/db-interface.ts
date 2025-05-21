@@ -2,7 +2,7 @@ import { Generated } from "kysely";
 
 type NotifyReasonType = "finish_survey" | null;
 type SurveyType = "test_site";
-type CommonVariablesLabelType = "ton_rub_price";
+type CommonVariablesLabelType = "ton_rub_price" | "auto_payments_enabled";
 type ReferralBonusesStatusType = "pending" | "completed";
 
 export interface BlacklistUsersEntity {

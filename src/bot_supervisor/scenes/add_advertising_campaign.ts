@@ -3,7 +3,7 @@ import logger from "../../lib/logger";
 import { BUTTONS_KEYBOARD } from "../../bot-common/constants/buttons";
 import {
   ConfirmCancelButtons,
-  SupervisorSettingKeyboard,
+  AuthSupervisorKeyboard,
 } from "../../bot-common/keyboards/keyboard";
 import { ADD_ADV_CAMPAIGN_SCENE } from "../../bot-common/constants/scenes";
 import {
@@ -26,7 +26,7 @@ export async function addAdvertisingCampaignScene(
     const name = await enterNameStep(conversation, ctx);
     if (!name) {
       await ctx.reply(ADD_ADV_CAMPAIGN_SCENE.SOME_ERROR, {
-        reply_markup: SupervisorSettingKeyboard(),
+        reply_markup: AuthSupervisorKeyboard(),
       });
       return;
     }
@@ -41,7 +41,7 @@ export async function addAdvertisingCampaignScene(
 
     if (!resultConfirm) {
       await ctx.reply(ADD_ADV_CAMPAIGN_SCENE.SOME_ERROR, {
-        reply_markup: SupervisorSettingKeyboard(),
+        reply_markup: AuthSupervisorKeyboard(),
       });
 
       return;
@@ -58,23 +58,23 @@ export async function addAdvertisingCampaignScene(
       );
       if (!isAdd) {
         await ctx.reply(ADD_ADV_CAMPAIGN_SCENE.SOME_ERROR, {
-          reply_markup: SupervisorSettingKeyboard(),
+          reply_markup: AuthSupervisorKeyboard(),
         });
         return;
       }
       await ctx.reply(ADD_ADV_CAMPAIGN_SCENE.SUCCESS + `<code>${link}</code>`, {
         parse_mode: "HTML",
-        reply_markup: SupervisorSettingKeyboard(),
+        reply_markup: AuthSupervisorKeyboard(),
       });
     } else {
       return ctx.reply(ADD_ADV_CAMPAIGN_SCENE.CANCELLED, {
-        reply_markup: SupervisorSettingKeyboard(),
+        reply_markup: AuthSupervisorKeyboard(),
       });
     }
   } catch (error) {
     logger.error("Error in addAdvertisingCampaignScene: " + error);
     await ctx.reply(ADD_ADV_CAMPAIGN_SCENE.SOME_ERROR, {
-      reply_markup: SupervisorSettingKeyboard(),
+      reply_markup: AuthSupervisorKeyboard(),
     });
   }
 }

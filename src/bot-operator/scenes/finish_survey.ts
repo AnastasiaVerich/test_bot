@@ -4,7 +4,7 @@ import { getUserId } from "../../bot-common/utils/getUserId";
 import { BUTTONS_KEYBOARD } from "../../bot-common/constants/buttons";
 import { FinishSurveyKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
 import {
-  AuthMultiOperKeyboard,
+  AuthOperatorKeyboard,
   ConfirmCancelButtons,
   createKeyboardFromWords,
   YesNoButtons,
@@ -144,11 +144,11 @@ export async function finishSurveyScene(
       );
 
       return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SUCCESS, {
-        reply_markup: AuthMultiOperKeyboard(),
+        reply_markup: AuthOperatorKeyboard(),
       });
     } else {
       return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.CANCELLED, {
-        reply_markup: AuthMultiOperKeyboard(),
+        reply_markup: AuthOperatorKeyboard(),
       });
     }
   } catch (error) {

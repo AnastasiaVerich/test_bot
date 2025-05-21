@@ -25,6 +25,9 @@ export const BUTTONS_CALLBACK_QUERIES = {
 
   TookButton: "TookButton",
   TookButtonText: "Провести опрос",
+
+  ThisUserWrote: "ThisUserWrote",
+  ThisUserGetSurveyInfo: "ThisUserGetSurveyInfo",
 };
 export const BUTTONS_KEYBOARD = {
   SendNumberButton: "Отправить номер",
@@ -37,11 +40,18 @@ export const BUTTONS_KEYBOARD = {
   OpenAppButton: "Пройти фотоконтроль",
   ShareButton: "Поделиться",
   SkipButton: "Пропустить",
+
   YesButton: "Да",
   NoButton: "Нет",
+
+  OnButton: "Включить",
+  OffButton: "Отключить",
 
   NewSurveys: "Новые опросы",
   CurrentSurveys: "Текущее опросы",
 
   AddAdvertisingCampaign: "Добавить рекламную компанию",
+  AddNewSurveys: "Добавить опросы",
+  AutoPaymentOnOrOff: "Вкл/откл автоматического проведения платежей",
+  ExecutePendingPaymentsByHand: "Провести платежи вручную",
 };
