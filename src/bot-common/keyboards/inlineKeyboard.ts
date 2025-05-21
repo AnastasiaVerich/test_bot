@@ -67,7 +67,7 @@ export const HelpKeyboard = (): InlineKeyboard => {
     );
 };
 
-export const NewSurveysKeyboard = (
+export const CreateInlineKeyboard = (
   arr: { label: string; value: string }[],
 ): InlineKeyboard => {
   const keyboard = new InlineKeyboard();

@@ -53,3 +53,9 @@ export const HANDLER_GET_USER_SURVEY_INFO = {
   IF_NEED_FINISH_SURVEY: "После окончания опроса нажмите на кнопку завершения.",
   SOME_ERROR: "Бот временно недоступен",
 };
+
+export const HANDLER_PENDING_PAYMENT_INFO = {
+  ERROR_DATA_UNDEFINED: "Данные не получены.",
+  ERROR_DATA_INVALID: "Неверный формат данных.",
+  SOME_ERROR: "Бот временно недоступен",
+};

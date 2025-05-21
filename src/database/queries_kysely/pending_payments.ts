@@ -77,6 +77,23 @@ export async function getAllPendingPaymentByUserId(
   }
 }
 
+export async function getPendingPaymentByUserId(
+  userId: PendingPaymentsType["user_id"],
+  trx: poolType = pool,
+): Promise<PendingPaymentsType | null> {
+  try {
+    const result = await trx
+      .selectFrom("pending_payments")
+      .selectAll()
+      .where("user_id", "=", Number(userId))
+      .executeTakeFirst();
+
+    return result ?? null;
+  } catch (error) {
+    throw new Error("Error getPendingPaymentByUserId: " + error);
+  }
+}
+
 export async function updateAttemptPendingPayment(
   userId: PendingPaymentsType["user_id"],
   params: {

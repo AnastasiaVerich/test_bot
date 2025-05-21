@@ -1,3 +1,5 @@
+import { BUTTONS_KEYBOARD } from "./buttons";
+
 export const HANDLER_NEW_SURVEYS = {
   NO_NEW_SURVEYS: "У вас нет новый опросов.",
   TG_ACC: "Юзернейм:",
@@ -15,4 +17,10 @@ export const HANDLER_CURRENT_SURVEYS = {
     "Нажмите на кнопку ниже, что бы узнать информацию об опросе либо что бы закрыть опрос",
 
   SOME_ERROR: "Бот временно недоступен",
+};
+export const HANDLER_MANUAL_PAYMENT = {
+  AUTO_PAYMENT_ON: `Включено автоматическое проведение платежей. Вручную можно провести только платежи, которые по какой-то причине не смогли пройти автоматически.`,
+  AVAILABLE_PAYMENTS: `Платежи, доступные для проведения вручную.`,
+  NO_AVAILABLE_PAYMENTS: `В данным момент нет платежей, доступных для проведения вручную.`,
+  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.ManualPayment}'.`,
 };

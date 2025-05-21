@@ -36,9 +36,6 @@ export const OffButtons = (): Keyboard =>
     .resized()
     .oneTime();
 
-export const ConfirmButton = (): Keyboard =>
-  new Keyboard().text(BUTTONS_KEYBOARD.ConfirmButton).resized().oneTime();
-
 export const EmptyKeyboard = (): Keyboard => new Keyboard().resized().oneTime();
 
 export const sendLocation = (): Keyboard =>
@@ -68,7 +65,9 @@ export const AuthSupervisorKeyboard = (): Keyboard =>
     .row()
     .text(BUTTONS_KEYBOARD.AddNewSurveys)
     .row()
-    .text(BUTTONS_KEYBOARD.AutoPaymentOnOrOff)
+    .text(BUTTONS_KEYBOARD.SwitchPaymentType)
+    .row()
+    .text(BUTTONS_KEYBOARD.ManualPayment)
     .row()
     .resized();
 

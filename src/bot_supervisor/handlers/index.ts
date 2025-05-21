@@ -8,6 +8,9 @@ import {
 import { ScenesSupervisor } from "../scenes";
 import { authSupervisorMiddleware } from "../middleware/authMiddleware";
 import { cancelSupervisorConversation } from "../utils/cancelSupervisorConversation";
+import { handleManualPayment } from "./mess_manual_payment";
+import { createCallbackRegex } from "../../utils/callBackRegex";
+import { handlePendingPaymentInfo } from "./callback_queries_pending_payment_info";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.command("start", async (ctx) => {
@@ -26,6 +29,12 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
         await ctx.conversation.enter(ScenesSupervisor.RegisterScene);
       },
     );
+  bot
+    .chatType("private")
+    .callbackQuery(
+      createCallbackRegex(BUTTONS_CALLBACK_QUERIES.ThisPendingPaymentInfo),
+      handlePendingPaymentInfo,
+    );
 }
 
 export function registerMessage(bot: Bot<MyContext>): void {
@@ -36,8 +45,12 @@ export function registerMessage(bot: Bot<MyContext>): void {
       );
     } else if (ctx.message.text === BUTTONS_KEYBOARD.AddNewSurveys) {
       await ctx.conversation.enter(ScenesSupervisor.AddNewSurveys);
-    } else if (ctx.message.text === BUTTONS_KEYBOARD.AutoPaymentOnOrOff) {
-      await ctx.conversation.enter(ScenesSupervisor.AutoPaymentOnOrOff);
+    } else if (ctx.message.text === BUTTONS_KEYBOARD.SwitchPaymentType) {
+      await ctx.conversation.enter(ScenesSupervisor.SwitchPaymentType);
+    } else if (ctx.message.text === BUTTONS_KEYBOARD.ManualPayment) {
+      await handleManualPayment(ctx);
+
+      //await ctx.conversation.enter(ScenesSupervisor.ManualPayment);
     }
   });
 }

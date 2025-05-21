@@ -26,11 +26,11 @@ export async function addWithdrawalLog(
     wallet: WithdrawalLogsType["wallet"];
   },
   trx: poolType = pool,
-): Promise<void> {
+): Promise<WithdrawalLogsType["withdrawal_id"] | null> {
   try {
     const { userId, amount, wallet } = params;
 
-    await trx
+    const result = await trx
       .insertInto("withdrawal_logs")
       .values({
         user_id: userId,
@@ -38,7 +38,9 @@ export async function addWithdrawalLog(
         wallet,
         withdrawn_at: sql`CURRENT_TIMESTAMP`,
       })
-      .execute();
+      .returning("withdrawal_id")
+      .executeTakeFirst();
+    return result?.withdrawal_id ?? null;
   } catch (error) {
     throw new Error("Error addWithdrawalLog: " + error);
   }

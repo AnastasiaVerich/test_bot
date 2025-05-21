@@ -4,13 +4,15 @@ import { MyContext } from "../../bot-common/types/type";
 import { registrationSupervisorScene } from "./registration_supervisor";
 import { addAdvertisingCampaignScene } from "./add_advertising_campaign";
 import { addNewSurveysScene } from "./add_new_surveys";
-import { autoPaymentOnOrOff } from "./auto_payment_on_or_off";
+import { switchPaymentType } from "./switch_payment_type";
+import { makeAPayment } from "./make_a_payment";
 
 export enum ScenesSupervisor {
   RegisterScene = "RegisterScene", // eslint-disable-line no-unused-vars
   AddAdvertisingCampaignScene = "AddAdvertisingCampaignScene", // eslint-disable-line no-unused-vars
   AddNewSurveys = "AddNewSurveys", // eslint-disable-line no-unused-vars
-  AutoPaymentOnOrOff = "AutoPaymentOnOrOff", // eslint-disable-line no-unused-vars
+  SwitchPaymentType = "SwitchPaymentType", // eslint-disable-line no-unused-vars
+  MakeAPayment = "MakeAPayment", // eslint-disable-line no-unused-vars
 }
 export type ScenesSupervisorType =
   (typeof ScenesSupervisor)[keyof typeof ScenesSupervisor];
@@ -33,8 +35,13 @@ export function registerScenes(bot: Bot<MyContext>): void {
     }),
   );
   bot.use(
-    createConversation(autoPaymentOnOrOff, {
-      id: ScenesSupervisor.AutoPaymentOnOrOff,
+    createConversation(switchPaymentType, {
+      id: ScenesSupervisor.SwitchPaymentType,
+    }),
+  );
+  bot.use(
+    createConversation(makeAPayment, {
+      id: ScenesSupervisor.MakeAPayment,
     }),
   );
 }

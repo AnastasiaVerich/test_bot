@@ -5,7 +5,7 @@ import {
   OnButtons,
   AuthSupervisorKeyboard,
 } from "../../bot-common/keyboards/keyboard";
-import { AUTO_PAYMENT_SCENES } from "../../bot-common/constants/scenes";
+import { SWITCH_PAYMENT_TYPE_SCENES } from "../../bot-common/constants/scenes";
 import {
   MyConversation,
   MyConversationContext,
@@ -16,20 +16,20 @@ import {
 } from "../../database/queries_kysely/common_variables";
 import { BUTTONS_KEYBOARD } from "../../bot-common/constants/buttons";
 
-export async function autoPaymentOnOrOff(
+export async function switchPaymentType(
   conversation: MyConversation,
   ctx: MyConversationContext,
 ) {
   try {
     const autoPayInfo = await getCommonVariableByLabel("auto_payments_enabled");
     if (!autoPayInfo) {
-      await ctx.reply(AUTO_PAYMENT_SCENES.SOME_ERROR, {
+      await ctx.reply(SWITCH_PAYMENT_TYPE_SCENES.SOME_ERROR, {
         reply_markup: AuthSupervisorKeyboard(),
       });
       return;
     }
 
-    let question = AUTO_PAYMENT_SCENES.STATE_NOW;
+    let question = SWITCH_PAYMENT_TYPE_SCENES.STATE_NOW;
     let keyboard = OnButtons();
     if (autoPayInfo.value === "ON") {
       question = question
@@ -50,28 +50,28 @@ export async function autoPaymentOnOrOff(
       question,
     );
     if (resultKeyboard === null) {
-      await ctx.reply(AUTO_PAYMENT_SCENES.SOME_ERROR, {
+      await ctx.reply(SWITCH_PAYMENT_TYPE_SCENES.SOME_ERROR, {
         reply_markup: AuthSupervisorKeyboard(),
       });
     }
     if (resultKeyboard === BUTTONS_KEYBOARD.OnButton) {
       await upsertCommonVariable("auto_payments_enabled", "ON");
-      return ctx.reply(AUTO_PAYMENT_SCENES.SUCCESS_ON, {
+      return ctx.reply(SWITCH_PAYMENT_TYPE_SCENES.SUCCESS_ON, {
         reply_markup: AuthSupervisorKeyboard(),
       });
     } else if (resultKeyboard === BUTTONS_KEYBOARD.OffButton) {
       await upsertCommonVariable("auto_payments_enabled", "OFF");
-      return ctx.reply(AUTO_PAYMENT_SCENES.SUCCESS_OFF, {
+      return ctx.reply(SWITCH_PAYMENT_TYPE_SCENES.SUCCESS_OFF, {
         reply_markup: AuthSupervisorKeyboard(),
       });
     } else {
-      return ctx.reply(AUTO_PAYMENT_SCENES.CANCELLED, {
+      return ctx.reply(SWITCH_PAYMENT_TYPE_SCENES.CANCELLED, {
         reply_markup: AuthSupervisorKeyboard(),
       });
     }
   } catch (error) {
-    logger.error("Error in autoPaymentOnOrOff: " + error);
-    await ctx.reply(AUTO_PAYMENT_SCENES.SOME_ERROR, {
+    logger.error("Error in switchPaymentType: " + error);
+    await ctx.reply(SWITCH_PAYMENT_TYPE_SCENES.SOME_ERROR, {
       reply_markup: AuthSupervisorKeyboard(),
     });
   }
@@ -99,7 +99,7 @@ async function onOffStep(
         ],
         {
           otherwise: (ctx) =>
-            ctx.reply(AUTO_PAYMENT_SCENES.ENTER_ON_OR_OFF_OTHERWISE, {
+            ctx.reply(SWITCH_PAYMENT_TYPE_SCENES.ENTER_ON_OR_OFF_OTHERWISE, {
               parse_mode: "HTML",
               reply_markup: keyboard,
             }),

@@ -28,6 +28,7 @@ export const BUTTONS_CALLBACK_QUERIES = {
 
   ThisUserWrote: "ThisUserWrote",
   ThisUserGetSurveyInfo: "ThisUserGetSurveyInfo",
+  ThisPendingPaymentInfo: "GetPendingPaymentInfo",
 };
 export const BUTTONS_KEYBOARD = {
   SendNumberButton: "Отправить номер",
@@ -52,6 +53,6 @@ export const BUTTONS_KEYBOARD = {
 
   AddAdvertisingCampaign: "Добавить рекламную компанию",
   AddNewSurveys: "Добавить опросы",
-  AutoPaymentOnOrOff: "Вкл/откл автоматического проведения платежей",
-  ExecutePendingPaymentsByHand: "Провести платежи вручную",
+  SwitchPaymentType: "Вкл/откл автоматического проведения платежей",
+  ManualPayment: "Провести платежи вручную",
 };

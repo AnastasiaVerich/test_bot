@@ -238,7 +238,7 @@ export const ADD_NEW_SURVEYS_SCENES = {
   SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.AddNewSurveys}'.`,
 };
 
-export const AUTO_PAYMENT_SCENES = {
+export const SWITCH_PAYMENT_TYPE_SCENES = {
   STATE_NOW:
     "На данный момент автоматическое проведение платежей {status}.\n\nЕсли хотите {action}, нажмите на соответствующую кнопку.",
 
@@ -248,5 +248,19 @@ export const AUTO_PAYMENT_SCENES = {
   SUCCESS_OFF: "Автоматическое проведение платежей отключено.",
   CANCELLED: "Ничего не изменили.",
 
-  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.AutoPaymentOnOrOff}'.`,
+  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.SwitchPaymentType}'.`,
+};
+export const MAKE_A_PAYMENT_SCENES = {
+  NO_PENDING_PAYMENT: "Больше нет платежей в ожидании у этого пользователя.",
+  INFO:
+    `Совершите следующий платеж\n\n` +
+    `Сумма: <code>{amount}</code>\nКошелек: <code>{address}</code>`,
+
+  CONFIRMATION: "Вы совершили платеж?",
+  CONFIRMATION_OTHERWISE:
+    "Нажмите на соответсвующую кнопку для подтверждения или отклонения проведения платежа вручную.",
+
+  SUCCESS: "Платеж совершен.",
+  CANCELLED: "Отменено.",
+  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.ManualPayment}'.`,
 };

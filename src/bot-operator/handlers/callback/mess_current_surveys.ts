@@ -2,7 +2,7 @@ import { MyContext } from "../../../bot-common/types/type";
 import logger from "../../../lib/logger";
 import { getUserId } from "../../../bot-common/utils/getUserId";
 import { HANDLER_CURRENT_SURVEYS } from "../../../bot-common/constants/handler_messages";
-import { NewSurveysKeyboard } from "../../../bot-common/keyboards/inlineKeyboard";
+import { CreateInlineKeyboard } from "../../../bot-common/keyboards/inlineKeyboard";
 import { getAllActiveSurveysUnreservedByOperatorId } from "../../../database/queries_kysely/survey_active";
 import { BUTTONS_CALLBACK_QUERIES } from "../../../bot-common/constants/buttons";
 
@@ -31,7 +31,7 @@ export const currentSurveysHandler = async (ctx: MyContext) => {
 
     await ctx.reply(HANDLER_CURRENT_SURVEYS.HEADER, {
       parse_mode: "HTML",
-      reply_markup: NewSurveysKeyboard(wordStr),
+      reply_markup: CreateInlineKeyboard(wordStr),
     });
   } catch (error) {
     logger.error("Error in currentSurveysHandler: " + error);

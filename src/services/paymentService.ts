@@ -4,12 +4,14 @@ import { mnemonicToPrivateKey } from "@ton/crypto";
 import { seed_phrase } from "../config/env";
 import logger from "../lib/logger";
 import {
-  deletePendingPayment,
   getAllPendingPayment,
   updateAttemptPendingPayment,
 } from "../database/queries_kysely/pending_payments";
-import { addWithdrawalLog } from "../database/queries_kysely/withdrawal_logs";
-import { getCommonVariableByLabel } from "../database/queries_kysely/common_variables";
+import {
+  getCommonVariableByLabel,
+  upsertCommonVariable,
+} from "../database/queries_kysely/common_variables";
+import { paymentIsCompleted } from "../database/services/paymentService";
 
 export async function executePendingPayments(): Promise<void> {
   let pass = false;
@@ -36,12 +38,14 @@ export async function executePendingPayments(): Promise<void> {
 
           const result = await make_payment(payment.amount, payment.address);
           if (result.isSuccess) {
-            await deletePendingPayment(payment.user_id);
-            await addWithdrawalLog({
-              userId: payment.user_id,
-              amount: payment.amount,
-              wallet: payment.address,
-            });
+            const res = await paymentIsCompleted(payment);
+            if (!res) {
+              await upsertCommonVariable("auto_payments_enabled", "OFF");
+
+              throw new Error(
+                `Payment ${payment.user_id} is completed, but not delete from db`,
+              );
+            }
           } else {
             switch (result.reason) {
               case "big gas":
