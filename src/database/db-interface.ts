@@ -73,6 +73,7 @@ export interface BotUserLogsEntity {
   id: Generated<number>;
   user_id: number;
   event_type: string;
+  step: string | null;
   event_data: any;
 
   logged_at: Generated<string>; // Дата и время в ISO формате

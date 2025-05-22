@@ -12,7 +12,6 @@ export const handleHelpCommand = async (ctx: MyContext) => {
     await addUserLogs({
       user_id: userId,
       event_type: "help",
-      event_data: `{}`,
     });
 
     await ctx.reply(COMMAND_USER_HELP.HEADER, {

@@ -38,7 +38,6 @@ export const handleStartCommand = async (
       await addUserLogs({
         user_id: userId,
         event_type: "restart",
-        event_data: `{}`,
       });
 
       return ctx.reply(COMMAND_USER_START.WELCOME_OLD_USER, {
@@ -55,7 +54,7 @@ export const handleStartCommand = async (
       await addUserLogsUnique({
         user_id: userId,
         event_type: "start",
-        event_data: `{"referral_start": "${match}"}`,
+        event_data: JSON.stringify({ referral_start: match }),
       });
 
       return ctx.reply(COMMAND_USER_START.WELCOME_MENU_USER, {

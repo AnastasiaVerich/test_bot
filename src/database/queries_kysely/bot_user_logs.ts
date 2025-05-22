@@ -6,42 +6,43 @@ type EventLogType =
   | "start"
   | "restart"
   | "help"
-  | "registration_start"
-  | "registration_photo"
-  | "registration_phone"
-  | "registration_failed"
-  | "registration_success"
-  | "survey_start"
-  | "survey_can_take"
-  | "survey_location"
-  | "survey_search"
-  | "survey_failed"
-  | "survey_success"
-  | "withdrawal_start"
-  | "withdrawal_check_balance"
-  | "withdrawal_amount"
-  | "withdrawal_wallet"
-  | "withdrawal_success"
-  | "withdrawal_cancel"
-  | "withdrawal_failed"
-  | "end";
+  | "registration"
+  | "survey"
+  | "withdrawal";
+
+type StepType =
+  | "start"
+  | "photo"
+  | "phone"
+  | "failed"
+  | "success"
+  | "check_can_take"
+  | "location"
+  | "search"
+  | "check_balance"
+  | "amount"
+  | "wallet"
+  | "cancel"
+  | null;
 
 export async function addUserLogs(
   params: {
     user_id: BotUserLogsType["user_id"];
     event_type: EventLogType;
-    event_data: BotUserLogsType["event_data"];
+    step?: StepType;
+    event_data?: BotUserLogsType["event_data"];
   },
   trx: poolType = pool,
 ): Promise<BotUserLogsType["id"] | null> {
   try {
-    const { user_id, event_type, event_data } = params;
+    const { user_id, event_type, event_data = "{}", step = null } = params;
     const result = await trx
       .insertInto("bot_user_logs")
       .values({
         user_id: user_id,
         event_type: event_type,
         event_data: event_data,
+        step: step,
       })
       .returning("id")
       .executeTakeFirst();
@@ -57,12 +58,13 @@ export async function addUserLogsUnique(
   params: {
     user_id: BotUserLogsType["user_id"];
     event_type: EventLogType;
-    event_data: BotUserLogsType["event_data"];
+    step?: StepType;
+    event_data?: BotUserLogsType["event_data"];
   },
   trx: poolType = pool,
 ): Promise<BotUserLogsType["id"] | null> {
   try {
-    const { user_id, event_type, event_data } = params;
+    const { user_id, event_type, event_data = "", step = null } = params;
 
     // Проверяем, существует ли запись с таким user_id и event_type
     const existing = await trx
@@ -84,6 +86,7 @@ export async function addUserLogsUnique(
         user_id: user_id,
         event_type: event_type,
         event_data: event_data,
+        step: null,
       })
       .returning("id")
       .executeTakeFirst();
@@ -106,7 +109,7 @@ export async function getAllUserLogsByEvent(
 
     const logs = await trx
       .selectFrom("bot_user_logs")
-      .select(["id", "user_id", "event_type", "event_data", "logged_at"])
+      .selectAll()
       .where("user_id", "=", user_id)
       .where("event_type", "=", event_type)
       .orderBy("logged_at", "desc") // Сортировка по времени, последние логи первыми

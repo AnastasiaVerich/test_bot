@@ -109,6 +109,7 @@ GRANT ALL PRIVILEGES ON TABLE advertising_campaigns TO admin_vadim;
 CREATE TABLE bot_user_logs (
     id BIGSERIAL PRIMARY KEY,  -- Уникальный идентификатор записи лога
     user_id BIGINT NOT NULL,  -- ID пользователя
+    step VARCHAR(50) DEFAULT NULL,
     event_type VARCHAR(50) NOT NULL,  -- Тип события (например, START, REGISTRATION_STEP, REGISTRATION_STOP)
     event_data JSONB DEFAULT '{}',  -- Дополнительные данные события (например, шаг регистрации, введенные данные)
     logged_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP  -- Время события

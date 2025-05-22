@@ -47,8 +47,8 @@ export async function surveyScene(
     await conversation.external(() =>
       addUserLogs({
         user_id: userId,
-        event_type: "survey_start",
-        event_data: `{}`,
+        event_type: "survey",
+        step: "start",
       }),
     );
 
@@ -68,8 +68,9 @@ export async function surveyScene(
     await conversation.external(() =>
       addUserLogs({
         user_id: userId,
-        event_type: "survey_can_take",
-        event_data: `${JSON.stringify(resultCheck)}`,
+        event_type: "survey",
+        step: "check_can_take",
+        event_data: JSON.stringify(resultCheck),
       }),
     );
 
@@ -97,10 +98,12 @@ export async function surveyScene(
       await conversation.external(() =>
         addUserLogs({
           user_id: userId,
-          event_type: "survey_failed",
-          event_data: `{}`,
+          event_type: "survey",
+          step: "failed",
+          event_data: JSON.stringify("can't take survey"),
         }),
       );
+
       return;
     }
 
@@ -109,10 +112,12 @@ export async function surveyScene(
     await conversation.external(() =>
       addUserLogs({
         user_id: userId,
-        event_type: "survey_location",
-        event_data: `{"result":"${location}"}`,
+        event_type: "survey",
+        step: "location",
+        event_data: JSON.stringify(location),
       }),
     );
+
     if (!location) {
       await ctx.reply(SURVEY_USER_SCENE.SOME_ERROR, {
         reply_markup: AuthUserKeyboard(),
@@ -120,8 +125,9 @@ export async function surveyScene(
       await conversation.external(() =>
         addUserLogs({
           user_id: userId,
-          event_type: "survey_failed",
-          event_data: `{}`,
+          event_type: "survey",
+          step: "failed",
+          event_data: JSON.stringify("location not defined"),
         }),
       );
       return;
@@ -142,10 +148,12 @@ export async function surveyScene(
     await conversation.external(() =>
       addUserLogs({
         user_id: userId,
-        event_type: "survey_search",
-        event_data: `{"result":"${survey_id}"}`,
+        event_type: "survey",
+        step: "search",
+        event_data: JSON.stringify(survey_id),
       }),
     );
+
     if (!survey_id) {
       await ctx.reply(SURVEY_USER_SCENE.SOME_ERROR, {
         reply_markup: AuthUserKeyboard(),
@@ -153,10 +161,12 @@ export async function surveyScene(
       await conversation.external(() =>
         addUserLogs({
           user_id: userId,
-          event_type: "survey_failed",
-          event_data: `{}`,
+          event_type: "survey",
+          step: "failed",
+          event_data: JSON.stringify("survey_id not defined"),
         }),
       );
+
       return;
     }
 
@@ -173,10 +183,11 @@ export async function surveyScene(
       await conversation.external(() =>
         addUserLogs({
           user_id: userId,
-          event_type: "survey_success",
-          event_data: `{}`,
+          event_type: "survey",
+          step: "success",
         }),
       );
+
       return ctx.reply(
         //`Оператор @${'andrei_s086'} ${SURVEY_USER_SCENE.SUCCESS}`,
         `${SURVEY_USER_SCENE.SUCCESS}`,
@@ -186,24 +197,27 @@ export async function surveyScene(
       await conversation.external(() =>
         addUserLogs({
           user_id: userId,
-          event_type: "survey_failed",
-          event_data: `{}`,
+          event_type: "survey",
+          step: "failed",
+          event_data: JSON.stringify("save in db is failed"),
         }),
       );
+
       return ctx.reply(SURVEY_USER_SCENE.FAILED, {
         reply_markup: AuthUserKeyboard(),
       });
     }
   } catch (error) {
     const userId = await conversation.external(() => getUserId(ctx));
-
     await conversation.external(() =>
       addUserLogs({
         user_id: userId ?? 0,
-        event_type: "survey_failed",
-        event_data: `{}`,
+        event_type: "survey",
+        step: "failed",
+        event_data: JSON.stringify("some error"),
       }),
     );
+
     logger.error("Error in survey: " + error);
     await ctx.reply(SURVEY_USER_SCENE.SOME_ERROR, {
       reply_markup: AuthUserKeyboard(),

@@ -43,39 +43,31 @@ export async function registrationUserScene(
       });
       return;
     }
-    await conversation.external(() => {
-      const data = {};
-      return addUserLogs({
+    await conversation.external(() =>
+      addUserLogs({
         user_id: userId,
-        event_type: "registration_start",
-        event_data: JSON.stringify(data),
-      });
-    });
+        event_type: "registration",
+        step: "start",
+      }),
+    );
 
     const userPhone = await phoneStep(conversation, ctx, userId);
-    await conversation.external(() => {
-      const data = { result: userPhone };
-      return addUserLogs({
+    await conversation.external(() =>
+      addUserLogs({
         user_id: userId,
-        event_type: "registration_phone",
-        event_data: JSON.stringify(data),
-      });
-    });
+        event_type: "registration",
+        step: "phone",
+        event_data: JSON.stringify(userPhone),
+      }),
+    );
 
     if (userPhone === null) {
-      await conversation.external(() => {
-        const data = { result: userPhone };
-        return addUserLogs({
-          user_id: userId,
-          event_type: "registration_failed",
-          event_data: JSON.stringify(data),
-        });
-      });
       await conversation.external(() =>
         addUserLogs({
           user_id: userId,
-          event_type: "registration_failed",
-          event_data: `{}`,
+          event_type: "registration",
+          step: "failed",
+          event_data: JSON.stringify("userPhone is null"),
         }),
       );
 
@@ -90,8 +82,9 @@ export async function registrationUserScene(
     await conversation.external(() =>
       addUserLogs({
         user_id: userId,
-        event_type: "registration_photo",
-        event_data: `{"result":"${response}"}`,
+        event_type: "registration",
+        step: "photo",
+        event_data: JSON.stringify(response),
       }),
     );
 
@@ -99,8 +92,9 @@ export async function registrationUserScene(
       await conversation.external(() =>
         addUserLogs({
           user_id: userId,
-          event_type: "registration_failed",
-          event_data: `{}`,
+          event_type: "registration",
+          step: "failed",
+          event_data: JSON.stringify("registration failed"),
         }),
       );
 
@@ -113,8 +107,8 @@ export async function registrationUserScene(
     await conversation.external(() =>
       addUserLogs({
         user_id: userId,
-        event_type: "registration_success",
-        event_data: `{}`,
+        event_type: "registration",
+        step: "success",
       }),
     );
 
@@ -124,8 +118,9 @@ export async function registrationUserScene(
     await conversation.external(() =>
       addUserLogs({
         user_id: userId ?? 0,
-        event_type: "registration_failed",
-        event_data: `{}`,
+        event_type: "registration",
+        step: "failed",
+        event_data: JSON.stringify("some error"),
       }),
     );
 
@@ -213,7 +208,7 @@ async function photoStep(
         event_data.referral_start.length === 0;
     }
 
-    let result: RegistrationResponseText | null = null;
+    let result: RegistrationResponseText | null | "skip_photo" = null;
 
     if (skip_photo_verification) {
       const isHasSomeNumberUser = await getUser({ phone: userPhone });
@@ -240,7 +235,7 @@ async function photoStep(
           userPhone: userPhone,
           skip_photo_verification: skip_photo_verification,
         });
-        result = "success";
+        result = "skip_photo";
       }
     } else {
       await ctx.reply(REGISTRATION_USER_SCENE.VERIFY_BY_PHOTO, {
@@ -281,6 +276,7 @@ async function photoStep(
         });
         break;
       case "success":
+      case "skip_photo":
         await ctx.reply(REGISTRATION_USER_SCENE.SUCCESS, {
           reply_markup: AuthUserKeyboard(),
         });
