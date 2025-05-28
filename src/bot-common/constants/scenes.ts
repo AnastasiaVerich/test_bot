@@ -36,6 +36,7 @@ export const FINISH_SURVEY_OPERATOR_SCENE = {
 
   SUCCESS: "Прохождение опроса подтверждено!",
 };
+
 export const REGISTRATION_OPERATOR_SCENE = {
   ENTER_PHONE:
     "Для регистрации пришлите свой номер телефона." +
@@ -94,6 +95,7 @@ export const IDENTIFICATION_USER_SCENE = {
 
   SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.IdentificationButtonText}'.`,
 };
+
 export const INVITE_USER_SCENE = {
   INVITE_FRIENDS:
     "Пригласи друга и получи 100 рублей за пройденный им первый опрос\n\nТвоя ссылка:\n.",
@@ -101,6 +103,7 @@ export const INVITE_USER_SCENE = {
   INVITE_MESSAGE:
     "Проходи опросы и получай от 50 рублей за каждый пройденный опрос.",
 };
+
 export const REGISTRATION_USER_SCENE = {
   ENTER_PHONE:
     "Для регистрации пришлите свой номер телефона." +
@@ -127,6 +130,7 @@ export const REGISTRATION_USER_SCENE = {
 
   SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.RegistrationButtonText}'.`,
 };
+
 export const SURVEY_USER_SCENE = {
   USER_LOCK_UNTIL: "Следующий опрос будет доступен не раньше, чем",
 
@@ -156,6 +160,7 @@ export const SURVEY_USER_SCENE = {
 
   SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.SurveyButton}'.`,
 };
+
 export const WITHDRAWAL_USER_SCENE = {
   HAS_PENDING_PAYMENT: "Вы уже поставили средства на вывод.",
 
@@ -209,6 +214,7 @@ export const REGISTRATION_SUPERVISOR_SCENE = {
 
   SUCCESS: "Регистрация пройдена.",
 };
+
 export const ADD_ADV_CAMPAIGN_SCENE = {
   ENTER_NAME:
     "Введите название рекламной компании, используя только числа, латинский буквы и нижнее подчеркивание ( Прим: Promo_X123 ).",
@@ -224,6 +230,22 @@ export const ADD_ADV_CAMPAIGN_SCENE = {
   SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.AddAdvertisingCampaign}'.`,
 
   SUCCESS: "Сохранено!\n\nСсылка:\n",
+};
+
+export const ADD_NEW_OPERATORS_SCENE = {
+  ENTER_USERNAME: "Введите юзернейм нового оператора.",
+  ENTER_USERNAME_OTHERWISE: `Пожалуйста, введите юзернейм нового оператора.`,
+  ENTER_USERNAME_INVALID: `Пожалуйста, введите корректный юзернейм.`,
+  ENTER_USERNAME_EXIST: `Такой пользователь уже существует.`,
+
+  CONFIRMATION: "Сохранить нового оператора @{operator_name}?",
+  CONFIRMATION_OTHERWISE:
+    "Нажмите на соответсвующую кнопку для подтверждения или отклонения сохранения нового оператора.",
+  CANCELLED: `Отменено.`,
+
+  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.AddNewOperators}'.`,
+
+  SUCCESS: "Сохранено!",
 };
 
 export const ADD_NEW_SURVEYS_SCENES = {
@@ -250,6 +272,7 @@ export const SWITCH_PAYMENT_TYPE_SCENES = {
 
   SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.SwitchPaymentType}'.`,
 };
+
 export const MAKE_A_PAYMENT_SCENES = {
   NO_PENDING_PAYMENT: "Больше нет платежей в ожидании у этого пользователя.",
   INFO:

@@ -53,6 +53,7 @@ export const BUTTONS_KEYBOARD = {
 
   AddAdvertisingCampaign: "Добавить рекламную компанию",
   AddNewSurveys: "Добавить опросы",
+  AddNewOperators: "Добавить оператора",
   SwitchPaymentType: "Вкл/откл автоматического проведения платежей",
   ManualPayment: "Провести платежи вручную",
 };

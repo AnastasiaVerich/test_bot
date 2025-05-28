@@ -45,6 +45,8 @@ export function registerMessage(bot: Bot<MyContext>): void {
       );
     } else if (ctx.message.text === BUTTONS_KEYBOARD.AddNewSurveys) {
       await ctx.conversation.enter(ScenesSupervisor.AddNewSurveys);
+    } else if (ctx.message.text === BUTTONS_KEYBOARD.AddNewOperators) {
+      await ctx.conversation.enter(ScenesSupervisor.AddNewOperators);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.SwitchPaymentType) {
       await ctx.conversation.enter(ScenesSupervisor.SwitchPaymentType);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.ManualPayment) {
