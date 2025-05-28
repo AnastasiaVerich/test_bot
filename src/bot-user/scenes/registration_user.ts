@@ -21,10 +21,7 @@ import { addUser, getUser } from "../../database/queries_kysely/users";
 import { isUserInBlacklist } from "../../database/queries_kysely/blacklist_users";
 import { getOperatorByIdPhoneOrTg } from "../../database/queries_kysely/operators";
 import { RegistrationResponseText } from "../../config/common_types";
-import {
-  addUserLogs,
-  getAllUserLogsByEvent,
-} from "../../database/queries_kysely/bot_user_logs";
+import { addUserLogs } from "../../database/queries_kysely/bot_user_logs";
 
 export async function registrationUserScene(
   conversation: MyConversation,
@@ -195,18 +192,18 @@ async function photoStep(
   try {
     let skip_photo_verification = false;
 
-    const user_start_logs = await conversation.external(() =>
-      getAllUserLogsByEvent({
-        user_id: userId,
-        event_type: "start",
-      }),
-    );
-    if (user_start_logs.length > 0) {
-      const event_data = user_start_logs[0].event_data;
-      skip_photo_verification =
-        event_data.referral_start.startsWith("campaign__") ||
-        event_data.referral_start.length === 0;
-    }
+    // const user_start_logs = await conversation.external(() =>
+    //   getAllUserLogsByEvent({
+    //     user_id: userId,
+    //     event_type: "start",
+    //   }),
+    // );
+    // if (user_start_logs.length > 0) {
+    //   const event_data = user_start_logs[0].event_data;
+    //   skip_photo_verification =
+    //     event_data.referral_start.startsWith("campaign__") ||
+    //     event_data.referral_start.length === 0;
+    // }
 
     let result: RegistrationResponseText | null | "skip_photo" = null;
 
