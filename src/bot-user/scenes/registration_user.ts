@@ -101,13 +101,24 @@ export async function registrationUserScene(
 
       return;
     }
-    await conversation.external(() =>
-      addUserLogs({
-        user_id: userId,
-        event_type: "registration",
-        step: "success",
-      }),
-    );
+    if (response === "success" || response === "skip_photo") {
+      await conversation.external(() =>
+        addUserLogs({
+          user_id: userId,
+          event_type: "registration",
+          step: "success",
+        }),
+      );
+    } else {
+      await conversation.external(() =>
+        addUserLogs({
+          user_id: userId,
+          event_type: "registration",
+          step: "failed",
+          event_data: JSON.stringify("registration failed"),
+        }),
+      );
+    }
 
     return;
   } catch (error) {
