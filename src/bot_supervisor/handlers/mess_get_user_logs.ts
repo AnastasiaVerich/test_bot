@@ -49,6 +49,7 @@ function metricsToCsv(metrics: UserMetrics[]): string {
     "Phone",
     "Photo",
     "Registration Success",
+    "Registration Date",
     "Last Geolocation",
     "Balance",
     "Total Withdrawn",
@@ -75,6 +76,7 @@ function metricsToCsv(metrics: UserMetrics[]): string {
         ? row.registration_photo
         : JSON.stringify(row.registration_photo),
       row.registration_success,
+      row.registration_date,
       row.last_geolocation,
       row.balance.toString(),
       row.total_withdrawn.toString(),

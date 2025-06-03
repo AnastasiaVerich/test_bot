@@ -13,6 +13,7 @@ export interface UserMetrics {
   survey_completion_count: number;
   referral_count: number;
   referrals_with_survey_count: number;
+  registration_date: string | null;
 }
 
 export async function getUserRegistrationMetrics(): Promise<
@@ -92,7 +93,8 @@ export async function getUserRegistrationMetrics(): Promise<
             WHERE rb.referrer_id = bul_main.user_id
           ), 0)
           ELSE 0
-        END AS referrals_with_survey_count
+        END AS referrals_with_survey_count,
+    u.created_at AS registration_date
       FROM (
         SELECT DISTINCT user_id
         FROM bot_user_logs
@@ -102,7 +104,7 @@ export async function getUserRegistrationMetrics(): Promise<
         ON bul.user_id = bul_main.user_id 
         AND bul.event_type = 'registration' 
         AND bul.step IN ('phone', 'photo', 'success')
-      GROUP BY bul_main.user_id, u.balance;
+      GROUP BY bul_main.user_id, u.balance, u.created_at;
     `;
 
     const result = await client.query<UserMetrics>(queryText);
