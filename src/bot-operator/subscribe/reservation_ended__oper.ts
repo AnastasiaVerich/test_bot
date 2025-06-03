@@ -7,6 +7,7 @@ import {
 import logger from "../../lib/logger";
 import { cancelTakeSurveyByUser } from "../../database/services/surveyService";
 import { SurveyActiveType } from "../../database/db-types";
+import { getUser } from "../../database/queries_kysely/users";
 
 async function processRecord(
   bot: Bot<MyContext>,
@@ -18,14 +19,16 @@ async function processRecord(
     user_id,
     operator_id,
     created_at,
-    tg_account,
     code_word,
   } = record;
 
+  const users = await getUser({ user_id: user_id });
+  if (!users) return;
+
   let message = `Время резервации вышло для пользователя `;
 
-  if (tg_account) {
-    message += "@" + tg_account + ".";
+  if (users.last_tg_account) {
+    message += "@" + users.last_tg_account + ".";
   }
   if (code_word) {
     message += "с кодовым словом " + code_word + ".";

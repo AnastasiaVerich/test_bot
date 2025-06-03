@@ -5,6 +5,7 @@ import { HANDLER_CURRENT_SURVEYS } from "../../../bot-common/constants/handler_m
 import { CreateInlineKeyboard } from "../../../bot-common/keyboards/inlineKeyboard";
 import { getAllActiveSurveysUnreservedByOperatorId } from "../../../database/queries_kysely/survey_active";
 import { BUTTONS_CALLBACK_QUERIES } from "../../../bot-common/constants/buttons";
+import { getUsersByIds } from "../../../database/queries_kysely/users";
 
 export const currentSurveysHandler = async (ctx: MyContext) => {
   try {
@@ -18,16 +19,24 @@ export const currentSurveysHandler = async (ctx: MyContext) => {
       await ctx.reply(HANDLER_CURRENT_SURVEYS.NO_CURRENT_SURVEYS);
       return;
     }
+    const users = await getUsersByIds(
+      currentActiveSurveys.map((e) => e.user_id),
+    );
 
-    const wordStr = currentActiveSurveys.map((e) => ({
-      label: e.tg_account
-        ? `${HANDLER_CURRENT_SURVEYS.TG_ACC} ${e.tg_account}`
-        : `${HANDLER_CURRENT_SURVEYS.CODE_WORD} ${e.code_word}`,
-      value:
-        BUTTONS_CALLBACK_QUERIES.ThisUserGetSurveyInfo +
-        "_" +
-        e.survey_active_id,
-    }));
+    const wordStr = currentActiveSurveys.map((e) => {
+      const tg_acc = users.find(
+        (el) => el.user_id === e.user_id,
+      )?.last_tg_account;
+      return {
+        label: tg_acc
+          ? `${HANDLER_CURRENT_SURVEYS.TG_ACC} ${tg_acc}`
+          : `${HANDLER_CURRENT_SURVEYS.CODE_WORD} ${e.code_word}`,
+        value:
+          BUTTONS_CALLBACK_QUERIES.ThisUserGetSurveyInfo +
+          "_" +
+          e.survey_active_id,
+      };
+    });
 
     await ctx.reply(HANDLER_CURRENT_SURVEYS.HEADER, {
       parse_mode: "HTML",

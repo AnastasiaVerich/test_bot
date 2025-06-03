@@ -111,12 +111,17 @@ export async function takeSurveyByUser(params: {
     if (!isUpd) {
       throw new Error("updateSurvey не обновилась");
     }
+    const isUserUpdate = await updateUserByUserId(userId, {
+      last_user_location: location_string,
+      last_tg_account: tg_account,
+    });
+    if (!isUserUpdate) {
+      throw new Error("updateUserByUserId filed");
+    }
     await addSurveyActive({
       surveyId: surveyId,
       userId: userId,
-      tgAccount: tg_account,
       codeWord: code_word,
-      userLocation: location_string,
     });
 
     await client.query("COMMIT"); // Завершаем транзакцию

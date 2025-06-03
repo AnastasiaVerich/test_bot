@@ -7,6 +7,7 @@ import { getActiveSurvey } from "../../../database/queries_kysely/survey_active"
 import { getInfoAboutSurvey } from "../../../database/services/surveyService";
 import { getAllSurveyTasks } from "../../../database/queries_kysely/survey_tasks";
 import { FinishSurveyKeyboard } from "../../../bot-common/keyboards/inlineKeyboard";
+import { getUser } from "../../../database/queries_kysely/users";
 
 export async function handleGetUserSurveyInfo(ctx: MyContext): Promise<void> {
   try {
@@ -35,6 +36,9 @@ export async function handleGetUserSurveyInfo(ctx: MyContext): Promise<void> {
     const surveyInfo = await getInfoAboutSurvey(active_survey.survey_id);
     if (!surveyInfo) return;
 
+    const user = await getUser({ user_id: active_survey.user_id });
+    if (!user) return;
+
     const surveyActiveTasks = await getAllSurveyTasks(active_survey.survey_id);
 
     let message = [
@@ -43,7 +47,7 @@ export async function handleGetUserSurveyInfo(ctx: MyContext): Promise<void> {
       //`<b>Тип:</b> ${surveyActive.survey_type}`,
       //`<b>Описание:</b> ${surveyActive.description}`,
       `<b>Геолокация опроса:</b> ${surveyInfo.region_name}`,
-      `<b>Геолокация пользователя:</b> ${active_survey.user_location}`,
+      `<b>Геолокация пользователя:</b> ${user.last_user_location}`,
       ``, // Empty line for spacing
     ].join("\n");
 

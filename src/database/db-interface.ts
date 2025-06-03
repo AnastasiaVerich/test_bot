@@ -22,6 +22,8 @@ export interface UsersEntity {
   survey_lock_until: Generated<string | null>; // Возможно, в ISO строке
   last_init: Generated<string | null>; // Дата и время в ISO формате
   skip_photo_verification: Generated<boolean>; // -- Пропуск фотоконтроля
+  last_tg_account: Generated<string | null>; // -- Последняя инфа о тг-аккаунте
+  last_user_location: Generated<string | null>; // -- Пропуск инфа о локации юзера
 
   created_at: Generated<string>; // Дата и время в ISO формате
 }
@@ -128,9 +130,7 @@ export interface SurveyActiveEntity {
   is_user_notified: Generated<boolean>;
   is_reservation_end: Generated<boolean>;
   reservation_end: string | null;
-  tg_account: string | null;
   code_word: string | null;
-  user_location: string | null;
 
   created_at: Generated<string>; // Дата и время в ISO формате
 }

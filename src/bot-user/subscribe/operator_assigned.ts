@@ -8,6 +8,7 @@ import logger from "../../lib/logger";
 import { getOperatorByIdPhoneOrTg } from "../../database/queries_kysely/operators";
 import { updateActiveSurvey } from "../../database/queries_kysely/survey_active";
 import { SurveyActiveType } from "../../database/db-types";
+import { getUser } from "../../database/queries_kysely/users";
 
 async function processRecord(
   bot: Bot<MyContext>,
@@ -20,13 +21,15 @@ async function processRecord(
     created_at,
     reservation_end,
     code_word,
-    tg_account,
   } = record;
   if (!operator_id) return;
   const operator = await getOperatorByIdPhoneOrTg({ operator_id: operator_id });
 
+  const user = await getUser({ user_id: user_id });
+  if (!user) return;
+
   let message = "";
-  if (tg_account) {
+  if (user.last_tg_account) {
     message = `Оператор @${operator?.tg_account} проведет с вами опрос. Пожалуйста, напишите ему в Telegram как можно скорее, чтобы подтвердить готовность. Он свяжется с вами, когда будет свободен.`;
   }
   if (code_word) {

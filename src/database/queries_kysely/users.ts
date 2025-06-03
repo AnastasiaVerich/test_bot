@@ -40,6 +40,27 @@ export async function getUser(
   }
 }
 
+export async function getUsersByIds(
+  user_ids: UsersType["user_id"][],
+  trx: poolType = pool,
+): Promise<UsersType[]> {
+  try {
+    if (!user_ids || user_ids.length === 0) {
+      throw new Error("At least one user_id must be provided.");
+    }
+
+    const result = await trx
+      .selectFrom("users")
+      .selectAll()
+      .where("user_id", "in", user_ids)
+      .execute();
+
+    return result;
+  } catch (error) {
+    throw new Error("Error getUsersByIds: " + error);
+  }
+}
+
 export async function addUser(
   params: {
     userId: UsersType["user_id"];
@@ -75,20 +96,30 @@ export async function updateUserByUserId(
   params: {
     last_init?: "update";
     notifyReason?: UsersType["notify_reason"];
+    last_user_location?: UsersType["last_user_location"];
+    last_tg_account?: UsersType["last_tg_account"];
     add_balance?: UsersType["balance"];
     interval_survey_lock_until?: UsersType["survey_lock_until"];
   },
   trx: poolType = pool,
 ): Promise<UsersType["user_id"] | null> {
   try {
-    const { last_init, notifyReason, add_balance, interval_survey_lock_until } =
-      params;
+    const {
+      last_init,
+      notifyReason,
+      add_balance,
+      interval_survey_lock_until,
+      last_user_location,
+      last_tg_account,
+    } = params;
 
     if (
       last_init === undefined &&
       notifyReason === undefined &&
       add_balance === undefined &&
-      interval_survey_lock_until === undefined
+      interval_survey_lock_until === undefined &&
+      last_user_location === undefined &&
+      last_tg_account === undefined
     ) {
       throw new Error(
         `At least one ( ${Object.keys(params).join(", ")} ) must be provided.`,
@@ -99,6 +130,12 @@ export async function updateUserByUserId(
 
     if (notifyReason !== undefined) {
       set.notify_reason = notifyReason;
+    }
+    if (last_user_location !== undefined) {
+      set.last_user_location = last_user_location;
+    }
+    if (last_tg_account !== undefined) {
+      set.last_tg_account = last_tg_account;
     }
     if (last_init === "update") {
       set.last_init = sql<Date>`NOW()` as unknown as string;

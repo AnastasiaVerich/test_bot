@@ -6,14 +6,12 @@ export async function addSurveyActive(
   params: {
     surveyId: SurveyActiveType["survey_id"];
     userId: SurveyActiveType["user_id"];
-    tgAccount: SurveyActiveType["tg_account"];
     codeWord: SurveyActiveType["code_word"];
-    userLocation: SurveyActiveType["user_location"];
   },
   trx: poolType = pool,
 ): Promise<SurveyActiveType["survey_active_id"] | null> {
   try {
-    const { surveyId, userId, tgAccount, codeWord, userLocation } = params;
+    const { surveyId, userId, codeWord } = params;
 
     const result = await trx
       .insertInto("survey_active")
@@ -21,9 +19,7 @@ export async function addSurveyActive(
         survey_id: surveyId,
         user_id: userId,
         operator_id: null,
-        tg_account: tgAccount,
         code_word: codeWord,
-        user_location: userLocation,
       })
       .returning("survey_active_id")
       .executeTakeFirst();

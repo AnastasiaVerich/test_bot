@@ -7,6 +7,7 @@ import {
   getActiveSurvey,
   updateActiveSurvey,
 } from "../../../database/queries_kysely/survey_active";
+import { getUser } from "../../../database/queries_kysely/users";
 
 export async function handleUserWrote(ctx: MyContext): Promise<void> {
   try {
@@ -36,8 +37,11 @@ export async function handleUserWrote(ctx: MyContext): Promise<void> {
       });
       if (!newSurveyActive) return;
 
+      const user = await getUser({ user_id: newSurveyActive.user_id });
+      if (!user) return;
+
       let message = `Вы отметили, что пользователь `;
-      const username = newSurveyActive.tg_account;
+      const username = user.last_tg_account;
       if (username) {
         message += "@" + username + " написал.";
       }

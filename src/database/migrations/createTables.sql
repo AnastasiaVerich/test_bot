@@ -29,6 +29,9 @@ CREATE TABLE users (
     survey_lock_until TIMESTAMP WITH TIME ZONE DEFAULT NULL,  --Дата после которой можно проходить опрос
     last_init TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Последний раз его идентификация была в этот день и час
     skip_photo_verification BOOLEAN DEFAULT FALSE NOT NULL,  -- Пропуск фотоконтроля
+    last_tg_account VARCHAR(255) DEFAULT NULL,
+    last_user_location VARCHAR(255) DEFAULT NULL,
+
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -196,10 +199,7 @@ CREATE TABLE survey_active (
     is_user_notified BOOLEAN NOT NULL DEFAULT FALSE,
     is_reservation_end BOOLEAN NOT NULL DEFAULT FALSE,
     reservation_end TIMESTAMP WITH TIME ZONE,
-    tg_account VARCHAR(255),
     code_word VARCHAR(255),
-    user_location VARCHAR(255),
-
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
