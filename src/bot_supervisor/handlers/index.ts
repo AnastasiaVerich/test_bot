@@ -11,6 +11,7 @@ import { cancelSupervisorConversation } from "../utils/cancelSupervisorConversat
 import { handleManualPayment } from "./mess_manual_payment";
 import { createCallbackRegex } from "../../utils/callBackRegex";
 import { handlePendingPaymentInfo } from "./callback_queries_pending_payment_info";
+import { handleGetUserLogs } from "./mess_get_user_logs";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.command("start", async (ctx) => {
@@ -45,14 +46,14 @@ export function registerMessage(bot: Bot<MyContext>): void {
       );
     } else if (ctx.message.text === BUTTONS_KEYBOARD.AddNewSurveys) {
       await ctx.conversation.enter(ScenesSupervisor.AddNewSurveys);
+    } else if (ctx.message.text === BUTTONS_KEYBOARD.GetUsersLogs) {
+      await handleGetUserLogs(ctx);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.AddNewOperators) {
       await ctx.conversation.enter(ScenesSupervisor.AddNewOperators);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.SwitchPaymentType) {
       await ctx.conversation.enter(ScenesSupervisor.SwitchPaymentType);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.ManualPayment) {
       await handleManualPayment(ctx);
-
-      //await ctx.conversation.enter(ScenesSupervisor.ManualPayment);
     }
   });
 }

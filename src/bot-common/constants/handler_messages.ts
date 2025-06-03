@@ -24,3 +24,6 @@ export const HANDLER_MANUAL_PAYMENT = {
   NO_AVAILABLE_PAYMENTS: `В данным момент нет платежей, доступных для проведения вручную.`,
   SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.ManualPayment}'.`,
 };
+export const HANDLER_GET_USER_LOGS = {
+  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.GetUsersLogs}'.`,
+};
