@@ -46,15 +46,15 @@ export const handleGetUserLogs = async (ctx: MyContext) => {
 function metricsToCsv(metrics: UserMetrics[]): string {
   const headers = [
     "User ID",
-    "Phone",
-    "Photo",
-    "Registration Success",
-    "Last Geolocation",
-    "Balance",
-    "Total Withdrawn",
-    "Survey Count",
-    "Referral Count",
-    "Referrals with Surveys",
+    "Шаг Телефон",
+    "Шаг Фото",
+    "Регистрация",
+    "Последняя геолокация",
+    "Текущий баланс",
+    "Снятие средств (TON)",
+    "К-во пройденных опросов",
+    "К-во приглашенных пользователей",
+    "К-во приглашенных пользователей, прошедших опросов",
   ];
 
   const escapeCsv = (value: any): string => {
