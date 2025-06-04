@@ -106,7 +106,7 @@ export const registration = async (
           currentEmbedding,
           Object.values(JSON.parse(JSON.stringify(row.embedding))),
         );
-        if (distance < 0.56) {
+        if (distance < 0.51) {
           // Пороговое значение для сравнения
           matches.push({ user_id: row.user_id, distance });
         }
