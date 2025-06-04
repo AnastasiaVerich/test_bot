@@ -10,8 +10,8 @@ import {
   getAllFaceEmbeddings,
 } from "../../../database/queries_kysely/face_embedding";
 import { getOperatorByIdPhoneOrTg } from "../../../database/queries_kysely/operators";
-import { addPhoto } from "../../../database/queries_kysely/photos";
 import { addUser, getUser } from "../../../database/queries_kysely/users";
+import { addPhoto } from "../../../database/queries_kysely/photos";
 
 // Интерфейс для тела запроса на регистрацию
 interface RegistrationRequestBody {
@@ -51,6 +51,11 @@ export const registration = async (
           status: 2,
           text: "missing_user_phone",
         });
+      }
+
+      // Сохраняем фото, если флаг `isSavePhoto` равен '1'
+      if (isSavePhoto === "1") {
+        await addPhoto(userId, req.file.buffer);
       }
 
       // Проверяем существование пользователя по номеру телефона и ID
@@ -109,7 +114,9 @@ export const registration = async (
 
       // Если лицо совпадает с уже существующим
       if (matches.length > 0) {
-        return res.status(200).send({ status: 0, text: "user_exist_face" });
+        return res
+          .status(200)
+          .send({ status: 0, text: "user_exist_face", matches });
       }
 
       // Добавляем нового пользователя в таблицу users
@@ -120,11 +127,6 @@ export const registration = async (
 
       // Сохраняем эмбеддинг лица в таблице face_embeddings
       await addFaceEmbedding(userId, JSON.stringify(currentEmbedding, null, 2));
-
-      // Сохраняем фото, если флаг `isSavePhoto` равен '1'
-      if (isSavePhoto === "1") {
-        await addPhoto(userId, req.file.buffer);
-      }
 
       await client.query("COMMIT"); // Фиксируем транзакцию
       return res.status(200).send({ status: 1, text: "success" });

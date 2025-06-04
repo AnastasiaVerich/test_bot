@@ -47,7 +47,7 @@ function metricsToCsv(metrics: UserMetrics[]): string {
   const headers = [
     "User ID",
     "Phone",
-    "Photo",
+    "Geolocation",
     "Registration Success",
     "Registration Date",
     "Last Geolocation",

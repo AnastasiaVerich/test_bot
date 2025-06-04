@@ -217,6 +217,7 @@ async function photoStep(
     // }
 
     let result: RegistrationResponseText | null | "skip_photo" = null;
+    let dataAll: any = {};
 
     if (skip_photo_verification) {
       const isHasSomeNumberUser = await getUser({ phone: userPhone });
@@ -266,6 +267,7 @@ async function photoStep(
       );
       if (message_web_app_data.message?.web_app_data) {
         const data = JSON.parse(message_web_app_data.message.web_app_data.data);
+        dataAll = data;
         result = data.text;
       }
     }
@@ -274,6 +276,14 @@ async function photoStep(
       case "user_exist_number":
       case "user_exist_id":
       case "user_exist_face":
+        await conversation.external(() =>
+          addUserLogs({
+            user_id: userId,
+            event_type: "registration",
+            step: "photo_user_exist_face",
+            event_data: JSON.stringify(dataAll?.matches),
+          }),
+        );
         await ctx.reply(REGISTRATION_USER_SCENE.USER_EXIST, {
           reply_markup: IdentificationKeyboard(),
         });

@@ -13,6 +13,7 @@ type EventLogType =
 type StepType =
   | "start"
   | "photo"
+  | "photo_user_exist_face"
   | "phone"
   | "failed"
   | "success"
