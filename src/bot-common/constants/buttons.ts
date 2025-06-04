@@ -55,6 +55,7 @@ export const BUTTONS_KEYBOARD = {
   GetUsersLogs: "Логи пользователей",
   AddNewSurveys: "Добавить опросы",
   AddNewOperators: "Добавить оператора",
-  SwitchPaymentType: "Вкл/откл автоматического проведения платежей",
+  SwitchPaymentType: "Переключатель автоматического проведения платежей",
   ManualPayment: "Провести платежи вручную",
+  RestartFailedPayments: "Повторить неуспешные платежи",
 };

@@ -12,6 +12,7 @@ import { handleManualPayment } from "./mess_manual_payment";
 import { createCallbackRegex } from "../../utils/callBackRegex";
 import { handlePendingPaymentInfo } from "./callback_queries_pending_payment_info";
 import { handleGetUserLogs } from "./mess_get_user_logs";
+import { handleRestartFailedPayments } from "../../bot-operator/handlers/callback/mess_restart_failed_payments";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.command("start", async (ctx) => {
@@ -54,6 +55,8 @@ export function registerMessage(bot: Bot<MyContext>): void {
       await ctx.conversation.enter(ScenesSupervisor.SwitchPaymentType);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.ManualPayment) {
       await handleManualPayment(ctx);
+    } else if (ctx.message.text === BUTTONS_KEYBOARD.RestartFailedPayments) {
+      await handleRestartFailedPayments(ctx);
     }
   });
 }

@@ -334,7 +334,7 @@ async function stepWallet(
 
       const wallet = response.message?.text.trim();
 
-      if (wallet?.length === 0) {
+      if (wallet?.length < 10) {
         await ctx.reply(WITHDRAWAL_USER_SCENE.ENTERED_INVALID_WALLET, {
           parse_mode: "HTML",
           reply_markup: EmptyKeyboard(),

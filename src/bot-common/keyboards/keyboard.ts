@@ -73,6 +73,8 @@ export const AuthSupervisorKeyboard = (): Keyboard =>
     .row()
     .text(BUTTONS_KEYBOARD.ManualPayment)
     .row()
+    .text(BUTTONS_KEYBOARD.RestartFailedPayments)
+    .row()
     .resized();
 
 export const createKeyboardFromWords = (words: string[]): Keyboard => {

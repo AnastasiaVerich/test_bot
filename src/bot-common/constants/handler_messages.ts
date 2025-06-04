@@ -9,6 +9,13 @@ export const HANDLER_NEW_SURVEYS = {
 
   SOME_ERROR: "Бот временно недоступен",
 };
+export const HANDLER_RESTART_FAILED_PAYMENT = {
+  NO_FAILED_PENDING_PAYMENTS:
+    "Нет неуспешных платежей, которые можно перезапустить.",
+  SUCCESS: "Платежи были направлены в очередь на проведение.",
+
+  SOME_ERROR: "Бот временно недоступен",
+};
 export const HANDLER_CURRENT_SURVEYS = {
   NO_CURRENT_SURVEYS: "У вас нет текущих опросов.",
   TG_ACC: "Юзернейм:",
