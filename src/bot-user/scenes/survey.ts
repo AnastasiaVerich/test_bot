@@ -138,6 +138,14 @@ export async function surveyScene(
       await ctx.reply(SURVEY_USER_SCENE.REGION_NOT_SURVEY, {
         reply_markup: AuthUserKeyboard(),
       });
+      await conversation.external(() =>
+        addUserLogs({
+          user_id: userId,
+          event_type: "survey",
+          step: "failed",
+          event_data: JSON.stringify("location not available"),
+        }),
+      );
       return;
     }
 
