@@ -133,6 +133,14 @@ export async function surveyScene(
       return;
     }
 
+    const availableCountry = ["Беларусь", "Россия"];
+    if (!availableCountry.includes(location.countryName)) {
+      await ctx.reply(SURVEY_USER_SCENE.REGION_NOT_SURVEY, {
+        reply_markup: AuthUserKeyboard(),
+      });
+      return;
+    }
+
     const location_string = formatLocation(location);
 
     // const region = await findRegionByLocation(location);
