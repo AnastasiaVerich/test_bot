@@ -24,6 +24,8 @@ export async function executePendingPayments(): Promise<void> {
       const pendingPayments = await getAllPendingPayment();
 
       for (const payment of pendingPayments) {
+        console.log(payment);
+
         if (payment.attempts >= 3) {
           //0 1 2 3
           logger.info(
@@ -58,6 +60,16 @@ export async function executePendingPayments(): Promise<void> {
                   pass = true;
                 }
                 break;
+              case "not confirmed":
+                {
+                  pass = true;
+                  await upsertCommonVariable("auto_payments_enabled", "OFF");
+
+                  throw new Error(
+                    `Payment ${payment.user_id} is NOT completed, need check`,
+                  );
+                }
+                break;
             }
           }
         }
@@ -70,7 +82,7 @@ export async function executePendingPayments(): Promise<void> {
 
 type ResponseType = {
   isSuccess: boolean;
-  reason?: "big gas" | "little balance" | "some error";
+  reason?: "big gas" | "little balance" | "not confirmed" | "some error";
 };
 
 export async function make_payment(
@@ -94,6 +106,7 @@ export async function make_payment(
 
   let contract = client.open(wallet);
   let seqno: number = await contract.getSeqno();
+  console.log(seqno);
 
   const estimateSumGas = await estimateFee(client, recipientAddress, amountTON);
 
@@ -117,6 +130,31 @@ export async function make_payment(
           }),
         ],
       });
+      logger.info(
+        `Транзакция на ${amountTON} TON для ${recipientAddress} отправлена, seqno: ${seqno}`,
+      );
+      // Ждем подтверждения
+      let confirmed = false;
+      for (let i = 0; i < 20; i++) {
+        // Проверяем 20 раз, ~40 секунд
+        await new Promise((resolve) => setTimeout(resolve, 2000)); // Ждем 2 секунды
+        const newSeqno = await contract.getSeqno();
+        console.log("seqno", seqno);
+        console.log("newSeqno", newSeqno);
+        if (newSeqno > seqno) {
+          confirmed = true;
+          logger.info(
+            `Транзакция на ${amountTON} TON для ${recipientAddress} подтверждена, новый seqno: ${newSeqno}`,
+          );
+          break;
+        }
+      }
+      if (!confirmed) {
+        logger.warn(
+          `Транзакция на ${amountTON} TON для ${recipientAddress} не подтверждена`,
+        );
+        return { isSuccess: false, reason: "not confirmed" };
+      }
       return { isSuccess: true };
     } catch (error) {
       logger.info(error);
