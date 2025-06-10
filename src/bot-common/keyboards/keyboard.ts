@@ -102,7 +102,7 @@ export const WebAppKeyboard = (
           userPhone,
           type: type,
           isSavePhoto: isSavePhoto,
-          version: 10,
+          version: 11,
         }),
       )}`,
     )
