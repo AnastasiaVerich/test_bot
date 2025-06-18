@@ -19,22 +19,41 @@ export async function getAllWithdrawalLogByUserId(
   }
 }
 
+export async function getAllWithdrawalLogByOperatorId(
+  operatorId: WithdrawalLogsType["operator_id"],
+  trx: poolType = pool,
+): Promise<WithdrawalLogsType[]> {
+  try {
+    const result = await trx
+      .selectFrom("withdrawal_logs")
+      .selectAll()
+      .where("operator_id", "=", operatorId)
+      .execute();
+
+    return result;
+  } catch (error) {
+    throw new Error("Error getAllWithdrawalLogByOperatorId: " + error);
+  }
+}
+
 export async function addWithdrawalLog(
   params: {
-    userId: WithdrawalLogsType["user_id"];
+    userId?: WithdrawalLogsType["user_id"];
+    operatorId?: WithdrawalLogsType["operator_id"];
     amount: WithdrawalLogsType["amount"];
     wallet: WithdrawalLogsType["wallet"];
   },
   trx: poolType = pool,
 ): Promise<WithdrawalLogsType["withdrawal_id"] | null> {
   try {
-    const { userId, amount, wallet } = params;
+    const { userId = null, operatorId = null, amount, wallet } = params;
 
     const result = await trx
       .insertInto("withdrawal_logs")
       .values({
         user_id: userId,
         amount: amount,
+        operator_id: operatorId,
         wallet,
         withdrawn_at: sql`CURRENT_TIMESTAMP`,
       })

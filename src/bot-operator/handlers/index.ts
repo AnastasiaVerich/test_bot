@@ -16,6 +16,9 @@ import { handleFinishSurvey } from "./callback/callback_queries_finish_survey";
 import { handleCancelSurvey } from "./callback/callback_queries_cancel_survey";
 import { handleUserWrote } from "./callback/callback_queries_user_wrote";
 import { handleGetUserSurveyInfo } from "./callback/callback_queries_get_user_survey_info";
+import { handleBalance } from "./callback/callback_queries_balance";
+import { handler_history_accrual } from "./callback/callback_queries_history_accrual";
+import { handler_history_withdrawal } from "./callback/callback_queries_history_withdrawal";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.chatType("private").command("start", async (ctx) => {
@@ -73,6 +76,33 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
         await handleTookSurvey(ctx, bot);
       },
     );
+
+  bot
+    .chatType("private")
+    .callbackQuery(
+      BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButton,
+      async (ctx: MyContext) => {
+        await ctx.conversation.enter(ScenesOperator.WithdrawalScene);
+      },
+    );
+
+  bot
+    .chatType("private")
+    .callbackQuery(
+      BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButton,
+      async (ctx: MyContext) => {
+        await handler_history_accrual(ctx);
+      },
+    );
+
+  bot
+    .chatType("private")
+    .callbackQuery(
+      BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButton,
+      async (ctx: MyContext) => {
+        await handler_history_withdrawal(ctx);
+      },
+    );
 }
 
 export function registerMessage(bot: Bot<MyContext>): void {
@@ -81,6 +111,8 @@ export function registerMessage(bot: Bot<MyContext>): void {
       await newSurveysHandler(ctx);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.CurrentSurveys) {
       await currentSurveysHandler(ctx);
+    } else if (ctx.message.text === BUTTONS_KEYBOARD.BalanceButton) {
+      await handleBalance(ctx);
     }
   });
 }

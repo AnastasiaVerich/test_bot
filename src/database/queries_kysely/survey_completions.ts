@@ -2,7 +2,7 @@ import { pool, poolType } from "../dbClient";
 import { SurveyCompletionsType } from "../db-types";
 
 export async function getSurveyCompletionsByUserId(
-  userId: number,
+  userId: SurveyCompletionsType["user_id"],
   trx: poolType = pool,
 ): Promise<SurveyCompletionsType[]> {
   try {
@@ -10,6 +10,22 @@ export async function getSurveyCompletionsByUserId(
       .selectFrom("survey_completions")
       .selectAll()
       .where("user_id", "=", userId)
+      .orderBy("completed_at", "desc")
+      .execute();
+  } catch (error) {
+    throw new Error("Error getSurveyCompletionsByUserId: " + error);
+  }
+}
+
+export async function getSurveyCompletionsByOperatorId(
+  operatorId: SurveyCompletionsType["operator_id"],
+  trx: poolType = pool,
+): Promise<SurveyCompletionsType[]> {
+  try {
+    return await trx
+      .selectFrom("survey_completions")
+      .selectAll()
+      .where("operator_id", "=", operatorId)
       .orderBy("completed_at", "desc")
       .execute();
   } catch (error) {
@@ -26,6 +42,7 @@ export async function addSurveyCompletion(
     result_main: SurveyCompletionsType["result"];
     result_positions: SurveyCompletionsType["result_positions_var"];
     reward: SurveyCompletionsType["reward"];
+    reward_operator: SurveyCompletionsType["reward_operator"];
   },
   trx: poolType = pool,
 ): Promise<SurveyCompletionsType["completion_id"] | null> {
@@ -38,6 +55,7 @@ export async function addSurveyCompletion(
       result_main,
       result_positions,
       reward,
+      reward_operator,
     } = params;
 
     const result = await trx
@@ -50,6 +68,7 @@ export async function addSurveyCompletion(
         reward: reward,
         result: result_main,
         result_positions_var: result_positions,
+        reward_operator: reward_operator,
       })
       .returning("completion_id")
       .executeTakeFirst();

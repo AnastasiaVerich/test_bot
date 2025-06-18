@@ -12,15 +12,33 @@ export async function paymentIsCompleted(
   try {
     await client.query("BEGIN"); // Начинаем транзакцию
 
-    const isDeleted = await deletePendingPayment(payment.user_id);
+    let isDeleted;
+    if (payment.user_id) {
+      isDeleted = await deletePendingPayment({ userId: payment.user_id });
+    } else if (payment.operator_id) {
+      isDeleted = await deletePendingPayment({
+        operatorId: payment.operator_id,
+      });
+    }
     if (!isDeleted) {
       throw new Error("deletePendingPayment failed");
     }
-    const isAdd = await addWithdrawalLog({
-      userId: payment.user_id,
-      amount: payment.amount,
-      wallet: payment.address,
-    });
+
+    let isAdd;
+    if (payment.user_id) {
+      isAdd = await addWithdrawalLog({
+        userId: payment.user_id,
+        amount: payment.amount,
+        wallet: payment.address,
+      });
+    } else if (payment.operator_id) {
+      isAdd = await addWithdrawalLog({
+        operatorId: payment.operator_id,
+        amount: payment.amount,
+        wallet: payment.address,
+      });
+    }
+
     if (!isAdd) {
       throw new Error("addWithdrawalLog failed");
     }

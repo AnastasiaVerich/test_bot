@@ -26,6 +26,7 @@ import {
   getReferralByReferredUserIdAndStatus,
   updateReferralByReferredUserId,
 } from "../queries_kysely/referral_bonuses";
+import { updateOperatorByOperatorId } from "../queries_kysely/operators";
 
 export async function reservationSurveyActiveByOperator(params: {
   operatorId: SurveyActiveType["operator_id"];
@@ -241,97 +242,6 @@ export async function getInfoAboutSurvey(
   }
 }
 
-export async function userCompletedSurvey2(
-  params: {
-    surveyActiveId: number;
-    user_id: number;
-    survey_id: number;
-    operator_id: number;
-  },
-  result: {
-    survey_task_id: number;
-    isCompleted: boolean;
-    result?: string;
-    result_positions?: string;
-    reward?: number;
-  }[],
-): Promise<any> {
-  const client = await db.connect(); // Получаем клиента для транзакции
-  try {
-    const { surveyActiveId, user_id, survey_id, operator_id } = params;
-    await client.query("BEGIN"); // Начинаем транзакцию
-
-    const isDeleteActiveSurveyId = await deleteActiveSurvey(surveyActiveId);
-    if (!isDeleteActiveSurveyId) {
-      throw new Error("Survey active delete failed");
-    }
-    let reward = 0;
-    for (const item of result) {
-      if (
-        item.isCompleted &&
-        item.result !== undefined &&
-        item.result_positions !== undefined &&
-        item.reward !== undefined
-      ) {
-        const completedTaskId = await addSurveyCompletion({
-          survey_id: survey_id,
-          survey_task_id: item.survey_task_id,
-          user_id: user_id,
-          operator_id: operator_id,
-          result_main: item.result,
-          result_positions: item.result_positions,
-          reward: item.reward,
-        });
-        if (!completedTaskId) {
-          throw new Error("Survey Completion add failed");
-        }
-        reward += Number(item.reward);
-      }
-    }
-
-    const isBalanceUpdate = await updateUserByUserId(user_id, {
-      add_balance: reward,
-    });
-    if (!isBalanceUpdate) {
-      throw new Error("UpdateBalance filed");
-    }
-
-    const referral_data = await getReferralByReferredUserIdAndStatus(
-      user_id,
-      "pending",
-    );
-
-    if (referral_data) {
-      const sum_regard = 100;
-      const isUpdateRes = await updateReferralByReferredUserId(user_id, {
-        status: "completed",
-        amount: sum_regard,
-      });
-      if (!isUpdateRes) {
-        throw new Error("updateReferralByReferredUserId filed");
-      }
-      const isBalanceUpdate = await updateUserByUserId(
-        referral_data.referrer_id,
-        {
-          add_balance: sum_regard,
-        },
-      );
-      if (!isBalanceUpdate) {
-        throw new Error("updateUserByUserId 2 filed");
-      }
-    }
-
-    await client.query("COMMIT"); // Завершаем транзакцию
-
-    return;
-  } catch (error) {
-    await client.query("ROLLBACK"); // Откатываем при ошибке
-    throw new Error("Error userCompletedSurvey: " + error);
-  } finally {
-    client.release(); // Освобождаем клиента
-  }
-}
-
 export async function userCompletedSurvey(
   params: {
     surveyActiveId: number;
@@ -346,6 +256,7 @@ export async function userCompletedSurvey(
     result?: string;
     result_positions?: string;
     reward?: number;
+    reward_operator?: number;
   }[],
 ): Promise<any> {
   try {
@@ -361,12 +272,14 @@ export async function userCompletedSurvey(
         throw new Error("Survey active delete failed");
       }
       let reward = 0;
+      let reward_operator = 0;
       for (const item of result) {
         if (
           item.isCompleted &&
           item.result !== undefined &&
           item.result_positions !== undefined &&
-          item.reward !== undefined
+          item.reward !== undefined &&
+          item.reward_operator !== undefined
         ) {
           const completedTaskId = await addSurveyCompletion(
             {
@@ -377,6 +290,7 @@ export async function userCompletedSurvey(
               result_main: item.result,
               result_positions: item.result_positions,
               reward: item.reward,
+              reward_operator: item.reward_operator,
             },
             trx,
           );
@@ -384,6 +298,7 @@ export async function userCompletedSurvey(
             throw new Error("Survey Completion add failed");
           }
           reward += Number(item.reward);
+          reward_operator += Number(item.reward_operator);
         }
       }
 
@@ -396,7 +311,14 @@ export async function userCompletedSurvey(
         },
         trx,
       );
-      if (!isBalanceUpdate) {
+      const isBalanceOperatorUpdate = await updateOperatorByOperatorId(
+        operator_id,
+        {
+          add_balance: reward_operator,
+        },
+        trx,
+      );
+      if (!isBalanceUpdate || !isBalanceOperatorUpdate) {
         throw new Error("UpdateBalance filed");
       }
 

@@ -28,15 +28,30 @@ export async function executePendingPayments(): Promise<void> {
 
         if (payment.attempts >= 3) {
           //0 1 2 3
-          logger.info(
-            `Оператору: Все попытки отправки платежа для пользователя ${payment.user_id} исчерпаны.`,
-          );
+          if (payment.user_id) {
+            logger.info(
+              `Оператору: Все попытки отправки платежа для пользователя ${payment.user_id} исчерпаны.`,
+            );
+          } else {
+            logger.info(
+              `Оператору: Все попытки отправки платежа для оператора ${payment.operator_id} исчерпаны.`,
+            );
+          }
+
           continue;
         }
         if (!pass) {
-          await updateAttemptPendingPayment(payment.user_id, {
-            attempts: payment.attempts + 1,
-          });
+          if (payment.user_id) {
+            await updateAttemptPendingPayment({
+              userId: payment.user_id,
+              attempts: payment.attempts + 1,
+            });
+          } else if (payment.operator_id) {
+            await updateAttemptPendingPayment({
+              operatorId: payment.operator_id,
+              attempts: payment.attempts + 1,
+            });
+          }
 
           const result = await make_payment(payment.amount, payment.address);
           if (result.isSuccess) {
@@ -44,9 +59,15 @@ export async function executePendingPayments(): Promise<void> {
             if (!res) {
               await upsertCommonVariable("auto_payments_enabled", "OFF");
 
-              throw new Error(
-                `Payment ${payment.user_id} is completed, but not delete from db`,
-              );
+              if (payment.user_id) {
+                throw new Error(
+                  `Payment ${payment.user_id} is completed, but not delete from db`,
+                );
+              } else {
+                throw new Error(
+                  `Payment ${payment.operator_id} is completed, but not delete from db`,
+                );
+              }
             }
           } else {
             switch (result.reason) {
@@ -64,9 +85,15 @@ export async function executePendingPayments(): Promise<void> {
                 pass = true;
                 await upsertCommonVariable("auto_payments_enabled", "OFF");
 
-                throw new Error(
-                  `Payment ${payment.user_id} is NOT completed, need check`,
-                );
+                if (payment.user_id) {
+                  throw new Error(
+                    `Payment ${payment.user_id} is NOT completed, need check`,
+                  );
+                } else {
+                  throw new Error(
+                    `Payment ${payment.operator_id} is NOT completed, need check`,
+                  );
+                }
               }
             }
           }

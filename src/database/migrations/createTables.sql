@@ -67,10 +67,14 @@ GRANT ALL PRIVILEGES ON TABLE photos TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE photos_photo_id_seq TO admin_vadim;
 
 CREATE SEQUENCE operator_default_id_seq;
+
+
+
 -- Таблица операторов
 CREATE TABLE operators (
     id SERIAL PRIMARY KEY,
     operator_id BIGINT UNIQUE NOT NULL DEFAULT nextval('operator_default_id_seq'),
+    balance DECIMAL(10, 2) DEFAULT 0.0 NOT NULL,  --Баланс, который можно снять
     tg_account VARCHAR(255) NOT NULL,
     phone VARCHAR(15) DEFAULT NULL,
     can_take_multiple_surveys BOOLEAN NOT NULL DEFAULT FALSE,
@@ -221,6 +225,7 @@ CREATE TABLE survey_completions (
     result VARCHAR(255) NOT NULL,
     result_positions_var VARCHAR(255) NOT NULL,
     reward DECIMAL(10, 2) NOT NULL, -- Фактическая награда (может отличаться от tasks.reward, если меняется со временем)
+    reward_operator DECIMAL(10, 2) NOT NULL,
 
     completed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
@@ -236,13 +241,16 @@ GRANT USAGE, SELECT, UPDATE ON SEQUENCE survey_completions_completion_id_seq TO 
 -- Таблица логов снятия средств
 CREATE TABLE withdrawal_logs (
     withdrawal_id SERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL,
+    user_id BIGINT DEFAULT NULL,
+    operator_id BIGINT DEFAULT NULL,
     amount DECIMAL(10, 2) NOT NULL,    -- Сумма снятия
     wallet  VARCHAR(100) NOT NULL,    -- На какой кошелек
 
     withdrawn_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
+    FOREIGN KEY (operator_id) REFERENCES operators(operator_id) ON DELETE NULL
+
 );
 
 GRANT ALL PRIVILEGES ON TABLE withdrawal_logs TO admin_vadim;
@@ -263,16 +271,21 @@ GRANT USAGE, SELECT, UPDATE ON SEQUENCE common_variables_common_vars_id_seq TO a
 
 --Таблица в которой хранится список, который ожидает вывода
 CREATE TABLE pending_payments (
-    user_id BIGINT PRIMARY KEY,
+    pending_payments_id SERIAL PRIMARY KEY,
+    user_id BIGINT DEFAULT NULL,
+    operator_id BIGINT DEFAULT NULL,
     amount DECIMAL(10, 2) NOT NULL,               -- Сумма платежа
     attempts INT DEFAULT 0 NOT NULL,              -- Количество попыток проведения платежа
     address TEXT NOT NULL,                        -- Адрес для платежа
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (operator_id) REFERENCES operators(operator_id) ON DELETE CASCADE
 );
+
 GRANT ALL PRIVILEGES ON TABLE pending_payments TO admin_vadim;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE pending_payments_pending_payments_id_seq TO admin_vadim;
 
 -- Таблица реферальных ссылок
 CREATE TABLE referral_bonuses (

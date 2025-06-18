@@ -21,7 +21,17 @@ export const handleRestartFailedPayments = async (ctx: MyContext) => {
     }
 
     for (const el of failedPendingPayment) {
-      await updateAttemptPendingPayment(el.user_id, { attempts: 0 });
+      if (el.user_id) {
+        await updateAttemptPendingPayment({
+          userId: el.user_id,
+          attempts: 0,
+        });
+      } else if (el.operator_id) {
+        await updateAttemptPendingPayment({
+          operatorId: el.operator_id,
+          attempts: 0,
+        });
+      }
     }
     await ctx.reply(HANDLER_RESTART_FAILED_PAYMENT.SUCCESS, {
       parse_mode: "HTML",

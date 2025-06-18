@@ -47,6 +47,7 @@ export interface PhotosEntity {
 export interface OperatorsEntity {
   id: Generated<number>;
   operator_id: Generated<number>;
+  balance: Generated<number>; // Текущий баланс
   tg_account: string;
   phone: Generated<string | null>;
   can_take_multiple_surveys: Generated<boolean>;
@@ -144,13 +145,15 @@ export interface SurveyCompletionsEntity {
   result: string;
   result_positions_var: string;
   reward: number;
+  reward_operator: number;
 
   completed_at: Generated<string>; // Дата и время в ISO формате
 }
 
 export interface WithdrawalLogsEntity {
   withdrawal_id: Generated<number>;
-  user_id: number;
+  user_id: Generated<number | null>; // Идентификатор оператора (связан с operators)
+  operator_id: Generated<number | null>; // Идентификатор пользователя (связан с users)
   amount: number;
   wallet: string;
 
@@ -166,7 +169,9 @@ export interface CommonVariablesEntity {
 }
 
 export interface PendingPaymentsEntity {
-  user_id: number; // Идентификатор пользователя (связан с users)
+  pending_payments_id: Generated<number>;
+  user_id: Generated<number | null>; // Идентификатор оператора (связан с operators)
+  operator_id: Generated<number | null>; // Идентификатор пользователя (связан с users)
   amount: number; // Сумма платежа
   attempts: Generated<number>; // Количество попыток проведения платежа
   address: string; // Адрес для платежа

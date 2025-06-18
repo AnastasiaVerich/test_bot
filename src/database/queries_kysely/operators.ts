@@ -1,3 +1,4 @@
+import { sql } from "kysely";
 import { pool, poolType } from "../dbClient";
 import { OperatorsType } from "../db-types";
 
@@ -92,6 +93,53 @@ export async function updateOperatorByTgAccount(
   }
 }
 
+export async function updateOperatorByOperatorId(
+  operator_id: OperatorsType["operator_id"],
+  params: {
+    phone?: OperatorsType["phone"];
+    can_take_multiple_surveys?: OperatorsType["can_take_multiple_surveys"];
+    add_balance?: OperatorsType["balance"];
+  },
+  trx: poolType = pool,
+): Promise<OperatorsType["operator_id"] | null> {
+  try {
+    const { phone, can_take_multiple_surveys, add_balance } = params;
+
+    if (
+      phone === undefined &&
+      add_balance === undefined &&
+      can_take_multiple_surveys === undefined
+    ) {
+      throw new Error(
+        `At least one ( ${Object.keys(params).join(", ")} ) must be provided.`,
+      );
+    }
+
+    const set: Partial<OperatorsType> = {};
+
+    if (phone !== undefined) {
+      set.phone = phone;
+    }
+    if (can_take_multiple_surveys !== undefined) {
+      set.can_take_multiple_surveys = can_take_multiple_surveys;
+    }
+
+    if (add_balance !== undefined) {
+      set.balance = sql<number>`balance + ${add_balance}` as unknown as number;
+    }
+
+    const result = await trx
+      .updateTable("operators")
+      .set(set)
+      .where("operator_id", "=", operator_id)
+      .returning("operator_id")
+      .executeTakeFirst();
+    return result?.operator_id ?? null;
+  } catch (error) {
+    throw new Error("Error updateOperatorByTgAccount: " + error);
+  }
+}
+
 export async function addOperator(
   tg_account: OperatorsType["tg_account"],
   trx: poolType = pool,
@@ -108,5 +156,22 @@ export async function addOperator(
     return result?.operator_id ?? null;
   } catch (error) {
     throw new Error("Error addOperator: " + error);
+  }
+}
+
+export async function getOperatorBalance(
+  operatorId: OperatorsType["operator_id"] | string,
+  trx: poolType = pool,
+): Promise<number | null> {
+  try {
+    const result = await trx
+      .selectFrom("operators")
+      .select("balance")
+      .where("operator_id", "=", Number(operatorId))
+      .executeTakeFirst();
+
+    return result?.balance ?? null;
+  } catch (error) {
+    throw new Error("Error getOperatorBalance: " + error);
   }
 }

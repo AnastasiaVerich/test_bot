@@ -35,6 +35,7 @@ export async function finishSurveyScene(
       survey_task_id: number;
       isCompleted: boolean;
       reward?: number;
+      reward_operator?: number;
       result?: string;
       result_positions?: string;
     }[] = await conversation.external(() => []);
@@ -90,6 +91,7 @@ export async function finishSurveyScene(
           isCompleted: true,
           survey_task_id: survey_task.survey_task_id,
           reward: surveyData.task_price,
+          reward_operator: surveyData.task_price / 2,
         };
 
         const result_position = await countResultStep(conversation, ctx);
