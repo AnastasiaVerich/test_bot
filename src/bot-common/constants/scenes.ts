@@ -141,6 +141,10 @@ export const SURVEY_USER_SCENE = {
 
   ENTER_LOCATION_OTHERWISE: `Пожалуйста, отправьте геолокации, нажав на кнопку '${BUTTONS_KEYBOARD.GeolocationButton}'.`,
 
+  ENTER_LOCATION_APP: `Отправьте геолокации, нажав на кнопку '${BUTTONS_KEYBOARD.GeolocationButton}'`,
+
+  ENTER_LOCATION_APP_OTHERWISE: `Пожалуйста, отправьте геолокации, нажав на кнопку '${BUTTONS_KEYBOARD.GeolocationButton}'.`,
+
   ENTERED_NOT_USER_LOCATION:
     "Пожалуйста, отправьте свою собственную текущую локацию.",
 

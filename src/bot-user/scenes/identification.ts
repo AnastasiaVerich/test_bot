@@ -7,7 +7,7 @@ import {
 } from "../../bot-common/keyboards/inlineKeyboard";
 import {
   AuthUserKeyboard,
-  WebAppKeyboard,
+  WebAppKeyboardPhoto,
 } from "../../bot-common/keyboards/keyboard";
 import { IDENTIFICATION_USER_SCENE } from "../../bot-common/constants/scenes";
 import {
@@ -68,7 +68,7 @@ export async function photoStep(
     let result = null;
 
     await ctx.reply(IDENTIFICATION_USER_SCENE.VERIFY_BY_PHOTO, {
-      reply_markup: WebAppKeyboard(userId, "", "identification", "1"),
+      reply_markup: WebAppKeyboardPhoto(userId, "", "identification", "1"),
     });
 
     const message_web_app_data = await conversation.waitFor(
@@ -76,7 +76,12 @@ export async function photoStep(
       {
         otherwise: (ctx) =>
           ctx.reply(IDENTIFICATION_USER_SCENE.VERIFY_BY_PHOTO_OTHERWISE, {
-            reply_markup: WebAppKeyboard(userId, "", "identification", "1"),
+            reply_markup: WebAppKeyboardPhoto(
+              userId,
+              "",
+              "identification",
+              "1",
+            ),
           }),
       },
     );

@@ -9,7 +9,7 @@ import {
 import {
   AuthUserKeyboard,
   sendUserPhone,
-  WebAppKeyboard,
+  WebAppKeyboardPhoto,
 } from "../../bot-common/keyboards/keyboard";
 import { REGISTRATION_USER_SCENE } from "../../bot-common/constants/scenes";
 import {
@@ -248,7 +248,12 @@ async function photoStep(
       }
     } else {
       await ctx.reply(REGISTRATION_USER_SCENE.VERIFY_BY_PHOTO, {
-        reply_markup: WebAppKeyboard(userId, userPhone, "registration", "1"),
+        reply_markup: WebAppKeyboardPhoto(
+          userId,
+          userPhone,
+          "registration",
+          "1",
+        ),
       });
 
       const message_web_app_data = await conversation.waitFor(
@@ -256,7 +261,7 @@ async function photoStep(
         {
           otherwise: (ctx) =>
             ctx.reply(REGISTRATION_USER_SCENE.VERIFY_BY_PHOTO_OTHERWISE, {
-              reply_markup: WebAppKeyboard(
+              reply_markup: WebAppKeyboardPhoto(
                 userId,
                 userPhone,
                 "registration",

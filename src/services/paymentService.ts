@@ -60,16 +60,14 @@ export async function executePendingPayments(): Promise<void> {
                   pass = true;
                 }
                 break;
-              case "not confirmed":
-                {
-                  pass = true;
-                  await upsertCommonVariable("auto_payments_enabled", "OFF");
+              case "not confirmed": {
+                pass = true;
+                await upsertCommonVariable("auto_payments_enabled", "OFF");
 
-                  throw new Error(
-                    `Payment ${payment.user_id} is NOT completed, need check`,
-                  );
-                }
-                break;
+                throw new Error(
+                  `Payment ${payment.user_id} is NOT completed, need check`,
+                );
+              }
             }
           }
         }

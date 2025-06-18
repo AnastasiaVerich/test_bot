@@ -16,7 +16,14 @@ export const cancelOperatorConversation = async (
     for (const activeScene of activeScenes) {
       await ctx.conversation.exit(ScenesOperator[activeScene]);
     }
-    if (skipReply) return;
+    if (skipReply) {
+      return ctx.reply("⏳...", {
+        reply_markup: {
+          remove_keyboard: true, // Удаляет reply-клавиатуру
+          inline_keyboard: [], // Удаляет inline-клавиатуру
+        },
+      });
+    }
     if (activeScenes.length > 0) {
       await ctx.reply("Отменено.", {
         reply_markup: AuthOperatorKeyboard(),

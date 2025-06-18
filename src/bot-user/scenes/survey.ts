@@ -8,6 +8,7 @@ import { formatTimestamp } from "../../lib/date";
 import {
   AuthUserKeyboard,
   sendLocation,
+  WebAppKeyboardGeolocation,
 } from "../../bot-common/keyboards/keyboard";
 import { SURVEY_USER_SCENE } from "../../bot-common/constants/scenes";
 import {
@@ -108,7 +109,8 @@ export async function surveyScene(
     }
 
     // Шаг 2: Ожидаем локацию
-    const location = await stepLocation(conversation, ctx);
+    //const location = await stepLocation(conversation, ctx);
+    const location = await stepLocationApp(conversation, ctx, userId);
     await conversation.external(() =>
       addUserLogs({
         user_id: userId,
@@ -283,6 +285,47 @@ async function stepLocation(
     return response;
   } catch (error) {
     logger.error("Error in surveyScene stepLocation: ", error);
+    return null;
+  }
+}
+
+async function stepLocationApp(
+  conversation: Conversation<MyContext, MyConversationContext>,
+  ctx: MyConversationContext,
+  userId: number,
+): Promise<null | GeocodeResponse> {
+  try {
+    let response: GeocodeResponse | null = null;
+    await ctx.reply(SURVEY_USER_SCENE.ENTER_LOCATION_APP, {
+      reply_markup: WebAppKeyboardGeolocation(userId),
+    });
+
+    const message_web_app_data = await conversation.waitFor(
+      "message:web_app_data",
+      {
+        otherwise: (ctx) =>
+          ctx.reply(SURVEY_USER_SCENE.ENTER_LOCATION_APP_OTHERWISE, {
+            reply_markup: WebAppKeyboardGeolocation(userId),
+          }),
+      },
+    );
+
+    if (message_web_app_data.message?.web_app_data) {
+      const data = await JSON.parse(
+        message_web_app_data.message.web_app_data.data,
+      );
+      if (data) {
+        response = await reverseGeocode(data?.latitude, data?.longitude);
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+
+    return response;
+  } catch (error) {
+    logger.error("Error in surveyScene stepLocationApp: ", error);
     return null;
   }
 }

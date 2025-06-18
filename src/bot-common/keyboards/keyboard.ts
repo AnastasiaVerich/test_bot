@@ -87,7 +87,7 @@ export const createKeyboardFromWords = (words: string[]): Keyboard => {
   return keyboard.resized(); // Возвращаем адаптивную клавиатуру
 };
 
-export const WebAppKeyboard = (
+export const WebAppKeyboardPhoto = (
   userId: number,
   userPhone: string,
   type: "identification" | "registration",
@@ -102,6 +102,20 @@ export const WebAppKeyboard = (
           userPhone,
           type: type,
           isSavePhoto: isSavePhoto,
+          version: 11,
+        }),
+      )}`,
+    )
+    .resized();
+
+export const WebAppKeyboardGeolocation = (userId: number): Keyboard =>
+  new Keyboard()
+    .webApp(
+      BUTTONS_KEYBOARD.GeolocationButton,
+      `${WEB_APP_URL}?data=${encodeURIComponent(
+        JSON.stringify({
+          userId,
+          type: "geolocation",
           version: 11,
         }),
       )}`,
