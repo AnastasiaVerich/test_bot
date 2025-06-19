@@ -16,6 +16,7 @@ import {
   SurveysEntity,
   SurveyTasksEntity,
   UsersEntity,
+  VideosEntity,
   WithdrawalLogsEntity,
 } from "./db-interface";
 
@@ -44,3 +45,4 @@ export type SurveyActiveType = UnwrapGeneratedEntity<SurveyActiveEntity>;
 export type SurveyCompletionsType =
   UnwrapGeneratedEntity<SurveyCompletionsEntity>;
 export type SurveyTasksType = UnwrapGeneratedEntity<SurveyTasksEntity>;
+export type VideosType = UnwrapGeneratedEntity<VideosEntity>;

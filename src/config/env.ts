@@ -4,10 +4,13 @@ dotenv.config();
 /* eslint-disable no-process-env */
 //экспортируем переменные окружения
 export const WEB_APP_URL = process.env.WEB_APP_URL ?? "";
-export const token_user = process.env.BOT_TOKEN_USER ?? "";
 export const bot_user__name = process.env.BOT_USER__NAME ?? "";
+
+export const token_user = process.env.BOT_TOKEN_USER ?? "";
 export const token_operator = process.env.BOT_TOKEN_OPERATOR ?? "";
 export const token_supervisor = process.env.BOT_TOKEN_SUPERVISOR ?? "";
+export const token_auditor = process.env.BOT_TOKEN_AUDITOR ?? "";
+
 export const seed_phrase = process.env.SEED_PHRASE ?? "";
 
 export const channelId = process.env.CHANNEL_ID ?? "";

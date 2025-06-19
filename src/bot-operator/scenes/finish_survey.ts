@@ -23,6 +23,8 @@ import {
   userCompletedSurvey,
 } from "../../database/services/surveyService";
 import { SurveyTasksType } from "../../database/db-types";
+import { token_auditor } from "../../config/env";
+import { addVideo } from "../../database/queries_kysely/videos";
 
 export async function finishSurveyScene(
   conversation: MyConversation,
@@ -304,6 +306,71 @@ async function countResultPositionVarStep(
     return [result_1, result_2, result_3];
   } catch (error) {
     return null;
+  }
+}
+
+// Новая функция для шага загрузки видео
+async function uploadVideoStep(
+  conversation: MyConversation,
+  ctx: MyConversationContext,
+  surveyActiveId: number,
+) {
+  try {
+    await ctx.reply(
+      "Пожалуйста, отправьте видео, подтверждающее выполнение опроса.",
+      {
+        parse_mode: "HTML",
+      },
+    );
+
+    let videoSaved = false;
+    while (true) {
+      const response = await conversation.waitFor("message:video", {
+        otherwise: (ctx) =>
+          ctx.reply(
+            "Ожидается видео. Пожалуйста, отправьте видео или пропустите этот шаг, отправив 'Пропустить'.",
+            { parse_mode: "HTML" },
+          ),
+      });
+
+      // Проверка на команду пропуска
+      if (response.message?.text?.trim() === "Пропустить") {
+        break;
+      }
+
+      const video = response.message?.video;
+      if (!video) {
+        continue;
+      }
+
+      const fileId = video.file_id;
+      const mimeType = video.mime_type ?? null;
+      const fileName =
+        video.file_name || `survey_${surveyActiveId}_${Date.now()}.mp4`;
+
+      // Получение file_path и загрузка видео
+      const file = await ctx.api.getFile(fileId);
+      const fileUrl = `https://api.telegram.org/file/bot${token_auditor}/${file.file_path}`;
+
+      // Загрузка видеофайла (опционально, если нужен video_data)
+      let videoData: Buffer | null = null;
+      // Замените на false, если не хотите хранить video_data
+      const response2 = await fetch(fileUrl);
+      const arrayBuffer = await response2.arrayBuffer();
+      videoData = Buffer.from(arrayBuffer);
+
+      // Сохранение в базу данных
+      await addVideo(fileId, videoData, fileName, mimeType);
+
+      await ctx.reply(`Видео успешно сохранено для опроса #${surveyActiveId}.`);
+      videoSaved = true;
+      break;
+    }
+
+    return videoSaved;
+  } catch (error) {
+    logger.error("Ошибка при загрузке видео: " + error);
+    return false;
   }
 }
 

@@ -189,6 +189,16 @@ export interface ReferralBonusesEntity {
   completed_at: Generated<string>;
 }
 
+export interface VideosEntity {
+  video_id: Generated<number>;
+  file_id: string;
+  video_data: Buffer;
+  file_name: string | null;
+  mime_type: string | null;
+
+  created_at: Generated<string>; // Дата и время в ISO формате
+}
+
 export interface Database {
   blacklist_users: BlacklistUsersEntity;
   users: UsersEntity;
@@ -208,4 +218,5 @@ export interface Database {
   supervisor: SupervisorEntity;
   advertising_campaigns: AdvertisingCampaignsEntity;
   bot_user_logs: BotUserLogsEntity;
+  videos: VideosEntity;
 }

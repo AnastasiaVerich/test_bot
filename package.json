@@ -7,6 +7,7 @@
     "start:bot-user": "ts-node src/bot-user/index.ts",
     "start:bot-operator": "ts-node src/bot-operator/index.ts",
     "start:bot-supervisor": "ts-node src/bot_supervisor/index.ts",
+    "start:bot-auditor": "ts-node src/bot-auditor/index.ts",
     "start:server": "ts-node src/server/index.ts",
     "start:scheduler": "ts-node src/jobs/index.ts",
     "lint": "eslint .",

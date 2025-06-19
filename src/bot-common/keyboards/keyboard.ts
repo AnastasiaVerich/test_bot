@@ -61,6 +61,9 @@ export const AuthOperatorKeyboard = (): Keyboard =>
     .text(BUTTONS_KEYBOARD.BalanceButton)
     .resized();
 
+export const AuthAuditorKeyboard = (): Keyboard =>
+  new Keyboard().text("Meaw").resized();
+
 export const AuthSupervisorKeyboard = (): Keyboard =>
   new Keyboard()
     .text(BUTTONS_KEYBOARD.GetUsersLogs)
@@ -104,7 +107,7 @@ export const WebAppKeyboardPhoto = (
           userPhone,
           type: type,
           isSavePhoto: isSavePhoto,
-          version: 11,
+          version: 12,
         }),
       )}`,
     )

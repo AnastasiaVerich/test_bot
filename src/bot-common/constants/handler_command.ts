@@ -14,6 +14,10 @@ export const COMMAND_OPERATOR_START = {
   SOME_ERROR: "Бот временно недоступен!",
 };
 
+export const COMMAND_AUDITOR_START = {
+  SOME_ERROR: "Бот временно недоступен!",
+};
+
 export const COMMAND_SUPERVISOR_START = {
   WELCOME_NEW_SUPERVISOR:
     "Добро пожаловать в <b>Green apple!</b>  \n" +

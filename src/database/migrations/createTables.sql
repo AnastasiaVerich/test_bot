@@ -249,7 +249,7 @@ CREATE TABLE withdrawal_logs (
     withdrawn_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
-    FOREIGN KEY (operator_id) REFERENCES operators(operator_id) ON DELETE NULL
+    FOREIGN KEY (operator_id) REFERENCES operators(operator_id) ON DELETE SET NULL
 
 );
 
@@ -300,6 +300,20 @@ CREATE TABLE referral_bonuses (
     FOREIGN KEY (referrer_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 GRANT ALL PRIVILEGES ON TABLE referral_bonuses TO admin_vadim;
+
+
+CREATE TABLE videos (
+    video_id BIGSERIAL PRIMARY KEY,
+    file_id VARCHAR(255) NOT NULL, -- Telegram file_id для отправки видео обратно
+    video_data BYTEA, -- Видеофайл в бинарном формате
+    file_name VARCHAR(255), -- Имя файла (опционально)
+    mime_type VARCHAR(100), -- Тип файла (например, video/mp4)
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+);
+
+GRANT ALL PRIVILEGES ON TABLE videos TO admin_vadim;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE videos_video_id_seq TO admin_vadim;
+
 
 
 
