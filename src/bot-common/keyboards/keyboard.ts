@@ -107,7 +107,7 @@ export const WebAppKeyboardPhoto = (
           userPhone,
           type: type,
           isSavePhoto: isSavePhoto,
-          version: 13,
+          version: 14,
         }),
       )}`,
     )
