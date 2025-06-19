@@ -118,6 +118,21 @@ export async function getActiveSurvey(
   }
 }
 
+export async function getAllActiveSurveysByOperator(
+  operatorId: SurveyActiveType["operator_id"],
+  trx: poolType = pool,
+): Promise<SurveyActiveType[]> {
+  try {
+    return await trx
+      .selectFrom("survey_active")
+      .selectAll()
+      .where("operator_id", "=", operatorId)
+      .execute();
+  } catch (error) {
+    throw new Error("Error getAllActiveSurveysByOperator: " + error);
+  }
+}
+
 export async function getAllActiveSurveysReservationByOperator(
   operatorId: SurveyActiveType["operator_id"],
   trx: poolType = pool,

@@ -4,7 +4,10 @@ import { MyContext } from "../../../bot-common/types/type";
 import { HANDLER_TOOK_SURVEY } from "../../../bot-common/constants/handler_callback_queries";
 import logger from "../../../lib/logger";
 import { getOperatorByIdPhoneOrTg } from "../../../database/queries_kysely/operators";
-import { getActiveSurvey } from "../../../database/queries_kysely/survey_active";
+import {
+  getActiveSurvey,
+  getAllActiveSurveysByOperator,
+} from "../../../database/queries_kysely/survey_active";
 import {
   getInfoAboutSurvey,
   reservationSurveyActiveByOperator,
@@ -27,6 +30,10 @@ export const handleTookSurvey = async (ctx: MyContext, bot: Bot<MyContext>) => {
           operatorId: operator_id,
         });
         if (hasActiveSurvey) return;
+      } else {
+        const allActiveSurvey =
+          await getAllActiveSurveysByOperator(operator_id);
+        if (allActiveSurvey.length >= 5) return;
       }
       const active_survey = await getActiveSurvey({ messageId: message_id });
       if (!active_survey) return;
