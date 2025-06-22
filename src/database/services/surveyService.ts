@@ -27,6 +27,7 @@ import {
   updateReferralByReferredUserId,
 } from "../queries_kysely/referral_bonuses";
 import { updateOperatorByOperatorId } from "../queries_kysely/operators";
+import { addAuditSurveyActive } from "../queries_kysely/audit_survey_active";
 
 export async function reservationSurveyActiveByOperator(params: {
   operatorId: SurveyActiveType["operator_id"];
@@ -249,6 +250,7 @@ export async function userCompletedSurvey(
     survey_id: number;
     operator_id: number;
     survey_interval: string;
+    videoId: number | null;
   },
   result: {
     survey_task_id: number;
@@ -260,8 +262,14 @@ export async function userCompletedSurvey(
   }[],
 ): Promise<any> {
   try {
-    const { surveyActiveId, user_id, survey_id, operator_id, survey_interval } =
-      params;
+    const {
+      surveyActiveId,
+      user_id,
+      survey_id,
+      operator_id,
+      survey_interval,
+      videoId,
+    } = params;
 
     return await pool.transaction().execute(async (trx) => {
       const isDeleteActiveSurveyId = await deleteActiveSurvey(
@@ -270,6 +278,18 @@ export async function userCompletedSurvey(
       );
       if (!isDeleteActiveSurveyId) {
         throw new Error("Survey active delete failed");
+      }
+      const addAuditSurveyActiveId = await addAuditSurveyActive(
+        {
+          survey_active_id: surveyActiveId,
+          survey_id: survey_id,
+          auditor_id: null,
+          video_id: videoId,
+        },
+        trx,
+      );
+      if (!addAuditSurveyActiveId) {
+        throw new Error("Audit survey active delete failed");
       }
       let reward = 0;
       let reward_operator = 0;
@@ -291,6 +311,8 @@ export async function userCompletedSurvey(
               result_positions: item.result_positions,
               reward: item.reward,
               reward_operator: item.reward_operator,
+              video_id: videoId,
+              survey_active_id: surveyActiveId,
             },
             trx,
           );

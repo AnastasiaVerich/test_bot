@@ -22,6 +22,9 @@ export const YesNoButtons = (): Keyboard =>
     .resized()
     .oneTime();
 
+export const SkipButtonKeyboard = (): Keyboard =>
+  new Keyboard().text(BUTTONS_KEYBOARD.SkipButton).resized().oneTime();
+
 export const OnButtons = (): Keyboard =>
   new Keyboard()
     .text(BUTTONS_KEYBOARD.OnButton)
@@ -62,7 +65,7 @@ export const AuthOperatorKeyboard = (): Keyboard =>
     .resized();
 
 export const AuthAuditorKeyboard = (): Keyboard =>
-  new Keyboard().text("Meaw").resized();
+  new Keyboard().text(BUTTONS_KEYBOARD.CheckSurveyByAuditor).resized();
 
 export const AuthSupervisorKeyboard = (): Keyboard =>
   new Keyboard()

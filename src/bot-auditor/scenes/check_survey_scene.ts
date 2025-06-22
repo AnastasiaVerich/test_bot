@@ -1,38 +1,27 @@
 import { Conversation } from "@grammyjs/conversations";
 import logger from "../../lib/logger";
 import { getUserId } from "../../bot-common/utils/getUserId";
-import { BUTTONS_KEYBOARD } from "../../bot-common/constants/buttons";
-import { FinishSurveyKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
 import {
-  AuthOperatorKeyboard,
+  AuthAuditorKeyboard,
   ConfirmCancelButtons,
   createKeyboardFromWords,
-  SkipButtonKeyboard,
   YesNoButtons,
 } from "../../bot-common/keyboards/keyboard";
-import { FINISH_SURVEY_OPERATOR_SCENE } from "../../bot-common/constants/scenes";
+import { CHECK_SURVEY_AUDITOR_SCENE } from "../../bot-common/constants/scenes";
 import {
   MyContext,
   MyConversation,
   MyConversationContext,
 } from "../../bot-common/types/type";
-import { getOperatorByIdPhoneOrTg } from "../../database/queries_kysely/operators";
-import { getActiveSurvey } from "../../database/queries_kysely/survey_active";
-import { getAllSurveyTasks } from "../../database/queries_kysely/survey_tasks";
-import {
-  getInfoAboutSurvey,
-  userCompletedSurvey,
-} from "../../database/services/surveyService";
-import { SurveyTasksType } from "../../database/db-types";
-import { token_operator } from "../../config/env";
 import { addVideo } from "../../database/queries_kysely/videos";
+import { SurveyTasksType } from "../../database/db-types";
+import { BUTTONS_KEYBOARD } from "../../bot-common/constants/buttons";
+import { token_operator } from "../../config/env";
 
-export async function finishSurveyScene(
+export async function checkSurveyScene(
   conversation: MyConversation,
   ctx: MyConversationContext,
-  arg: { state: { surveyActiveId: number } },
 ) {
-  let surveyActiveId = arg.state.surveyActiveId;
   try {
     const result: {
       survey_task_id: number;
@@ -43,125 +32,93 @@ export async function finishSurveyScene(
       result_positions?: string;
     }[] = await conversation.external(() => []);
 
-    const operator_id = await conversation.external(() => getUserId(ctx));
-    if (!operator_id) return;
+    const auditor_id = await conversation.external(() => getUserId(ctx));
+    if (!auditor_id) return;
 
-    const operator = await getOperatorByIdPhoneOrTg({
-      operator_id: operator_id,
-    });
-    if (!operator) {
-      return;
-      //что-то придумать.
-    }
-
-    const surveyActive = await getActiveSurvey({
-      surveyActiveId: surveyActiveId,
-    });
-    if (!surveyActive) {
-      return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SURVEY_ACTIVE_NOT_FOUND, {
-        reply_markup: { remove_keyboard: true },
-      });
-    }
-
-    const surveyData = await getInfoAboutSurvey(surveyActive.survey_id);
-    if (!surveyData) {
-      return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SURVEY_ACTIVE_NOT_FOUND, {
-        reply_markup: { remove_keyboard: true },
-      });
-    }
-    const survey_tasks = await conversation.external(() =>
-      getAllSurveyTasks(surveyActive.survey_id),
-    );
-
-    //скиньте видео
-    //сколько выполнил заданий
-    //подтвердить
-    for (const survey_task of survey_tasks) {
-      const index = survey_tasks.indexOf(survey_task);
-      const isCompleted = await completedOrNotStep(
-        conversation,
-        ctx,
-        survey_task,
-      );
-      if (isCompleted === null) {
-        await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-          reply_markup: FinishSurveyKeyboard(surveyActiveId),
-        });
-        continue;
-      }
-      if (isCompleted === BUTTONS_KEYBOARD.YesButton) {
-        result[index] = {
-          isCompleted: true,
-          survey_task_id: survey_task.survey_task_id,
-          reward: surveyData.task_price,
-          reward_operator: surveyData.task_price / 2,
-        };
-
-        const result_position = await countResultStep(conversation, ctx);
-        if (!result_position) {
-          await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-            reply_markup: FinishSurveyKeyboard(surveyActiveId),
-          });
-          continue;
-        }
-        result[index].result = result_position;
-
-        const result_positions = await countResultPositionVarStep(
-          conversation,
-          ctx,
-          survey_task.data,
-        );
-        if (!result_positions) {
-          await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-            reply_markup: FinishSurveyKeyboard(surveyActiveId),
-          });
-          continue;
-        }
-        result[index].result_positions = result_positions.join(", ");
-      } else {
-        result[index] = {
-          isCompleted: false,
-          survey_task_id: survey_task.survey_task_id,
-        };
-      }
-    }
-
-    const videoId = await uploadVideoStep(conversation, ctx, surveyActiveId);
-
-    const resultConfirm = await stepConfirm(conversation, ctx);
-
-    if (!resultConfirm) {
-      await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-        reply_markup: FinishSurveyKeyboard(surveyActiveId),
-      });
-      return;
-    }
-
-    if (resultConfirm === BUTTONS_KEYBOARD.ConfirmButton) {
-      await userCompletedSurvey(
-        {
-          surveyActiveId: surveyActive.survey_active_id,
-          user_id: surveyActive.user_id,
-          survey_id: surveyActive.survey_id,
-          operator_id: operator_id,
-          survey_interval: surveyData.survey_interval,
-          videoId: videoId,
-        },
-        result,
-      );
-
-      return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SUCCESS, {
-        reply_markup: AuthOperatorKeyboard(),
-      });
-    } else {
-      return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.CANCELLED, {
-        reply_markup: AuthOperatorKeyboard(),
-      });
-    }
+    // const surveys = await getSurveysCompletionsByAuditorRequired(true);
+    // if (surveys.length === 0) {
+    //   return ctx.reply("Нет опросов для проверки");
+    //   //что-то придумать.
+    // }
+    // const currentSurvey = surveys[0];
+    // const video = await getVideoByVideoId(currentSurvey.video_id);
+    // if (!video || !video.video_data || !video.file_name) {
+    //   return ctx.reply("Видео для этого опроса не найдено.");
+    // }
+    //
+    // const fileName = `survey.mp4`;
+    // const inputFile = new InputFile(video.video_data, fileName);
+    // await ctx.reply("Ожидайте, видео отправляется ...");
+    // const videoReply = await ctx.replyWithVideo(inputFile, {
+    //   caption: `Видео для опроса`,
+    // });
+    // if (!videoReply || !videoReply.message_id) {
+    //   return ctx.reply("видео не отправилось");
+    // }
+    //
+    // const surveyData = await getInfoAboutSurvey(currentSurvey.survey_id);
+    // if (!surveyData) {
+    //   return ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.SURVEY_ACTIVE_NOT_FOUND, {
+    //     reply_markup: { remove_keyboard: true },
+    //   });
+    // }
+    // const survey_tasks = await conversation.external(() =>
+    //   getAllSurveyTasks(currentSurvey.survey_id),
+    // );
+    //
+    // for (const survey_task of survey_tasks) {
+    //   const index = survey_tasks.indexOf(survey_task);
+    //   const isCompleted = await completedOrNotStep(
+    //     conversation,
+    //     ctx,
+    //     survey_task,
+    //   );
+    //   if (isCompleted === null) {
+    //     await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
+    //       reply_markup: FinishSurveyKeyboard(surveyActiveId),
+    //     });
+    //     continue;
+    //   }
+    //   if (isCompleted === BUTTONS_KEYBOARD.YesButton) {
+    //     result[index] = {
+    //       isCompleted: true,
+    //       survey_task_id: survey_task.survey_task_id,
+    //       reward: surveyData.task_price,
+    //       reward_operator: surveyData.task_price / 2,
+    //     };
+    //
+    //     const result_position = await countResultStep(conversation, ctx);
+    //     if (!result_position) {
+    //       await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
+    //         reply_markup: FinishSurveyKeyboard(surveyActiveId),
+    //       });
+    //       continue;
+    //     }
+    //     result[index].result = result_position;
+    //
+    //     const result_positions = await countResultPositionVarStep(
+    //       conversation,
+    //       ctx,
+    //       survey_task.data,
+    //     );
+    //     if (!result_positions) {
+    //       await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
+    //         reply_markup: FinishSurveyKeyboard(surveyActiveId),
+    //       });
+    //       continue;
+    //     }
+    //     result[index].result_positions = result_positions.join(", ");
+    //   } else {
+    //     result[index] = {
+    //       isCompleted: false,
+    //       survey_task_id: survey_task.survey_task_id,
+    //     };
+    //   }
+    // }
   } catch (error) {
     logger.error("Error in registrationScene: " + error);
-    await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-      reply_markup: FinishSurveyKeyboard(surveyActiveId),
+    await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.SOME_ERROR, {
+      reply_markup: AuthAuditorKeyboard(),
     });
   }
 }
@@ -173,7 +130,7 @@ async function completedOrNotStep(
 ) {
   try {
     await ctx.reply(
-      FINISH_SURVEY_OPERATOR_SCENE.ENTER_COMPLETED_OR_NOT +
+      CHECK_SURVEY_AUDITOR_SCENE.ENTER_COMPLETED_OR_NOT +
         `\n\n${survey_task.description.replaceAll("/n", "\n")}`,
       {
         parse_mode: "HTML",
@@ -189,7 +146,7 @@ async function completedOrNotStep(
         {
           otherwise: (ctx) =>
             ctx.reply(
-              FINISH_SURVEY_OPERATOR_SCENE.ENTER_COMPLETED_OR_NOT_OTHERWISE,
+              CHECK_SURVEY_AUDITOR_SCENE.ENTER_COMPLETED_OR_NOT_OTHERWISE,
               {
                 parse_mode: "HTML",
                 reply_markup: YesNoButtons(),
@@ -216,22 +173,20 @@ async function countResultStep(
   ctx: MyConversationContext,
 ) {
   try {
-    await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT);
+    await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_RESULT);
 
     let result_position: any = null;
     //Два выхода из цикла — контакт юзера получен либо произошла ошибка(скорее всего на стороне тг)
     while (true) {
       const response = await conversation.waitFor("message:text", {
         otherwise: (ctx) =>
-          ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT_OTHERWISE),
+          ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_RESULT_OTHERWISE),
       });
       const userInput = response.message?.text.trim() ?? "";
       const number = Number(userInput); // Преобразуем в целое число
 
       if (isNaN(number)) {
-        await ctx.reply(
-          FINISH_SURVEY_OPERATOR_SCENE.ENTERED_NOT_CORRECT_RESULT,
-        );
+        await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTERED_NOT_CORRECT_RESULT);
         continue;
       }
       result_position = number;
@@ -251,7 +206,7 @@ async function countResultPositionVarStep(
   try {
     const { positions_var } = data;
 
-    await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT_POS_VAR_1, {
+    await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_RESULT_POS_VAR_1, {
       reply_markup: createKeyboardFromWords(positions_var),
     });
 
@@ -260,7 +215,7 @@ async function countResultPositionVarStep(
     while (true) {
       const response = await conversation.waitFor("message:text", {
         otherwise: (ctx) =>
-          ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RES_POS_OTHERWISE, {
+          ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_RES_POS_OTHERWISE, {
             reply_markup: createKeyboardFromWords(positions_var),
           }),
       });
@@ -269,7 +224,7 @@ async function countResultPositionVarStep(
       result_1 = userInput;
       break;
     }
-    await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT_POS_VAR_2, {
+    await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_RESULT_POS_VAR_2, {
       reply_markup: createKeyboardFromWords(positions_var),
     });
 
@@ -278,7 +233,7 @@ async function countResultPositionVarStep(
     while (true) {
       const response = await conversation.waitFor("message:text", {
         otherwise: (ctx) =>
-          ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RES_POS_OTHERWISE, {
+          ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_RES_POS_OTHERWISE, {
             reply_markup: createKeyboardFromWords(positions_var),
           }),
       });
@@ -287,7 +242,7 @@ async function countResultPositionVarStep(
       result_2 = userInput;
       break;
     }
-    await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT_POS_VAR_3, {
+    await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_RESULT_POS_VAR_3, {
       reply_markup: createKeyboardFromWords(positions_var),
     });
 
@@ -296,7 +251,7 @@ async function countResultPositionVarStep(
     while (true) {
       const response = await conversation.waitFor("message:text", {
         otherwise: (ctx) =>
-          ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RES_POS_OTHERWISE, {
+          ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_RES_POS_OTHERWISE, {
             reply_markup: createKeyboardFromWords(positions_var),
           }),
       });
@@ -319,38 +274,18 @@ async function uploadVideoStep(
   surveyActiveId: number,
 ): Promise<number | null> {
   try {
-    await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_VIDEO, {
+    await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_VIDEO, {
       parse_mode: "HTML",
-      reply_markup: SkipButtonKeyboard(),
     });
 
     let video_id: number | null = null;
     while (true) {
-      console.log(0);
-      const response = await conversation.waitFor(
-        ["message:video", "message:text"],
-        {
-          otherwise: (ctx) =>
-            ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_VIDEO_OTHERWISE, {
-              parse_mode: "HTML",
-              reply_markup: SkipButtonKeyboard(),
-            }),
-        },
-      );
-
-      console.log(111);
-      // Проверяем, является ли сообщение текстом
-      if (response.message?.text) {
-        const text = response.message.text.trim();
-        if (text === BUTTONS_KEYBOARD.SkipButton) {
-          return null; // Возвращаем null, если пользователь пропустил
-        }
-        // Если текст не "пропустить", продолжаем цикл
-        await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_VIDEO_OTHERWISE, {
-          parse_mode: "HTML",
-        });
-        continue;
-      }
+      const response = await conversation.waitFor("message:video", {
+        otherwise: (ctx) =>
+          ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_VIDEO_OTHERWISE, {
+            parse_mode: "HTML",
+          }),
+      });
 
       const video = response.message?.video;
       if (!video) {
@@ -378,7 +313,7 @@ async function uploadVideoStep(
         addVideo(fileId, videoData, fileName, mimeType),
       );
 
-      await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_VIDEO_SUCCESS);
+      await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_VIDEO_SUCCESS);
       break;
     }
 
@@ -394,7 +329,7 @@ async function stepConfirm(
   ctx: MyConversationContext,
 ) {
   try {
-    await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.CONFIRMATION, {
+    await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.CONFIRMATION, {
       parse_mode: "HTML",
       reply_markup: ConfirmCancelButtons(),
     });
@@ -406,7 +341,7 @@ async function stepConfirm(
         [BUTTONS_KEYBOARD.ConfirmButton, BUTTONS_KEYBOARD.CancelButton],
         {
           otherwise: (ctx) =>
-            ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.CONFIRMATION_OTHERWISE, {
+            ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.CONFIRMATION_OTHERWISE, {
               parse_mode: "HTML",
               reply_markup: ConfirmCancelButtons(),
             }),

@@ -33,7 +33,7 @@ export const handleTookSurvey = async (ctx: MyContext, bot: Bot<MyContext>) => {
       } else {
         const allActiveSurvey =
           await getAllActiveSurveysByOperator(operator_id);
-        if (allActiveSurvey.length >= 5) return;
+        if (allActiveSurvey.length >= 10) return;
       }
       const active_survey = await getActiveSurvey({ messageId: message_id });
       if (!active_survey) return;

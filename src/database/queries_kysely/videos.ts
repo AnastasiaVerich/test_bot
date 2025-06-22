@@ -27,6 +27,24 @@ export async function addVideo(
   }
 }
 
+export async function getVideoByVideoId(
+  video_id: VideosType["video_id"],
+  trx: poolType = pool,
+): Promise<VideosType | null> {
+  try {
+    const result = await trx
+      .selectFrom("videos")
+      .selectAll()
+
+      .where("video_id", "=", Number(video_id))
+      .executeTakeFirst();
+
+    return result ?? null;
+  } catch (error) {
+    throw new Error("Error getVideoByVideoId: " + error);
+  }
+}
+
 export async function deleteOldVideos(trx: poolType = pool): Promise<void> {
   try {
     const param =

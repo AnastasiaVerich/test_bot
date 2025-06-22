@@ -16,7 +16,7 @@ export const cancelAuditorConversation = async (
     for (const activeScene of activeScenes) {
       await ctx.conversation.exit(ScenesAuditor[activeScene]);
     }
-    if (skipReply) {
+    if (skipReply && activeScenes.length > 0) {
       return ctx.reply("⏳...", {
         reply_markup: {
           remove_keyboard: true, // Удаляет reply-клавиатуру

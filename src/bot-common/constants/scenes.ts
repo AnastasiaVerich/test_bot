@@ -14,6 +14,54 @@ export const FINISH_SURVEY_OPERATOR_SCENE = {
 
   ENTER_RESULT_OTHERWISE: `Пожалуйста, введите число, обозначающее позицию сайта при поиске.`,
 
+  ENTER_VIDEO: "Пожалуйста, отправьте видео, подтверждающее выполнение опроса.",
+
+  ENTER_VIDEO_OTHERWISE: `Ожидается видео. Пожалуйста, отправьте видео, или пропустите этот шаг, нажав кнопку "${BUTTONS_KEYBOARD.SkipButton}"`,
+
+  ENTER_VIDEO_SUCCESS: `Видео успешно сохранено.`,
+
+  ENTERED_NOT_CORRECT_RESULT: "Пожалуйста, введите число!",
+
+  ENTER_RESULT_POS_VAR_1: "Выберите сайт, который был на 1ой позиции",
+
+  ENTER_RESULT_POS_VAR_2: "Выберите сайт, который был на 2ой позиции",
+
+  ENTER_RESULT_POS_VAR_3: "Выберите сайт, который был на 3ей позиции",
+
+  ENTER_RES_POS_OTHERWISE: `Пожалуйста, выберете сайт.`,
+
+  CONFIRMATION:
+    "Подтвердите, что вы ввели корректные данные по окончанию прохождения опроса.",
+
+  CONFIRMATION_OTHERWISE:
+    "Нажмите на соответсвующую кнопку для подтверждения или отклонения результата прохождения опроса.",
+
+  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.FinishSurveyButtonText}'.`,
+
+  CANCELLED: `Отменено. Начните заново.`,
+
+  SUCCESS: "Прохождение опроса подтверждено!",
+};
+
+export const CHECK_SURVEY_AUDITOR_SCENE = {
+  SURVEY_ACTIVE_NOT_FOUND: "Активный опрос отсутствует",
+
+  ENTER_COMPLETED_OR_NOT: "Пользователь выполнил это задание?",
+
+  ENTER_COMPLETED_OR_NOT_OTHERWISE: `Нажмите на соответствующую кнопку`,
+
+  ENTERED_NOT_CORRECT_COUNT: "Пожалуйста, введите число!",
+
+  ENTER_RESULT: "Введите позицию сайта во время опроса",
+
+  ENTER_RESULT_OTHERWISE: `Пожалуйста, введите число, обозначающее позицию сайта при поиске.`,
+
+  ENTER_VIDEO: "Пожалуйста, отправьте видео, подтверждающее выполнение опроса.",
+
+  ENTER_VIDEO_OTHERWISE: `Ожидается видео. Пожалуйста, отправьте видео.`,
+
+  ENTER_VIDEO_SUCCESS: `Видео успешно сохранено.`,
+
   ENTERED_NOT_CORRECT_RESULT: "Пожалуйста, введите число!",
 
   ENTER_RESULT_POS_VAR_1: "Выберите сайт, который был на 1ой позиции",
@@ -74,6 +122,24 @@ export const REGISTRATION_OPERATOR_SCENE = {
 
   SUCCESS:
     "Регистрация пройдена.\n\nВступите в канал для операторов, что бы получать новые опросы. Перейдите по ссылке: " +
+    linkWelcome,
+};
+export const REGISTRATION_AUDITOR_SCENE = {
+  ENTER_PHONE:
+    "Для регистрации пришлите свой номер телефона." +
+    "\n" +
+    "\n" +
+    `Нажмите на кнопку '${BUTTONS_KEYBOARD.SendNumberButton}', которая появилась внизу экрана.`,
+  ENTER_PHONE_OTHERWISE: `Пожалуйста, отправьте номер, нажав на кнопку '${BUTTONS_KEYBOARD.SendNumberButton}'.`,
+
+  ENTERED_NOT_USER_PHONE: "Пожалуйста, отправьте свой собственный номер.",
+
+  ENTERED_USER_PHONE: "Ваш номер:",
+
+  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.RegistrationButtonText}'.`,
+
+  SUCCESS:
+    "Регистрация пройдена.\n\nВступите в канал для аудиторов, что бы получать проверять новые записи. Перейдите по ссылке: " +
     linkWelcome,
 };
 

@@ -1,6 +1,9 @@
 import { Generated } from "kysely";
 import {
   AdvertisingCampaignsEntity,
+  AuditorEntity,
+  AuditorSurveyActiveEntity,
+  AuditorSurveyTaskCompletionsEntity,
   BlacklistUsersEntity,
   BotUserLogsEntity,
   CommonVariablesEntity,
@@ -46,3 +49,8 @@ export type SurveyCompletionsType =
   UnwrapGeneratedEntity<SurveyCompletionsEntity>;
 export type SurveyTasksType = UnwrapGeneratedEntity<SurveyTasksEntity>;
 export type VideosType = UnwrapGeneratedEntity<VideosEntity>;
+export type AuditorsType = UnwrapGeneratedEntity<AuditorEntity>;
+export type AuditorSurveyActiveType =
+  UnwrapGeneratedEntity<AuditorSurveyActiveEntity>;
+export type AuditorSurveyTaskCompletionsType =
+  UnwrapGeneratedEntity<AuditorSurveyTaskCompletionsEntity>;

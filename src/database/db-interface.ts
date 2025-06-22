@@ -64,6 +64,16 @@ export interface SupervisorEntity {
   created_at: Generated<string>; // Дата и время в ISO формате
 }
 
+export interface AuditorEntity {
+  id: Generated<number>;
+  auditor_id: Generated<number>;
+  tg_account: string;
+  phone: Generated<string | null>;
+  balance: Generated<number>; // Текущий баланс
+
+  created_at: Generated<string>; // Дата и время в ISO формате
+}
+
 export interface AdvertisingCampaignsEntity {
   id: Generated<number>;
   name: string;
@@ -139,6 +149,7 @@ export interface SurveyActiveEntity {
 export interface SurveyCompletionsEntity {
   completion_id: Generated<number>;
   survey_id: number;
+  survey_active_id: number;
   survey_task_id: number;
   user_id: number;
   operator_id: number;
@@ -146,6 +157,30 @@ export interface SurveyCompletionsEntity {
   result_positions_var: string;
   reward: number;
   reward_operator: number;
+  video_id: Generated<number | null>;
+
+  completed_at: Generated<string>; // Дата и время в ISO формате
+}
+
+export interface AuditorSurveyActiveEntity {
+  audit_survey_active_id: Generated<number>;
+  survey_active_id: number;
+  survey_id: number;
+  auditor_id: number | null;
+  video_id: number | null;
+
+  created_at: Generated<string>; // Дата и время в ISO формате
+}
+
+export interface AuditorSurveyTaskCompletionsEntity {
+  audit_survey_task_completions_id: Generated<number>;
+  auditor_id: number;
+  survey_id: number;
+  survey_task_id: number;
+  result: string;
+  result_positions_var: string;
+  reward_auditor: number;
+  video_id: Generated<number | null>;
 
   completed_at: Generated<string>; // Дата и время в ISO формате
 }
@@ -192,7 +227,7 @@ export interface ReferralBonusesEntity {
 export interface VideosEntity {
   video_id: Generated<number>;
   file_id: string;
-  video_data: Buffer;
+  video_data: Buffer | null;
   file_name: string | null;
   mime_type: string | null;
 
@@ -205,12 +240,15 @@ export interface Database {
   face_embeddings: FaceEmbeddingsEntity;
   photos: PhotosEntity;
   operators: OperatorsEntity;
+  auditors: AuditorEntity;
   region_settings: RegionSettingsEntity;
   operators_regions: OperatorsRegionsEntity;
   surveys: SurveysEntity;
   survey_tasks: SurveyTasksEntity;
   survey_active: SurveyActiveEntity;
   survey_completions: SurveyCompletionsEntity;
+  audit_survey_active: AuditorSurveyActiveEntity;
+  audit_survey_task_completions: AuditorSurveyTaskCompletionsEntity;
   withdrawal_logs: WithdrawalLogsEntity;
   common_variables: CommonVariablesEntity;
   pending_payments: PendingPaymentsEntity;

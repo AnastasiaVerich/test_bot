@@ -101,8 +101,22 @@ CREATE TABLE supervisor (
 );
 
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE supervisor_default_id_seq TO admin_vadim;
-GRANT USAGE, SELECT, UPDATE ON SEQUENCE supervisor_id_seq TO admin_vadim;
 GRANT ALL PRIVILEGES ON TABLE supervisor TO admin_vadim;
+
+
+-- Таблица аудиторов
+CREATE SEQUENCE auditor_default_id_seq;
+CREATE TABLE auditors (
+    id SERIAL PRIMARY KEY,
+    auditor_id BIGINT UNIQUE NOT NULL DEFAULT nextval('auditor_default_id_seq'),
+    tg_account VARCHAR(255) NOT NULL,
+    phone VARCHAR(15) DEFAULT NULL,
+    balance DECIMAL(10, 2) DEFAULT 0.0 NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE auditor_default_id_seq TO admin_vadim;
+GRANT ALL PRIVILEGES ON TABLE auditors TO admin_vadim;
 
 CREATE TABLE advertising_campaigns (
     id SERIAL PRIMARY KEY,  -- Уникальный идентификатор бонусной программы
@@ -226,16 +240,54 @@ CREATE TABLE survey_completions (
     result_positions_var VARCHAR(255) NOT NULL,
     reward DECIMAL(10, 2) NOT NULL, -- Фактическая награда (может отличаться от tasks.reward, если меняется со временем)
     reward_operator DECIMAL(10, 2) NOT NULL,
+    video_id BIGINT,
 
     completed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL,
     FOREIGN KEY (operator_id) REFERENCES operators(operator_id) ON DELETE SET NULL,
     FOREIGN KEY (survey_task_id) REFERENCES survey_tasks(survey_task_id) ON DELETE SET NULL
-
+    FOREIGN KEY (video_id) REFERENCES videos(video_id) ON DELETE SET NULL
 );
 GRANT ALL PRIVILEGES ON TABLE survey_completions TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE survey_completions_completion_id_seq TO admin_vadim;
+
+CREATE TABLE audit_survey_active (
+    audit_survey_active_id SERIAL PRIMARY KEY,
+    survey_active_id INT NOT NULL,
+    survey_id INT NOT NULL,
+    auditor_id BIGINT,
+    video_id BIGINT,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (auditor_id) REFERENCES auditors(auditor_id) ON DELETE SET NULL,
+    FOREIGN KEY (survey_id) REFERENCES surveys(survey_id) ON DELETE CASCADE,
+    FOREIGN KEY (video_id) REFERENCES videos(video_id) ON DELETE SET NULL
+);
+
+GRANT ALL PRIVILEGES ON TABLE audit_survey_active TO admin_vadim;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE audit_survey_active_audit_survey_active_id_seq TO admin_vadim;
+
+-- Таблица в которой зафиксированы результаты прохождения опроса
+CREATE TABLE audit_survey_task_completions (
+    audit_survey_task_completions_id SERIAL PRIMARY KEY,
+    auditor_id BIGINT NOT NULL,
+    survey_id INT NOT NULL,
+    survey_task_id INT NOT NULL,
+    result VARCHAR(255) NOT NULL,
+    result_positions_var VARCHAR(255) NOT NULL,
+    reward_auditor DECIMAL(10, 2) NOT NULL,
+    video_id BIGINT,
+
+    completed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (auditor_id) REFERENCES auditors(auditor_id) ON DELETE SET NULL,
+    FOREIGN KEY (survey_task_id) REFERENCES survey_tasks(survey_task_id) ON DELETE SET NULL,
+    FOREIGN KEY (video_id) REFERENCES videos(video_id) ON DELETE SET NULL
+);
+GRANT ALL PRIVILEGES ON TABLE audit_survey_task_completions TO admin_vadim;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE audit_survey_task_completions_audit_survey_task_completions_id_seq TO admin_vadim;
 
 
 -- Таблица логов снятия средств

@@ -43,6 +43,8 @@ export async function addSurveyCompletion(
     result_positions: SurveyCompletionsType["result_positions_var"];
     reward: SurveyCompletionsType["reward"];
     reward_operator: SurveyCompletionsType["reward_operator"];
+    video_id: SurveyCompletionsType["video_id"];
+    survey_active_id: SurveyCompletionsType["survey_active_id"];
   },
   trx: poolType = pool,
 ): Promise<SurveyCompletionsType["completion_id"] | null> {
@@ -56,6 +58,8 @@ export async function addSurveyCompletion(
       result_positions,
       reward,
       reward_operator,
+      video_id,
+      survey_active_id,
     } = params;
 
     const result = await trx
@@ -69,6 +73,8 @@ export async function addSurveyCompletion(
         result: result_main,
         result_positions_var: result_positions,
         reward_operator: reward_operator,
+        video_id: video_id,
+        survey_active_id: survey_active_id,
       })
       .returning("completion_id")
       .executeTakeFirst();

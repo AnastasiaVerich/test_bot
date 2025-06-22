@@ -10,7 +10,11 @@ import { MyContext } from "../bot-common/types/type";
 import { PsqlConversationAdapter } from "../services/psqlConversationAdapter";
 import { errorMiddleware } from "../bot-common/middleware/errorMiddleware";
 import { token_auditor } from "../config/env";
-import { registerCommands } from "./handlers";
+import {
+  registerCallbackQueries,
+  registerCommands,
+  registerMessage,
+} from "./handlers";
 import { registerScenes } from "./scenes";
 
 async function bootstrap() {
@@ -30,6 +34,8 @@ async function bootstrap() {
 
     registerCommands(bot);
     registerScenes(bot);
+    registerCallbackQueries(bot);
+    registerMessage(bot);
 
     // Обработчик ошибок
     bot.catch((err) => {

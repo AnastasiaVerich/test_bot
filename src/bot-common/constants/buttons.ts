@@ -58,4 +58,6 @@ export const BUTTONS_KEYBOARD = {
   SwitchPaymentType: "Переключатель автоматического проведения платежей",
   ManualPayment: "Провести платежи вручную",
   RestartFailedPayments: "Повторить неуспешные платежи",
+
+  CheckSurveyByAuditor: "Проверить прохождение опроса",
 };
