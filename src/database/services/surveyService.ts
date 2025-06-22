@@ -20,7 +20,7 @@ import {
 import { addSurveyTask } from "../queries_kysely/survey_tasks";
 import logger from "../../lib/logger";
 import { getRegionById } from "../queries_kysely/region_settings";
-import { addSurveyCompletion } from "../queries_kysely/survey_completions";
+import { addSurveyCompletion } from "../queries_kysely/survey_task_completions";
 import { updateUserByUserId } from "../queries_kysely/users";
 import {
   getReferralByReferredUserIdAndStatus,

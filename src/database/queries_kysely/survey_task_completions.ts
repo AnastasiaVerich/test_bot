@@ -7,7 +7,7 @@ export async function getSurveyCompletionsByUserId(
 ): Promise<SurveyCompletionsType[]> {
   try {
     return await trx
-      .selectFrom("survey_completions")
+      .selectFrom("survey_task_completions")
       .selectAll()
       .where("user_id", "=", userId)
       .orderBy("completed_at", "desc")
@@ -23,7 +23,7 @@ export async function getSurveyCompletionsByOperatorId(
 ): Promise<SurveyCompletionsType[]> {
   try {
     return await trx
-      .selectFrom("survey_completions")
+      .selectFrom("survey_task_completions")
       .selectAll()
       .where("operator_id", "=", operatorId)
       .orderBy("completed_at", "desc")
@@ -63,7 +63,7 @@ export async function addSurveyCompletion(
     } = params;
 
     const result = await trx
-      .insertInto("survey_completions")
+      .insertInto("survey_task_completions")
       .values({
         survey_id: survey_id,
         survey_task_id: survey_task_id,

@@ -230,7 +230,7 @@ GRANT ALL PRIVILEGES ON TABLE survey_active TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE survey_active_survey_active_id_seq TO admin_vadim;
 
 -- Таблица в которой зафиксированы результаты прохождения опроса
-CREATE TABLE survey_completions (
+CREATE TABLE survey_task_completions (
     completion_id SERIAL PRIMARY KEY,
     survey_id INT NOT NULL,
     survey_task_id INT NOT NULL,
@@ -249,8 +249,8 @@ CREATE TABLE survey_completions (
     FOREIGN KEY (survey_task_id) REFERENCES survey_tasks(survey_task_id) ON DELETE SET NULL
     FOREIGN KEY (video_id) REFERENCES videos(video_id) ON DELETE SET NULL
 );
-GRANT ALL PRIVILEGES ON TABLE survey_completions TO admin_vadim;
-GRANT USAGE, SELECT, UPDATE ON SEQUENCE survey_completions_completion_id_seq TO admin_vadim;
+GRANT ALL PRIVILEGES ON TABLE survey_task_completions TO admin_vadim;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE survey_task_completions_completion_id_seq TO admin_vadim;
 
 CREATE TABLE audit_survey_active (
     audit_survey_active_id SERIAL PRIMARY KEY,

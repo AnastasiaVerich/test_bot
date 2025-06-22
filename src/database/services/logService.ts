@@ -70,7 +70,7 @@ export async function getUserRegistrationMetrics(): Promise<
           WHEN BOOL_OR(CASE WHEN bul.step = 'success' THEN true ELSE false END)
           THEN COALESCE((
             SELECT COUNT(DISTINCT sc.completed_at)
-            FROM survey_completions sc
+            FROM survey_task_completions sc
             WHERE sc.user_id = bul_main.user_id
           ), 0)
           ELSE 0
@@ -89,7 +89,7 @@ export async function getUserRegistrationMetrics(): Promise<
           THEN COALESCE((
             SELECT COUNT(DISTINCT rb.referred_user_id)
             FROM referral_bonuses rb
-            JOIN survey_completions sc ON rb.referred_user_id = sc.user_id
+            JOIN survey_task_completions sc ON rb.referred_user_id = sc.user_id
             WHERE rb.referrer_id = bul_main.user_id
           ), 0)
           ELSE 0

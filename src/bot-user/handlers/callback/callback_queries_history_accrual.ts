@@ -7,7 +7,7 @@ import { BUTTONS_CALLBACK_QUERIES } from "../../../bot-common/constants/buttons"
 import { HANDLER_HISTORY_ACCRUAL } from "../../../bot-common/constants/handler_callback_queries";
 import { MyContext } from "../../../bot-common/types/type";
 import { getAllReferralByrReferrerIdAndStatus } from "../../../database/queries_kysely/referral_bonuses";
-import { getSurveyCompletionsByUserId } from "../../../database/queries_kysely/survey_completions";
+import { getSurveyCompletionsByUserId } from "../../../database/queries_kysely/survey_task_completions";
 
 export async function handler_history_accrual(
   ctx: MyContext,

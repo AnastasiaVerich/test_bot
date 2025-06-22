@@ -246,7 +246,7 @@ export interface Database {
   surveys: SurveysEntity;
   survey_tasks: SurveyTasksEntity;
   survey_active: SurveyActiveEntity;
-  survey_completions: SurveyCompletionsEntity;
+  survey_task_completions: SurveyCompletionsEntity;
   audit_survey_active: AuditorSurveyActiveEntity;
   audit_survey_task_completions: AuditorSurveyTaskCompletionsEntity;
   withdrawal_logs: WithdrawalLogsEntity;
