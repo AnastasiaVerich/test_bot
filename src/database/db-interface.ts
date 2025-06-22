@@ -149,7 +149,6 @@ export interface SurveyActiveEntity {
 export interface SurveyCompletionsEntity {
   completion_id: Generated<number>;
   survey_id: number;
-  survey_active_id: number;
   survey_task_id: number;
   user_id: number;
   operator_id: number;
@@ -164,7 +163,7 @@ export interface SurveyCompletionsEntity {
 
 export interface AuditorSurveyActiveEntity {
   audit_survey_active_id: Generated<number>;
-  survey_active_id: number;
+  task_completions_ids: number[];
   survey_id: number;
   auditor_id: number | null;
   video_id: number | null;
@@ -173,16 +172,15 @@ export interface AuditorSurveyActiveEntity {
 }
 
 export interface AuditorSurveyTaskCompletionsEntity {
-  audit_survey_task_completions_id: Generated<number>;
+  id: Generated<number>;
+  completion_id: number | null;
   auditor_id: number;
-  survey_id: number;
-  survey_task_id: number;
-  result: string;
-  result_positions_var: string;
   reward_auditor: number;
-  video_id: Generated<number | null>;
+  result: string | null;
+  result_positions_var: string | null;
+  description: string | null;
 
-  completed_at: Generated<string>; // Дата и время в ISO формате
+  created_at: Generated<string>; // Дата и время в ISO формате
 }
 
 export interface WithdrawalLogsEntity {

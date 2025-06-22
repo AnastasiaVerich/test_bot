@@ -1,4 +1,5 @@
 import { Conversation } from "@grammyjs/conversations";
+import { InputFile } from "grammy";
 import logger from "../../lib/logger";
 import { getUserId } from "../../bot-common/utils/getUserId";
 import {
@@ -13,10 +14,14 @@ import {
   MyConversation,
   MyConversationContext,
 } from "../../bot-common/types/type";
-import { addVideo } from "../../database/queries_kysely/videos";
+import { getVideoByVideoId } from "../../database/queries_kysely/videos";
 import { SurveyTasksType } from "../../database/db-types";
 import { BUTTONS_KEYBOARD } from "../../bot-common/constants/buttons";
-import { token_operator } from "../../config/env";
+import { getAuditSurveyActive } from "../../database/queries_kysely/audit_survey_active";
+import { getInfoAboutSurvey } from "../../database/services/surveyService";
+import { getAllSurveyTasks } from "../../database/queries_kysely/survey_tasks";
+import { auditorCompletedAuditSurvey } from "../../database/services/auditService";
+import { getSurveyTaskCompletionByCompletionId } from "../../database/queries_kysely/survey_task_completions";
 
 export async function checkSurveyScene(
   conversation: MyConversation,
@@ -24,99 +29,145 @@ export async function checkSurveyScene(
 ) {
   try {
     const result: {
-      survey_task_id: number;
       isCompleted: boolean;
-      reward?: number;
-      reward_operator?: number;
-      result?: string;
-      result_positions?: string;
+      reward_auditor: number;
+      result: string | null;
+      result_positions: string | null;
+      description: string | null;
+      completed_id: number | null;
     }[] = await conversation.external(() => []);
 
     const auditor_id = await conversation.external(() => getUserId(ctx));
     if (!auditor_id) return;
 
-    // const surveys = await getSurveysCompletionsByAuditorRequired(true);
-    // if (surveys.length === 0) {
-    //   return ctx.reply("Нет опросов для проверки");
-    //   //что-то придумать.
-    // }
-    // const currentSurvey = surveys[0];
-    // const video = await getVideoByVideoId(currentSurvey.video_id);
-    // if (!video || !video.video_data || !video.file_name) {
-    //   return ctx.reply("Видео для этого опроса не найдено.");
-    // }
-    //
-    // const fileName = `survey.mp4`;
-    // const inputFile = new InputFile(video.video_data, fileName);
-    // await ctx.reply("Ожидайте, видео отправляется ...");
-    // const videoReply = await ctx.replyWithVideo(inputFile, {
-    //   caption: `Видео для опроса`,
-    // });
-    // if (!videoReply || !videoReply.message_id) {
-    //   return ctx.reply("видео не отправилось");
-    // }
-    //
-    // const surveyData = await getInfoAboutSurvey(currentSurvey.survey_id);
-    // if (!surveyData) {
-    //   return ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.SURVEY_ACTIVE_NOT_FOUND, {
-    //     reply_markup: { remove_keyboard: true },
-    //   });
-    // }
-    // const survey_tasks = await conversation.external(() =>
-    //   getAllSurveyTasks(currentSurvey.survey_id),
-    // );
-    //
-    // for (const survey_task of survey_tasks) {
-    //   const index = survey_tasks.indexOf(survey_task);
-    //   const isCompleted = await completedOrNotStep(
-    //     conversation,
-    //     ctx,
-    //     survey_task,
-    //   );
-    //   if (isCompleted === null) {
-    //     await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-    //       reply_markup: FinishSurveyKeyboard(surveyActiveId),
-    //     });
-    //     continue;
-    //   }
-    //   if (isCompleted === BUTTONS_KEYBOARD.YesButton) {
-    //     result[index] = {
-    //       isCompleted: true,
-    //       survey_task_id: survey_task.survey_task_id,
-    //       reward: surveyData.task_price,
-    //       reward_operator: surveyData.task_price / 2,
-    //     };
-    //
-    //     const result_position = await countResultStep(conversation, ctx);
-    //     if (!result_position) {
-    //       await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-    //         reply_markup: FinishSurveyKeyboard(surveyActiveId),
-    //       });
-    //       continue;
-    //     }
-    //     result[index].result = result_position;
-    //
-    //     const result_positions = await countResultPositionVarStep(
-    //       conversation,
-    //       ctx,
-    //       survey_task.data,
-    //     );
-    //     if (!result_positions) {
-    //       await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-    //         reply_markup: FinishSurveyKeyboard(surveyActiveId),
-    //       });
-    //       continue;
-    //     }
-    //     result[index].result_positions = result_positions.join(", ");
-    //   } else {
-    //     result[index] = {
-    //       isCompleted: false,
-    //       survey_task_id: survey_task.survey_task_id,
-    //     };
-    //   }
-    // }
+    const auditSurveyActive = await getAuditSurveyActive();
+    if (!auditSurveyActive) {
+      return ctx.reply("Нет опросов для проверки");
+      //что-то придумать.
+    }
+
+    if (auditSurveyActive.video_id == null) {
+      return ctx.reply("Видео нет.");
+    }
+
+    const video = await getVideoByVideoId(auditSurveyActive.video_id);
+    if (!video || !video.video_data || !video.file_name) {
+      return ctx.reply("Видео для этого опроса не найдено.");
+    }
+
+    const fileName = `survey.mp4`;
+    const inputFile = new InputFile(video.video_data, fileName);
+    await ctx.reply("Ожидайте, видео отправляется ...");
+    const videoReply = await ctx.replyWithVideo(inputFile, {
+      caption: `Видео для опроса`,
+    });
+    if (!videoReply || !videoReply.message_id) {
+      return ctx.reply("видео не отправилось");
+    }
+
+    const surveyData = await getInfoAboutSurvey(auditSurveyActive.survey_id);
+    if (!surveyData) {
+      return ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.SURVEY_ACTIVE_NOT_FOUND, {
+        reply_markup: { remove_keyboard: true },
+      });
+    }
+
+    const operatorResult: any = {};
+    for (const el of auditSurveyActive.task_completions_ids) {
+      const res = await getSurveyTaskCompletionByCompletionId(el);
+      if (res) {
+        operatorResult[res.survey_task_id] = res.completion_id;
+      }
+    }
+
+    const survey_tasks = await conversation.external(() =>
+      getAllSurveyTasks(auditSurveyActive.survey_id),
+    );
+
+    for (const survey_task of survey_tasks) {
+      const index = survey_tasks.indexOf(survey_task);
+      const isCompleted = await completedOrNotStep(
+        conversation,
+        ctx,
+        survey_task,
+      );
+      if (isCompleted === null) {
+        await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.SOME_ERROR, {
+          reply_markup: AuthAuditorKeyboard(),
+        });
+        continue;
+      }
+      if (isCompleted === BUTTONS_KEYBOARD.YesButton) {
+        result[index] = {
+          isCompleted: true,
+          reward_auditor: surveyData.task_price / 2,
+          result: null,
+          result_positions: null,
+          description: null,
+          completed_id: operatorResult?.[survey_task.survey_task_id] ?? null,
+        };
+
+        const result_position = await countResultStep(conversation, ctx);
+        if (!result_position) {
+          await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.SOME_ERROR, {
+            reply_markup: AuthAuditorKeyboard(),
+          });
+          continue;
+        }
+        result[index].result = result_position;
+
+        const result_positions = await countResultPositionVarStep(
+          conversation,
+          ctx,
+          survey_task.data,
+        );
+        if (!result_positions) {
+          await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.SOME_ERROR, {
+            reply_markup: AuthAuditorKeyboard(),
+          });
+          continue;
+        }
+        result[index].result_positions = result_positions.join(", ");
+      } else {
+        result[index] = {
+          isCompleted: false,
+          reward_auditor: surveyData.task_price / 2,
+          result: null,
+          result_positions: null,
+          description: null,
+          completed_id: operatorResult?.[survey_task.survey_task_id] ?? null,
+        };
+      }
+    }
+
+    const resultConfirm = await stepConfirm(conversation, ctx);
+
+    if (!resultConfirm) {
+      await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.SOME_ERROR, {
+        reply_markup: AuthAuditorKeyboard(),
+      });
+      return;
+    }
+
+    if (resultConfirm === BUTTONS_KEYBOARD.ConfirmButton) {
+      await auditorCompletedAuditSurvey(
+        {
+          audit_survey_active_id: auditSurveyActive.audit_survey_active_id,
+          auditor_id: auditor_id,
+        },
+        result,
+      );
+
+      return ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.SUCCESS, {
+        reply_markup: AuthAuditorKeyboard(),
+      });
+    } else {
+      return ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.CANCELLED, {
+        reply_markup: AuthAuditorKeyboard(),
+      });
+    }
   } catch (error) {
-    logger.error("Error in registrationScene: " + error);
+    logger.error("Error in CHECK_SURVEY_AUDITOR_SCENE: " + error);
     await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.SOME_ERROR, {
       reply_markup: AuthAuditorKeyboard(),
     });
@@ -263,63 +314,6 @@ async function countResultPositionVarStep(
 
     return [result_1, result_2, result_3];
   } catch (error) {
-    return null;
-  }
-}
-
-// Новая функция для шага загрузки видео
-async function uploadVideoStep(
-  conversation: MyConversation,
-  ctx: MyConversationContext,
-  surveyActiveId: number,
-): Promise<number | null> {
-  try {
-    await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_VIDEO, {
-      parse_mode: "HTML",
-    });
-
-    let video_id: number | null = null;
-    while (true) {
-      const response = await conversation.waitFor("message:video", {
-        otherwise: (ctx) =>
-          ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_VIDEO_OTHERWISE, {
-            parse_mode: "HTML",
-          }),
-      });
-
-      const video = response.message?.video;
-      if (!video) {
-        continue;
-      }
-
-      const fileId = video.file_id;
-      const mimeType = video.mime_type ?? null;
-      const fileName =
-        video.file_name || `survey_${surveyActiveId}_${Date.now()}.mp4`;
-
-      // Получение file_path и загрузка видео
-      const file = await ctx.api.getFile(fileId);
-      const fileUrl = `https://api.telegram.org/file/bot${token_operator}/${file.file_path}`;
-
-      // Загрузка видеофайла (опционально, если нужен video_data)
-      let videoData: Buffer | null = null;
-
-      const response2 = await fetch(fileUrl);
-      const arrayBuffer = await response2.arrayBuffer();
-      videoData = Buffer.from(arrayBuffer);
-
-      // Сохранение в базу данных onversation.external
-      video_id = await conversation.external(() =>
-        addVideo(fileId, videoData, fileName, mimeType),
-      );
-
-      await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_VIDEO_SUCCESS);
-      break;
-    }
-
-    return video_id;
-  } catch (error) {
-    logger.error("Ошибка при загрузке видео: " + error);
     return null;
   }
 }

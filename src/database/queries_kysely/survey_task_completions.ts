@@ -33,6 +33,24 @@ export async function getSurveyCompletionsByOperatorId(
   }
 }
 
+export async function getSurveyTaskCompletionByCompletionId(
+  completion_id: SurveyCompletionsType["completion_id"],
+  trx: poolType = pool,
+): Promise<SurveyCompletionsType | null> {
+  try {
+    const result = await trx
+      .selectFrom("survey_task_completions")
+      .selectAll()
+      .where("completion_id", "=", completion_id)
+      .orderBy("completed_at", "desc")
+      .executeTakeFirst();
+
+    return result ?? null;
+  } catch (error) {
+    throw new Error("Error getSurveyTaskCompletionByCompletionId: " + error);
+  }
+}
+
 export async function addSurveyCompletion(
   params: {
     survey_id: SurveyCompletionsType["survey_id"];
@@ -44,7 +62,6 @@ export async function addSurveyCompletion(
     reward: SurveyCompletionsType["reward"];
     reward_operator: SurveyCompletionsType["reward_operator"];
     video_id: SurveyCompletionsType["video_id"];
-    survey_active_id: SurveyCompletionsType["survey_active_id"];
   },
   trx: poolType = pool,
 ): Promise<SurveyCompletionsType["completion_id"] | null> {
@@ -59,7 +76,6 @@ export async function addSurveyCompletion(
       reward,
       reward_operator,
       video_id,
-      survey_active_id,
     } = params;
 
     const result = await trx
@@ -74,7 +90,6 @@ export async function addSurveyCompletion(
         result_positions_var: result_positions,
         reward_operator: reward_operator,
         video_id: video_id,
-        survey_active_id: survey_active_id,
       })
       .returning("completion_id")
       .executeTakeFirst();

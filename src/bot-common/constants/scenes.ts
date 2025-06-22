@@ -56,12 +56,6 @@ export const CHECK_SURVEY_AUDITOR_SCENE = {
 
   ENTER_RESULT_OTHERWISE: `Пожалуйста, введите число, обозначающее позицию сайта при поиске.`,
 
-  ENTER_VIDEO: "Пожалуйста, отправьте видео, подтверждающее выполнение опроса.",
-
-  ENTER_VIDEO_OTHERWISE: `Ожидается видео. Пожалуйста, отправьте видео.`,
-
-  ENTER_VIDEO_SUCCESS: `Видео успешно сохранено.`,
-
   ENTERED_NOT_CORRECT_RESULT: "Пожалуйста, введите число!",
 
   ENTER_RESULT_POS_VAR_1: "Выберите сайт, который был на 1ой позиции",
@@ -82,7 +76,7 @@ export const CHECK_SURVEY_AUDITOR_SCENE = {
 
   CANCELLED: `Отменено. Начните заново.`,
 
-  SUCCESS: "Прохождение опроса подтверждено!",
+  SUCCESS: "Проверка прохождения опроса подтверждена!",
 };
 
 export const REGISTRATION_OPERATOR_SCENE = {
