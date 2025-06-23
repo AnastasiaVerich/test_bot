@@ -1,5 +1,5 @@
 import { Bot } from "grammy";
-import { channelId } from "../../../config/env";
+import { channelIdOperator } from "../../../config/env";
 import { MyContext } from "../../../bot-common/types/type";
 import { HANDLER_TOOK_SURVEY } from "../../../bot-common/constants/handler_callback_queries";
 import logger from "../../../lib/logger";
@@ -19,7 +19,7 @@ export const handleTookSurvey = async (ctx: MyContext, bot: Bot<MyContext>) => {
     const chat_id = ctx.update.callback_query?.message?.chat.id;
     const operator_id = ctx.update.callback_query?.from?.id;
     if (!message_id || !chat_id || !operator_id) return;
-    if (chat_id.toString() === channelId) {
+    if (chat_id.toString() === channelIdOperator) {
       const operator = await getOperatorByIdPhoneOrTg({
         operator_id: operator_id,
       });
@@ -50,7 +50,7 @@ export const handleTookSurvey = async (ctx: MyContext, bot: Bot<MyContext>) => {
       });
       if (!isReservation) return;
 
-      await ctx.api.deleteMessage(channelId, message_id);
+      await ctx.api.deleteMessage(channelIdOperator, message_id);
       let messages = HANDLER_TOOK_SURVEY.TOOK_IT;
 
       await bot.api.sendMessage(operator_id, messages, {

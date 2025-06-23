@@ -165,6 +165,7 @@ export interface AuditorSurveyActiveEntity {
   audit_survey_active_id: Generated<number>;
   task_completions_ids: number[];
   survey_id: number;
+  message_id: number | null;
   auditor_id: number | null;
   video_id: number | null;
 
@@ -186,6 +187,7 @@ export interface AuditorSurveyTaskCompletionsEntity {
 export interface WithdrawalLogsEntity {
   withdrawal_id: Generated<number>;
   user_id: Generated<number | null>; // Идентификатор оператора (связан с operators)
+  auditor_id: Generated<number | null>; // Идентификатор пользователя (связан с users)
   operator_id: Generated<number | null>; // Идентификатор пользователя (связан с users)
   amount: number;
   wallet: string;
@@ -205,6 +207,7 @@ export interface PendingPaymentsEntity {
   pending_payments_id: Generated<number>;
   user_id: Generated<number | null>; // Идентификатор оператора (связан с operators)
   operator_id: Generated<number | null>; // Идентификатор пользователя (связан с users)
+  auditor_id: Generated<number | null>; // Идентификатор пользователя (связан с users)
   amount: number; // Сумма платежа
   attempts: Generated<number>; // Количество попыток проведения платежа
   address: string; // Адрес для платежа

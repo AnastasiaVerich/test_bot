@@ -26,6 +26,9 @@ export const BUTTONS_CALLBACK_QUERIES = {
   TookButton: "TookButton",
   TookButtonText: "Провести опрос",
 
+  TookAuditButton: "TookAuditButton",
+  TookAuditButtonText: "Провести аудит",
+
   ThisUserWrote: "ThisUserWrote",
   ThisUserGetSurveyInfo: "ThisUserGetSurveyInfo",
   ThisPendingPaymentInfo: "GetPendingPaymentInfo",
@@ -59,5 +62,5 @@ export const BUTTONS_KEYBOARD = {
   ManualPayment: "Провести платежи вручную",
   RestartFailedPayments: "Повторить неуспешные платежи",
 
-  CheckSurveyByAuditor: "Проверить прохождение опроса",
+  CheckSurveyByAuditor: "Провести аудит",
 };

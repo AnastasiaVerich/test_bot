@@ -40,3 +40,19 @@ export async function addAuditSurveyTaskCompletions(
     throw new Error("Error addAuditSurveyActive: " + error);
   }
 }
+
+export async function getAuditSurveyCompletionsByAuditorId(
+  auditor_id: AuditorSurveyTaskCompletionsType["auditor_id"],
+  trx: poolType = pool,
+): Promise<AuditorSurveyTaskCompletionsType[]> {
+  try {
+    return await trx
+      .selectFrom("audit_survey_task_completions")
+      .selectAll()
+      .where("auditor_id", "=", auditor_id)
+      .orderBy("created_at", "desc")
+      .execute();
+  } catch (error) {
+    throw new Error("Error getAuditSurveyCompletionsByAuditorId: " + error);
+  }
+}

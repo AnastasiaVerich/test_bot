@@ -1,5 +1,5 @@
 import { Bot } from "grammy";
-import { channelId } from "../../config/env";
+import { channelIdOperator } from "../../config/env";
 import { MyContext } from "../../bot-common/types/type";
 import {
   sendMessageWithRetry,
@@ -21,7 +21,7 @@ async function processRecord(
     const messageId = await sendMessageWithRetry(
       bot,
       message,
-      channelId,
+      channelIdOperator,
       TookKeyboard(),
     );
     if (messageId !== null) {

@@ -1,5 +1,5 @@
 import { BUTTONS_CALLBACK_QUERIES, BUTTONS_KEYBOARD } from "./buttons";
-import { linkWelcome } from "../../config/env";
+import { linkWelcomeAuditor, linkWelcomeOperator } from "../../config/env";
 
 export const FINISH_SURVEY_OPERATOR_SCENE = {
   SURVEY_ACTIVE_NOT_FOUND: "Активный опрос отсутствует",
@@ -116,8 +116,9 @@ export const REGISTRATION_OPERATOR_SCENE = {
 
   SUCCESS:
     "Регистрация пройдена.\n\nВступите в канал для операторов, что бы получать новые опросы. Перейдите по ссылке: " +
-    linkWelcome,
+    linkWelcomeOperator,
 };
+
 export const REGISTRATION_AUDITOR_SCENE = {
   ENTER_PHONE:
     "Для регистрации пришлите свой номер телефона." +
@@ -133,11 +134,49 @@ export const REGISTRATION_AUDITOR_SCENE = {
   SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.RegistrationButtonText}'.`,
 
   SUCCESS:
-    "Регистрация пройдена.\n\nВступите в канал для аудиторов, что бы получать проверять новые записи. Перейдите по ссылке: " +
-    linkWelcome,
+    "Регистрация пройдена.\n\nВступите в канал для аудиторов, что бы проверять новые записи. Перейдите по ссылке: " +
+    linkWelcomeAuditor,
 };
 
 export const WITHDRAWAL_OPERATOR_SCENE = {
+  HAS_PENDING_PAYMENT: "Вы уже поставили средства на вывод.",
+
+  INVALID_BALANCE: "У вас нулевой баланс в TON.",
+
+  ENTER_AMOUNT: "Введите сумму для снятия",
+
+  ENTERED_AMOUNT_OTHERWISE: "Пожалуйста, введите сумму для снятия TON",
+
+  INVALID_AMOUNT:
+    "Введена невалидная сумма. Она должна быть больше 0.05 TON и не меньше вашего баланса (доступно: {balance} TON). Попробуйте еще раз.",
+
+  ENTERED_AMOUNT: "Введенная сумма для снятия: ",
+
+  ENTER_WALLET:
+    "Пришлите адрес вашего счета из официального Telegram-бота @wallet. Вывод денег осуществляется в TON. \n" +
+    "\n" +
+    "Внимание! Если вы ошибетесь в адресе счета, Ваши деньги безвозвратно уйдут! Для своего удобства, можете использовать встроенный в телеграм кошелек @wallet. Инструкция по созданию кошелька: https://youtu.be/T6AbwwSrb_M?si=AgjHlVdOwb2od0N1",
+
+  ENTER_WALLET_OTHERWISE: "Пожалуйста, введите кошелек.",
+
+  ENTERED_INVALID_WALLET: "Вы ввели невалидный адрес. Попробуйте ещё.",
+
+  CONFIRMATION:
+    "Подтвердите снятие <b>{amount}</b> на адрес: <b>{address}</b>.",
+
+  CONFIRMATION_OTHERWISE:
+    "Нажмите на соответсвующую кнопку для подтверждения или отклонения вывода средств.",
+
+  SUCCESS:
+    "Операция отправлена на исполнение. Ожидайте перевод в течении 24 ч.",
+  CANCELLED: "Операция была отменена.",
+
+  SELECT_SOURCE: "Выберите, как хотите вывести деньги",
+
+  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButtonText}'.`,
+};
+
+export const WITHDRAWAL_AUDITOR_SCENE = {
   HAS_PENDING_PAYMENT: "Вы уже поставили средства на вывод.",
 
   INVALID_BALANCE: "У вас нулевой баланс в TON.",

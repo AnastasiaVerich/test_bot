@@ -17,7 +17,7 @@ import {
 import { getVideoByVideoId } from "../../database/queries_kysely/videos";
 import { SurveyTasksType } from "../../database/db-types";
 import { BUTTONS_KEYBOARD } from "../../bot-common/constants/buttons";
-import { getAuditSurveyActive } from "../../database/queries_kysely/audit_survey_active";
+import { getAuditSurveyActiveByAuditorId } from "../../database/queries_kysely/audit_survey_active";
 import { getInfoAboutSurvey } from "../../database/services/surveyService";
 import { getAllSurveyTasks } from "../../database/queries_kysely/survey_tasks";
 import { auditorCompletedAuditSurvey } from "../../database/services/auditService";
@@ -40,7 +40,7 @@ export async function checkSurveyScene(
     const auditor_id = await conversation.external(() => getUserId(ctx));
     if (!auditor_id) return;
 
-    const auditSurveyActive = await getAuditSurveyActive();
+    const auditSurveyActive = await getAuditSurveyActiveByAuditorId(auditor_id);
     if (!auditSurveyActive) {
       return ctx.reply("Нет опросов для проверки");
       //что-то придумать.

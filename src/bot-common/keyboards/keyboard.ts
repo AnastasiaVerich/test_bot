@@ -65,7 +65,11 @@ export const AuthOperatorKeyboard = (): Keyboard =>
     .resized();
 
 export const AuthAuditorKeyboard = (): Keyboard =>
-  new Keyboard().text(BUTTONS_KEYBOARD.CheckSurveyByAuditor).resized();
+  new Keyboard()
+    .text(BUTTONS_KEYBOARD.CheckSurveyByAuditor)
+    .row()
+    .text(BUTTONS_KEYBOARD.BalanceButton)
+    .resized();
 
 export const AuthSupervisorKeyboard = (): Keyboard =>
   new Keyboard()

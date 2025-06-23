@@ -27,6 +27,10 @@ export const HANDLER_TOOK_SURVEY = {
   TOOK_IT: "Вы взяли новый опрос.",
   SOME_ERROR: "Бот временно недоступен",
 };
+export const HANDLER_TOOK_AUDIT_SURVEY = {
+  TOOK_IT: "Вы взяли новый аудит.",
+  SOME_ERROR: "Бот временно недоступен",
+};
 
 export const HANDLER_CANCEL_SURVEY = {
   ERROR_DATA_UNDEFINED: "Данные не получены.",

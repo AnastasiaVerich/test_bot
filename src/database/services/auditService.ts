@@ -1,7 +1,11 @@
-import { pool } from "../dbClient";
-import { deleteAuditActiveSurvey } from "../queries_kysely/audit_survey_active";
+import { db, pool } from "../dbClient";
+import {
+  deleteAuditActiveSurvey,
+  setAuditActiveSurveyAuditorIdIfNull,
+} from "../queries_kysely/audit_survey_active";
 import { addAuditSurveyTaskCompletions } from "../queries_kysely/audit_survey_task_completions";
 import { updateAuditorByAuditorId } from "../queries_kysely/auditors";
+import { AuditorSurveyActiveType } from "../db-types";
 
 export async function auditorCompletedAuditSurvey(
   params: {
@@ -62,5 +66,32 @@ export async function auditorCompletedAuditSurvey(
     });
   } catch (error) {
     throw new Error("Error userCompletedSurvey: " + error);
+  }
+}
+
+export async function reservationAuditSurveyActiveByAuditor(params: {
+  auditor_id: AuditorSurveyActiveType["auditor_id"];
+  audit_survey_active_id: AuditorSurveyActiveType["audit_survey_active_id"];
+}): Promise<"ok" | undefined> {
+  const client = await db.connect(); // Получаем клиента для транзакции
+  try {
+    await client.query("BEGIN"); // Начинаем транзакцию
+
+    const { auditor_id, audit_survey_active_id } = params;
+
+    const auditActiveSurvey = setAuditActiveSurveyAuditorIdIfNull(
+      audit_survey_active_id,
+      auditor_id,
+    );
+    if (!auditActiveSurvey) return;
+
+    await client.query("COMMIT"); // Завершаем транзакцию
+
+    return "ok";
+  } catch (error) {
+    await client.query("ROLLBACK"); // Откатываем при ошибке
+    throw new Error("Error reservationAuditSurveyActiveByAuditor: " + error);
+  } finally {
+    client.release(); // Освобождаем клиента
   }
 }

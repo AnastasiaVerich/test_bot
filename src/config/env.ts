@@ -13,8 +13,11 @@ export const token_auditor = process.env.BOT_TOKEN_AUDITOR ?? "";
 
 export const seed_phrase = process.env.SEED_PHRASE ?? "";
 
-export const channelId = process.env.CHANNEL_ID ?? "";
-export const linkWelcome = process.env.LINK_WELCOME ?? "";
+export const channelIdOperator = process.env.CHANNEL_ID__OPERATOR ?? "";
+export const linkWelcomeOperator = process.env.LINK_WELCOME__OPERATOR ?? "";
+
+export const channelIdAuditor = process.env.CHANNEL_ID__AUDITOR ?? "";
+export const linkWelcomeAuditor = process.env.LINK_WELCOME__OPERATOR ?? "";
 
 export const convertApiKey = process.env.CONVERT_API_KEY ?? ""; // https://pro.coinmarketcap.com/account/
 

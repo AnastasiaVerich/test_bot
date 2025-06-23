@@ -19,6 +19,7 @@ export async function getAllPendingPayment(
 export async function addPendingPayment(
   params: {
     userId?: PendingPaymentsType["user_id"];
+    auditor_id?: PendingPaymentsType["auditor_id"];
     operatorId?: PendingPaymentsType["operator_id"];
     amount: PendingPaymentsType["amount"];
     address: PendingPaymentsType["address"];
@@ -26,13 +27,20 @@ export async function addPendingPayment(
   trx: poolType = pool,
 ): Promise<PendingPaymentsType["user_id"] | null> {
   try {
-    const { userId = null, operatorId = null, amount, address } = params;
+    const {
+      userId = null,
+      operatorId = null,
+      auditor_id = null,
+      amount,
+      address,
+    } = params;
 
     const result = await trx
       .insertInto("pending_payments")
       .values({
         user_id: userId,
         operator_id: operatorId,
+        auditor_id: auditor_id,
         amount,
         address,
       })
@@ -47,15 +55,20 @@ export async function addPendingPayment(
 
 export async function deletePendingPayment(
   params: {
+    auditor_id?: PendingPaymentsType["auditor_id"];
     userId?: PendingPaymentsType["user_id"];
     operatorId?: PendingPaymentsType["operator_id"];
   },
   trx: poolType = pool,
 ): Promise<PendingPaymentsType["user_id"] | null> {
   try {
-    const { userId, operatorId } = params;
+    const { userId, operatorId, auditor_id } = params;
 
-    if (userId === undefined && operatorId === undefined) {
+    if (
+      userId === undefined &&
+      operatorId === undefined &&
+      auditor_id === undefined
+    ) {
       throw new Error(
         `At least one ( ${Object.keys(params).join(", ")} ) must be provided.`,
       );
@@ -70,6 +83,9 @@ export async function deletePendingPayment(
         }
         if (operatorId !== undefined) {
           conditions.push(eb("operator_id", "=", operatorId));
+        }
+        if (auditor_id !== undefined) {
+          conditions.push(eb("auditor_id", "=", auditor_id));
         }
         return eb.or(conditions);
       })
@@ -115,6 +131,23 @@ export async function getAllPendingPaymentByOperatorId(
   }
 }
 
+export async function getAllPendingPaymentByAuditorId(
+  auditor_id: PendingPaymentsType["auditor_id"],
+  trx: poolType = pool,
+): Promise<PendingPaymentsType[]> {
+  try {
+    const result = await trx
+      .selectFrom("pending_payments")
+      .selectAll()
+      .where("auditor_id", "=", Number(auditor_id))
+      .execute();
+
+    return result;
+  } catch (error) {
+    throw new Error("Error getAllPendingPaymentByAuditorId: " + error);
+  }
+}
+
 export async function getPendingPaymentByUserId(
   userId: PendingPaymentsType["user_id"],
   trx: poolType = pool,
@@ -152,13 +185,19 @@ export async function getPendingPaymentByOperatorId(
 export async function updateAttemptPendingPayment(
   params: {
     userId?: PendingPaymentsType["user_id"];
+    auditor_id?: PendingPaymentsType["auditor_id"];
     operatorId?: PendingPaymentsType["operator_id"];
     attempts?: PendingPaymentsType["attempts"];
   },
   trx: poolType = pool,
 ): Promise<PendingPaymentsType["user_id"] | null> {
   try {
-    const { attempts, userId = null, operatorId = null } = params;
+    const {
+      attempts,
+      userId = null,
+      auditor_id = null,
+      operatorId = null,
+    } = params;
     if (attempts === undefined) {
       throw new Error(
         `At least one ( ${Object.keys(params).join(", ")} ) must be provided.`,
@@ -180,6 +219,9 @@ export async function updateAttemptPendingPayment(
         }
         if (operatorId !== undefined) {
           conditions.push(eb("operator_id", "=", operatorId));
+        }
+        if (auditor_id !== undefined) {
+          conditions.push(eb("auditor_id", "=", auditor_id));
         }
         return eb.or(conditions);
       })

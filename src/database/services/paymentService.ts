@@ -19,6 +19,10 @@ export async function paymentIsCompleted(
       isDeleted = await deletePendingPayment({
         operatorId: payment.operator_id,
       });
+    } else if (payment.auditor_id) {
+      isDeleted = await deletePendingPayment({
+        auditor_id: payment.auditor_id,
+      });
     }
     if (!isDeleted) {
       throw new Error("deletePendingPayment failed");
@@ -34,6 +38,12 @@ export async function paymentIsCompleted(
     } else if (payment.operator_id) {
       isAdd = await addWithdrawalLog({
         operatorId: payment.operator_id,
+        amount: payment.amount,
+        wallet: payment.address,
+      });
+    } else if (payment.auditor_id) {
+      isAdd = await addWithdrawalLog({
+        auditor_id: payment.auditor_id,
         amount: payment.amount,
         wallet: payment.address,
       });

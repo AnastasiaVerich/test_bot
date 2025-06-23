@@ -115,7 +115,7 @@ CREATE TABLE auditors (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-GRANT USAGE, SELECT, UPDATE ON SEQUENCE auditor_default_id_seq TO admin_vadim;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE auditors_id_seq TO admin_vadim;
 GRANT ALL PRIVILEGES ON TABLE auditors TO admin_vadim;
 
 CREATE TABLE advertising_campaigns (
@@ -258,6 +258,7 @@ CREATE TABLE audit_survey_active (
     survey_id INT NOT NULL,
     auditor_id BIGINT,
     video_id BIGINT,
+    message_id BIGINT,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
@@ -293,11 +294,13 @@ CREATE TABLE withdrawal_logs (
     withdrawal_id SERIAL PRIMARY KEY,
     user_id BIGINT DEFAULT NULL,
     operator_id BIGINT DEFAULT NULL,
+    auditor_id BIGINT DEFAULT NULL,
     amount DECIMAL(10, 2) NOT NULL,    -- Сумма снятия
     wallet  VARCHAR(100) NOT NULL,    -- На какой кошелек
 
     withdrawn_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
+    FOREIGN KEY (auditor_id ) REFERENCES auditors(auditor_id ) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
     FOREIGN KEY (operator_id) REFERENCES operators(operator_id) ON DELETE SET NULL
 
@@ -323,6 +326,7 @@ GRANT USAGE, SELECT, UPDATE ON SEQUENCE common_variables_common_vars_id_seq TO a
 CREATE TABLE pending_payments (
     pending_payments_id SERIAL PRIMARY KEY,
     user_id BIGINT DEFAULT NULL,
+    auditor_id BIGINT DEFAULT NULL,
     operator_id BIGINT DEFAULT NULL,
     amount DECIMAL(10, 2) NOT NULL,               -- Сумма платежа
     attempts INT DEFAULT 0 NOT NULL,              -- Количество попыток проведения платежа
@@ -330,6 +334,7 @@ CREATE TABLE pending_payments (
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
+    FOREIGN KEY (auditor_id ) REFERENCES auditors(auditor_id ) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (operator_id) REFERENCES operators(operator_id) ON DELETE CASCADE
 );
@@ -383,6 +388,22 @@ CREATE TRIGGER survey_active_trigger
 AFTER INSERT ON survey_active
 FOR EACH ROW
 EXECUTE FUNCTION notify_survey_active();
+
+-- Функция для отправки в канал АУДИТОРОВ нового опроса
+CREATE OR REPLACE FUNCTION notify_audit_survey_active() RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.auditor_id IS NULL AND NEW.message_id IS NULL THEN
+    PERFORM pg_notify('audit_survey_active_insert', row_to_json(NEW)::text);
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Триггер на таблицу survey_active
+CREATE TRIGGER audit_survey_active_trigger
+AFTER INSERT ON audit_survey_active
+FOR EACH ROW
+EXECUTE FUNCTION notify_audit_survey_active();
 
 
 

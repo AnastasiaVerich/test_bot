@@ -32,9 +32,13 @@ export async function executePendingPayments(): Promise<void> {
             logger.info(
               `Оператору: Все попытки отправки платежа для пользователя ${payment.user_id} исчерпаны.`,
             );
-          } else {
+          } else if (payment.operator_id) {
             logger.info(
               `Оператору: Все попытки отправки платежа для оператора ${payment.operator_id} исчерпаны.`,
+            );
+          } else if (payment.auditor_id) {
+            logger.info(
+              `Оператору: Все попытки отправки платежа для оператора ${payment.auditor_id} исчерпаны.`,
             );
           }
 
@@ -49,6 +53,11 @@ export async function executePendingPayments(): Promise<void> {
           } else if (payment.operator_id) {
             await updateAttemptPendingPayment({
               operatorId: payment.operator_id,
+              attempts: payment.attempts + 1,
+            });
+          } else if (payment.auditor_id) {
+            await updateAttemptPendingPayment({
+              auditor_id: payment.auditor_id,
               attempts: payment.attempts + 1,
             });
           }

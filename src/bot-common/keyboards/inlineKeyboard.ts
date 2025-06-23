@@ -91,3 +91,9 @@ export const TookKeyboard = (): InlineKeyboard => {
     BUTTONS_CALLBACK_QUERIES.TookButton,
   );
 };
+export const TookAuditKeyboard = (): InlineKeyboard => {
+  return new InlineKeyboard().text(
+    BUTTONS_CALLBACK_QUERIES.TookAuditButtonText,
+    BUTTONS_CALLBACK_QUERIES.TookAuditButton,
+  );
+};
