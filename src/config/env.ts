@@ -17,7 +17,7 @@ export const channelIdOperator = process.env.CHANNEL_ID__OPERATOR ?? "";
 export const linkWelcomeOperator = process.env.LINK_WELCOME__OPERATOR ?? "";
 
 export const channelIdAuditor = process.env.CHANNEL_ID__AUDITOR ?? "";
-export const linkWelcomeAuditor = process.env.LINK_WELCOME__OPERATOR ?? "";
+export const linkWelcomeAuditor = process.env.LINK_WELCOME__AUDITOR ?? "";
 
 export const convertApiKey = process.env.CONVERT_API_KEY ?? ""; // https://pro.coinmarketcap.com/account/
 
