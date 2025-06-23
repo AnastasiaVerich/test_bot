@@ -78,9 +78,9 @@ export async function withdrawalScene(
     }
 
     // Шаг 2: Ожидаем ввода адреса для перевода
-    const recipientAddress = await stepWallet(conversation, ctx);
+    const recipientWallet = await stepWallet(conversation, ctx);
 
-    if (!recipientAddress) {
+    if (!recipientWallet) {
       return ctx.reply(WITHDRAWAL_AUDITOR_SCENE.SOME_ERROR, {
         reply_markup: BalanceMenu(),
       });
@@ -90,7 +90,7 @@ export async function withdrawalScene(
     const resultConfirm = await stepConfirm(
       conversation,
       ctx,
-      recipientAddress,
+      recipientWallet,
       amountTON,
     );
 
@@ -105,7 +105,7 @@ export async function withdrawalScene(
       await addPendingPayment({
         auditor_id: auditorId,
         amount: amountTON,
-        address: recipientAddress,
+        wallet: recipientWallet,
       });
       const amountRub =
         amountTON * curseTon > balance ? balance : amountTON * curseTon;
@@ -238,7 +238,7 @@ async function stepWallet(
 async function stepConfirm(
   conversation: Conversation<MyContext, MyConversationContext>,
   ctx: MyConversationContext,
-  recipientAddress: string,
+  recipientWallet: string,
   amountTON: number,
 ) {
   try {
@@ -246,7 +246,7 @@ async function stepConfirm(
       WITHDRAWAL_AUDITOR_SCENE.CONFIRMATION.replace(
         "{amount}",
         amountTON.toString(),
-      ).replace("{address}", recipientAddress),
+      ).replace("{address}", recipientWallet),
       {
         parse_mode: "HTML",
         reply_markup: ConfirmCancelButtons(),

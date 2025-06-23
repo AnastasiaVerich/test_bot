@@ -22,7 +22,7 @@ export async function addPendingPayment(
     auditor_id?: PendingPaymentsType["auditor_id"];
     operatorId?: PendingPaymentsType["operator_id"];
     amount: PendingPaymentsType["amount"];
-    address: PendingPaymentsType["address"];
+    wallet: PendingPaymentsType["wallet"];
   },
   trx: poolType = pool,
 ): Promise<PendingPaymentsType["user_id"] | null> {
@@ -32,7 +32,7 @@ export async function addPendingPayment(
       operatorId = null,
       auditor_id = null,
       amount,
-      address,
+      wallet,
     } = params;
 
     const result = await trx
@@ -42,7 +42,7 @@ export async function addPendingPayment(
         operator_id: operatorId,
         auditor_id: auditor_id,
         amount,
-        address,
+        wallet,
       })
       .returning("pending_payments_id")
       .executeTakeFirst();

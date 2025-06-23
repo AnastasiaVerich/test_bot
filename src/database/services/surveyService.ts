@@ -4,7 +4,7 @@ import {
   SurveysType,
   UsersType,
 } from "../db-types";
-import { db, pool } from "../dbClient";
+import { pool } from "../dbClient";
 import {
   addSurveyActive,
   deleteActiveSurvey,
@@ -33,34 +33,33 @@ export async function reservationSurveyActiveByOperator(params: {
   operatorId: SurveyActiveType["operator_id"];
   surveyActiveId: SurveyActiveType["survey_active_id"];
   reservationMinutes: RegionSettingsType["reservation_time_min"];
-}): Promise<"ok" | undefined> {
-  const client = await db.connect(); // Получаем клиента для транзакции
+}): Promise<string | undefined> {
   try {
-    await client.query("BEGIN"); // Начинаем транзакцию
-
     const { operatorId, surveyActiveId, reservationMinutes } = params;
 
-    const activeSurvey = setActiveSurveyOperatorIdIfNull(
-      surveyActiveId,
-      operatorId,
-    );
-    if (!activeSurvey) return;
+    return await pool.transaction().execute(async (trx) => {
+      const activeSurvey = setActiveSurveyOperatorIdIfNull(
+        surveyActiveId,
+        operatorId,
+        trx,
+      );
+      if (!activeSurvey) return;
 
-    const resultUpdate = await updateActiveSurvey(surveyActiveId, {
-      reservationMinutes: reservationMinutes,
+      const resultUpdate = await updateActiveSurvey(
+        surveyActiveId,
+        {
+          reservationMinutes: reservationMinutes,
+        },
+        trx,
+      );
+      if (!resultUpdate) {
+        throw new Error("Не удалось обновить reservationMinutes");
+      }
+
+      return "ok";
     });
-    if (!resultUpdate) {
-      throw new Error("Не удалось обновить reservationMinutes");
-    }
-
-    await client.query("COMMIT"); // Завершаем транзакцию
-
-    return "ok";
   } catch (error) {
-    await client.query("ROLLBACK"); // Откатываем при ошибке
     throw new Error("Error reservationSurveyActiveByOperator: " + error);
-  } finally {
-    client.release(); // Освобождаем клиента
   }
 }
 
@@ -70,29 +69,34 @@ export async function checkCanUserTakeSurvey(user: UsersType): Promise<{
   surveyUntil?: number | null;
 }> {
   try {
-    const userInSurveyActive = await isInSurveyActive({
-      userId: user.user_id,
+    return await pool.transaction().execute(async (trx) => {
+      const userInSurveyActive = await isInSurveyActive(
+        {
+          userId: user.user_id,
+        },
+        trx,
+      );
+      if (userInSurveyActive)
+        return { result: false, reason: "userInSurveyActive" };
+
+      const nowTimespan = Number(new Date());
+      const lockUntilTimespan = user.survey_lock_until
+        ? Number(new Date(user.survey_lock_until))
+        : null;
+      const is_survey_lock = lockUntilTimespan
+        ? lockUntilTimespan > nowTimespan
+        : false;
+      if (is_survey_lock)
+        return {
+          result: false,
+          reason: "is_survey_lock",
+          surveyUntil: lockUntilTimespan,
+        };
+
+      return { result: true };
     });
-    if (userInSurveyActive)
-      return { result: false, reason: "userInSurveyActive" };
-
-    const nowTimespan = Number(new Date());
-    const lockUntilTimespan = user.survey_lock_until
-      ? Number(new Date(user.survey_lock_until))
-      : null;
-    const is_survey_lock = lockUntilTimespan
-      ? lockUntilTimespan > nowTimespan
-      : false;
-    if (is_survey_lock)
-      return {
-        result: false,
-        reason: "is_survey_lock",
-        surveyUntil: lockUntilTimespan,
-      };
-
-    return { result: true };
   } catch (error) {
-    throw new Error("Error canOperatorTakeSurvey: " + error);
+    throw new Error("Error checkCanUserTakeSurvey: " + error);
   }
 }
 
@@ -103,37 +107,38 @@ export async function takeSurveyByUser(params: {
   code_word: string | null;
   location_string: string;
 }): Promise<void> {
-  const client = await db.connect(); // Получаем клиента для транзакции
   try {
-    await client.query("BEGIN"); // Начинаем транзакцию
-
     const { surveyId, userId, tg_account, code_word, location_string } = params;
 
-    const isUpd = await updateSurvey(surveyId, { increment_count: 1 });
-    if (!isUpd) {
-      throw new Error("updateSurvey не обновилась");
-    }
-    const isUserUpdate = await updateUserByUserId(userId, {
-      last_user_location: location_string,
-      last_tg_account: tg_account,
-    });
-    if (!isUserUpdate) {
-      throw new Error("updateUserByUserId filed");
-    }
-    await addSurveyActive({
-      surveyId: surveyId,
-      userId: userId,
-      codeWord: code_word,
-    });
+    return await pool.transaction().execute(async (trx) => {
+      const isUpd = await updateSurvey(surveyId, { increment_count: 1 }, trx);
+      if (!isUpd) {
+        throw new Error("updateSurvey не обновилась");
+      }
+      const isUserUpdate = await updateUserByUserId(
+        userId,
+        {
+          last_user_location: location_string,
+          last_tg_account: tg_account,
+        },
+        trx,
+      );
+      if (!isUserUpdate) {
+        throw new Error("updateUserByUserId filed");
+      }
+      await addSurveyActive(
+        {
+          surveyId: surveyId,
+          userId: userId,
+          codeWord: code_word,
+        },
+        trx,
+      );
 
-    await client.query("COMMIT"); // Завершаем транзакцию
-
-    return;
+      return;
+    });
   } catch (error) {
-    await client.query("ROLLBACK"); // Откатываем при ошибке
     throw new Error("Error takeSurveyByUser: " + error);
-  } finally {
-    client.release(); // Освобождаем клиента
   }
 }
 
@@ -141,28 +146,25 @@ export async function cancelTakeSurveyByUser(
   surveyActiveId: SurveyActiveType["survey_active_id"],
   surveyId: SurveyActiveType["survey_id"],
 ): Promise<void> {
-  const client = await db.connect(); // Получаем клиента для транзакции
   try {
-    await client.query("BEGIN"); // Начинаем транзакцию
+    return await pool.transaction().execute(async (trx) => {
+      const isDeleteActiveSurveyId = await deleteActiveSurvey(
+        surveyActiveId,
+        trx,
+      );
+      if (!isDeleteActiveSurveyId) {
+        throw new Error("Survey active delete failed");
+      }
 
-    const isDeleteActiveSurveyId = await deleteActiveSurvey(surveyActiveId);
-    if (!isDeleteActiveSurveyId) {
-      throw new Error("Survey active delete failed");
-    }
+      const isUpd = await updateSurvey(surveyId, { decrement_count: 1 }, trx);
+      if (!isUpd) {
+        throw new Error("Survey updating failed");
+      }
 
-    const isUpd = await updateSurvey(surveyId, { decrement_count: 1 });
-    if (!isUpd) {
-      throw new Error("Survey updating failed");
-    }
-
-    await client.query("COMMIT"); // Завершаем транзакцию
-
-    return;
+      return;
+    });
   } catch (error) {
-    await client.query("ROLLBACK"); // Откатываем при ошибке
     throw new Error("Error cancelTakeSurveyByUser: " + error);
-  } finally {
-    client.release(); // Освобождаем клиента
   }
 }
 
@@ -177,12 +179,8 @@ export async function addNewSurveyWithTasks(params: {
     description: string;
     data: string;
   }[];
-}): Promise<"ok" | undefined> {
-  const client = await db.connect(); // Получаем клиента для транзакции
-
+}): Promise<string | undefined> {
   try {
-    await client.query("BEGIN"); // Начинаем транзакцию
-
     const {
       region_id,
       survey_type,
@@ -192,36 +190,39 @@ export async function addNewSurveyWithTasks(params: {
       task_price,
       tasks,
     } = params;
-
-    const newSurveyId = await addSurvey({
-      completionLimit: completion_limit,
-      description: description,
-      regionId: region_id,
-      surveyType: survey_type,
-      taskPrice: task_price,
-      topic: topic,
-    });
-    if (!newSurveyId) {
-      throw new Error("Survey insert failed");
-    }
-    for (const task of tasks) {
-      const insertTaskId = await addSurveyTask({
-        surveyId: newSurveyId,
-        description: task.description,
-        data: task.data,
-      });
-      if (!insertTaskId) {
-        throw new Error("Survey task insert failed");
+    return await pool.transaction().execute(async (trx) => {
+      const newSurveyId = await addSurvey(
+        {
+          completionLimit: completion_limit,
+          description: description,
+          regionId: region_id,
+          surveyType: survey_type,
+          taskPrice: task_price,
+          topic: topic,
+        },
+        trx,
+      );
+      if (!newSurveyId) {
+        throw new Error("Survey insert failed");
       }
-    }
-    await client.query("COMMIT"); // Завершаем транзакцию
-    return "ok";
+      for (const task of tasks) {
+        const insertTaskId = await addSurveyTask(
+          {
+            surveyId: newSurveyId,
+            description: task.description,
+            data: task.data,
+          },
+          trx,
+        );
+        if (!insertTaskId) {
+          throw new Error("Survey task insert failed");
+        }
+      }
+      return "ok";
+    });
   } catch (error) {
-    await client.query("ROLLBACK"); // Откатываем при ошибке
     logger.error("Error addNewSurveyWithTasks: " + error);
     return;
-  } finally {
-    client.release(); // Освобождаем клиента
   }
 }
 
@@ -229,17 +230,19 @@ export async function getInfoAboutSurvey(
   surveyId: number,
 ): Promise<(RegionSettingsType & SurveysType) | undefined> {
   try {
-    const survey = await getSurveyById(surveyId);
-    if (!survey) return;
+    return await pool.transaction().execute(async (trx) => {
+      const survey = await getSurveyById(surveyId, trx);
+      if (!survey) return;
 
-    const region = await getRegionById(survey.region_id);
-    if (!region) return;
-    return {
-      ...survey,
-      ...region,
-    };
+      const region = await getRegionById(survey.region_id, trx);
+      if (!region) return;
+      return {
+        ...survey,
+        ...region,
+      };
+    });
   } catch (error) {
-    throw new Error("Error getSurveyActiveInfo: " + error);
+    throw new Error("Error getInfoAboutSurvey: " + error);
   }
 }
 

@@ -87,7 +87,7 @@ export async function finishSurveyScene(
         await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
           reply_markup: FinishSurveyKeyboard(surveyActiveId),
         });
-        continue;
+        return;
       }
       if (isCompleted === BUTTONS_KEYBOARD.YesButton) {
         result[index] = {
@@ -98,11 +98,11 @@ export async function finishSurveyScene(
         };
 
         const result_position = await countResultStep(conversation, ctx);
-        if (!result_position) {
+        if (result_position === null) {
           await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
             reply_markup: FinishSurveyKeyboard(surveyActiveId),
           });
-          continue;
+          return;
         }
         result[index].result = result_position;
 
@@ -115,7 +115,7 @@ export async function finishSurveyScene(
           await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
             reply_markup: FinishSurveyKeyboard(surveyActiveId),
           });
-          continue;
+          return;
         }
         result[index].result_positions = result_positions.join(", ");
       } else {
@@ -159,8 +159,8 @@ export async function finishSurveyScene(
       });
     }
   } catch (error) {
-    logger.error("Error in registrationScene: " + error);
-    await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
+    logger.error("Error in finishSurveyScene: " + error);
+    return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
       reply_markup: FinishSurveyKeyboard(surveyActiveId),
     });
   }
@@ -214,7 +214,7 @@ async function completedOrNotStep(
 async function countResultStep(
   conversation: MyConversation,
   ctx: MyConversationContext,
-) {
+): Promise<string | null> {
   try {
     await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT);
 
@@ -228,7 +228,7 @@ async function countResultStep(
       const userInput = response.message?.text.trim() ?? "";
       const number = Number(userInput); // Преобразуем в целое число
 
-      if (isNaN(number)) {
+      if (isNaN(number) || number <= 0) {
         await ctx.reply(
           FINISH_SURVEY_OPERATOR_SCENE.ENTERED_NOT_CORRECT_RESULT,
         );
@@ -326,7 +326,6 @@ async function uploadVideoStep(
 
     let video_id: number | null = null;
     while (true) {
-      console.log(0);
       const response = await conversation.waitFor(
         ["message:video", "message:text"],
         {
@@ -338,7 +337,6 @@ async function uploadVideoStep(
         },
       );
 
-      console.log(111);
       // Проверяем, является ли сообщение текстом
       if (response.message?.text) {
         const text = response.message.text.trim();

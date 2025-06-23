@@ -36,7 +36,7 @@ export const handleStartCommand = async (
       reply_markup: AuthAuditorKeyboard(),
     });
   } catch (error) {
-    logger.info(error);
+    logger.error("Error in handleStartCommand: " + error);
     return ctx.reply(COMMAND_AUDITOR_START.SOME_ERROR, {
       reply_markup: { remove_keyboard: true },
     });

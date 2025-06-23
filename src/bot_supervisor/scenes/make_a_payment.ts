@@ -32,7 +32,7 @@ export async function makeAPayment(
       MAKE_A_PAYMENT_SCENES.INFO.replace(
         "{amount}",
         pendingPayment.amount.toString(),
-      ).replace("{address}", pendingPayment.address),
+      ).replace("{address}", pendingPayment.wallet),
       {
         parse_mode: "HTML",
       },

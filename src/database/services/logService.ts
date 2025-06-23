@@ -1,5 +1,4 @@
-import { PoolClient } from "pg";
-import { db } from "../dbClient";
+import { client } from "../dbClient";
 import logger from "../../lib/logger";
 
 export interface UserMetrics {
@@ -19,11 +18,7 @@ export interface UserMetrics {
 export async function getUserRegistrationMetrics(): Promise<
   UserMetrics[] | undefined
 > {
-  const client: PoolClient = await db.connect();
-
   try {
-    await client.query("BEGIN");
-
     const queryText = `
       SELECT 
         bul_main.user_id,
@@ -108,14 +103,10 @@ export async function getUserRegistrationMetrics(): Promise<
     `;
 
     const result = await client.query<UserMetrics>(queryText);
-    await client.query("COMMIT");
 
     return result.rows;
   } catch (error) {
-    await client.query("ROLLBACK");
     logger.error("Error in getUserRegistrationMetrics: " + error);
     return undefined;
-  } finally {
-    client.release();
   }
 }

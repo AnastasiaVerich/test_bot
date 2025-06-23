@@ -136,7 +136,7 @@ export async function updateOperatorByOperatorId(
       .executeTakeFirst();
     return result?.operator_id ?? null;
   } catch (error) {
-    throw new Error("Error updateOperatorByTgAccount: " + error);
+    throw new Error("Error updateOperatorByOperatorId: " + error);
   }
 }
 

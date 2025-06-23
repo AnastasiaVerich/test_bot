@@ -33,11 +33,11 @@ export async function handleBalance(ctx: MyContext): Promise<any | void> {
         ? pendingPayment
             .map((e) => {
               const amount = e.amount;
-              const address =
-                e.address.length > 12
-                  ? `${e.address.slice(0, 6)}...${e.address.slice(-6)}`
-                  : e.address;
-              return `⏳ *${amount} ${HANDLER_BALANCE.RUB}* — ${address}`;
+              const wallet =
+                e.wallet.length > 12
+                  ? `${e.wallet.slice(0, 6)}...${e.wallet.slice(-6)}`
+                  : e.wallet;
+              return `⏳ *${amount} ${HANDLER_BALANCE.RUB}* — ${wallet}`;
             })
             .join("\n")
         : HANDLER_BALANCE.NO_PENDING_PAYMENT;

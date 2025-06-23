@@ -145,7 +145,7 @@ export async function getAllActiveSurveysReservationByOperator(
       .where("reservation_end", "is not", null)
       .execute();
   } catch (error) {
-    throw new Error("Error getNewActiveSurveysByOperatorId: " + error);
+    throw new Error("Error getAllActiveSurveysReservationByOperator: " + error);
   }
 }
 

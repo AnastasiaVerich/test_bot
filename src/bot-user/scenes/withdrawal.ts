@@ -148,23 +148,23 @@ export async function withdrawalScene(
     }
 
     // Шаг 2: Ожидаем ввода адреса для перевода
-    const recipientAddress = await stepWallet(conversation, ctx);
+    const recipientWallet = await stepWallet(conversation, ctx);
     await conversation.external(() =>
       addUserLogs({
         user_id: userId,
         event_type: "withdrawal",
         step: "wallet",
-        event_data: JSON.stringify(recipientAddress),
+        event_data: JSON.stringify(recipientWallet),
       }),
     );
 
-    if (!recipientAddress) {
+    if (!recipientWallet) {
       await conversation.external(() =>
         addUserLogs({
           user_id: userId,
           event_type: "withdrawal",
           step: "failed",
-          event_data: JSON.stringify("recipientAddress is null"),
+          event_data: JSON.stringify("recipientWallet is null"),
         }),
       );
 
@@ -177,7 +177,7 @@ export async function withdrawalScene(
     const resultConfirm = await stepConfirm(
       conversation,
       ctx,
-      recipientAddress,
+      recipientWallet,
       amountTON,
     );
 
@@ -201,7 +201,7 @@ export async function withdrawalScene(
       await addPendingPayment({
         userId: userId,
         amount: amountTON,
-        address: recipientAddress,
+        wallet: recipientWallet,
       });
       const amountRub =
         amountTON * curseTon > balance ? balance : amountTON * curseTon;
@@ -357,7 +357,7 @@ async function stepWallet(
 async function stepConfirm(
   conversation: Conversation<MyContext, MyConversationContext>,
   ctx: MyConversationContext,
-  recipientAddress: string,
+  recipientWallet: string,
   amountTON: number,
 ) {
   try {
@@ -365,7 +365,7 @@ async function stepConfirm(
       WITHDRAWAL_USER_SCENE.CONFIRMATION.replace(
         "{amount}",
         amountTON.toString(),
-      ).replace("{address}", recipientAddress),
+      ).replace("{address}", recipientWallet),
       {
         parse_mode: "HTML",
         reply_markup: ConfirmCancelButtons(),

@@ -24,8 +24,6 @@ export async function executePendingPayments(): Promise<void> {
       const pendingPayments = await getAllPendingPayment();
 
       for (const payment of pendingPayments) {
-        console.log(payment);
-
         if (payment.attempts >= 3) {
           //0 1 2 3
           if (payment.user_id) {
@@ -62,7 +60,7 @@ export async function executePendingPayments(): Promise<void> {
             });
           }
 
-          const result = await make_payment(payment.amount, payment.address);
+          const result = await make_payment(payment.amount, payment.wallet);
           if (result.isSuccess) {
             const res = await paymentIsCompleted(payment);
             if (!res) {
@@ -121,7 +119,7 @@ type ResponseType = {
 
 export async function make_payment(
   amountTON: number,
-  recipientAddress: string,
+  recipientWallet: string,
 ): Promise<ResponseType> {
   const seedPhraseArr = seed_phrase.split(" ");
   const maxGas = 0.01; // Примерная комиссия за транзакцию
@@ -140,9 +138,8 @@ export async function make_payment(
 
   let contract = client.open(wallet);
   let seqno: number = await contract.getSeqno();
-  console.log(seqno);
 
-  const estimateSumGas = await estimateFee(client, recipientAddress, amountTON);
+  const estimateSumGas = await estimateFee(client, recipientWallet, amountTON);
 
   let conditions = true;
   if (conditions /*estimateSumGas <= maxGas*/) {
@@ -158,14 +155,14 @@ export async function make_payment(
         secretKey: keyPair.secretKey,
         messages: [
           internal({
-            to: recipientAddress,
+            to: recipientWallet,
             value: BigInt(amountTON * 1e9), // Сумма перевода в нанотонах
             bounce: false,
           }),
         ],
       });
       logger.info(
-        `Транзакция на ${amountTON} TON для ${recipientAddress} отправлена, seqno: ${seqno}`,
+        `Транзакция на ${amountTON} TON для ${recipientWallet} отправлена, seqno: ${seqno}`,
       );
       // Ждем подтверждения
       let confirmed = false;
@@ -173,19 +170,18 @@ export async function make_payment(
         // Проверяем 20 раз, ~40 секунд
         await new Promise((resolve) => setTimeout(resolve, 2000)); // Ждем 2 секунды
         const newSeqno = await contract.getSeqno();
-        console.log("seqno", seqno);
-        console.log("newSeqno", newSeqno);
+
         if (newSeqno > seqno) {
           confirmed = true;
           logger.info(
-            `Транзакция на ${amountTON} TON для ${recipientAddress} подтверждена, новый seqno: ${newSeqno}`,
+            `Транзакция на ${amountTON} TON для ${recipientWallet} подтверждена, новый seqno: ${newSeqno}`,
           );
           break;
         }
       }
       if (!confirmed) {
         logger.warn(
-          `Транзакция на ${amountTON} TON для ${recipientAddress} не подтверждена`,
+          `Транзакция на ${amountTON} TON для ${recipientWallet} не подтверждена`,
         );
         return { isSuccess: false, reason: "not confirmed" };
       }
@@ -201,7 +197,7 @@ export async function make_payment(
 
 async function estimateFee(
   client: TonClient,
-  recipientAddress: string,
+  recipientWallet: string,
   amountTON: number,
 ): Promise<number> {
   const seedPhrase = "your mnemonic seed phrase here";
@@ -222,7 +218,7 @@ async function estimateFee(
     secretKey: keyPair.secretKey,
     messages: [
       internal({
-        to: recipientAddress,
+        to: recipientWallet,
         value: BigInt(amountTON * 1e9), // Сумма перевода в нанотонах
         bounce: false,
       }),

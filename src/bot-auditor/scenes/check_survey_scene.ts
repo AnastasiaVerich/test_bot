@@ -95,7 +95,7 @@ export async function checkSurveyScene(
         await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.SOME_ERROR, {
           reply_markup: AuthAuditorKeyboard(),
         });
-        continue;
+        return;
       }
       if (isCompleted === BUTTONS_KEYBOARD.YesButton) {
         result[index] = {
@@ -112,7 +112,7 @@ export async function checkSurveyScene(
           await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.SOME_ERROR, {
             reply_markup: AuthAuditorKeyboard(),
           });
-          continue;
+          return;
         }
         result[index].result = result_position;
 
@@ -125,7 +125,7 @@ export async function checkSurveyScene(
           await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.SOME_ERROR, {
             reply_markup: AuthAuditorKeyboard(),
           });
-          continue;
+          return;
         }
         result[index].result_positions = result_positions.join(", ");
       } else {
@@ -167,7 +167,7 @@ export async function checkSurveyScene(
       });
     }
   } catch (error) {
-    logger.error("Error in CHECK_SURVEY_AUDITOR_SCENE: " + error);
+    logger.error("Error in checkSurveyScene: " + error);
     await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.SOME_ERROR, {
       reply_markup: AuthAuditorKeyboard(),
     });
@@ -222,7 +222,7 @@ async function completedOrNotStep(
 async function countResultStep(
   conversation: MyConversation,
   ctx: MyConversationContext,
-) {
+): Promise<string | null> {
   try {
     await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_RESULT);
 
@@ -236,7 +236,7 @@ async function countResultStep(
       const userInput = response.message?.text.trim() ?? "";
       const number = Number(userInput); // Преобразуем в целое число
 
-      if (isNaN(number)) {
+      if (isNaN(number) || number <= 0) {
         await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTERED_NOT_CORRECT_RESULT);
         continue;
       }

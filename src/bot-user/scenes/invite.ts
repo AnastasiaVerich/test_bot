@@ -45,7 +45,7 @@ export async function inviteScene(
       ),
     });
   } catch (error) {
-    logger.error("Error in invite: " + error);
+    logger.error("Error in inviteScene: " + error);
     await ctx.reply(RESPONSES.SOME_ERROR);
     return;
   }

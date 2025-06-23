@@ -43,7 +43,7 @@ export async function getAllReferralByrReferrerIdAndStatus(
 
     return result;
   } catch (error) {
-    throw new Error("Error getReferralByrReferrerId: " + error);
+    throw new Error("Error getAllReferralByrReferrerIdAndStatus: " + error);
   }
 }
 export async function getReferralByReferredUserIdAndStatus(
@@ -62,7 +62,7 @@ export async function getReferralByReferredUserIdAndStatus(
 
     return result ?? null;
   } catch (error) {
-    throw new Error("Error getReferralByrReferrerId: " + error);
+    throw new Error("Error getReferralByReferredUserIdAndStatus: " + error);
   }
 }
 
@@ -89,6 +89,6 @@ export async function updateReferralByReferredUserId(
       .executeTakeFirst();
     return result?.referred_user_id ?? null;
   } catch (error) {
-    throw new Error("Error updateUserByUserId: " + error);
+    throw new Error("Error updateReferralByReferredUserId: " + error);
   }
 }

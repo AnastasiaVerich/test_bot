@@ -24,11 +24,11 @@ GRANT USAGE, SELECT, UPDATE ON SEQUENCE blacklist_users_blacklist_id_seq TO admi
 CREATE TABLE users (
     user_id BIGINT PRIMARY KEY,
     phone VARCHAR(15) NOT NULL,
-    balance DECIMAL(10, 2) DEFAULT 0.0 NOT NULL,  --Баланс, который можно снять
+    balance DECIMAL(10, 2) DEFAULT 0.0 NOT NULL,
     notify_reason notify_reason_enum DEFAULT NULL,
-    survey_lock_until TIMESTAMP WITH TIME ZONE DEFAULT NULL,  --Дата после которой можно проходить опрос
-    last_init TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Последний раз его идентификация была в этот день и час
-    skip_photo_verification BOOLEAN DEFAULT FALSE NOT NULL,  -- Пропуск фотоконтроля
+    survey_lock_until TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+    last_init TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    skip_photo_verification BOOLEAN DEFAULT FALSE NOT NULL,
     last_tg_account VARCHAR(255) DEFAULT NULL,
     last_user_location VARCHAR(255) DEFAULT NULL,
 
@@ -74,7 +74,7 @@ CREATE SEQUENCE operator_default_id_seq;
 CREATE TABLE operators (
     id SERIAL PRIMARY KEY,
     operator_id BIGINT UNIQUE NOT NULL DEFAULT nextval('operator_default_id_seq'),
-    balance DECIMAL(10, 2) DEFAULT 0.0 NOT NULL,  --Баланс, который можно снять
+    balance DECIMAL(10, 2) DEFAULT 0.0 NOT NULL,
     tg_account VARCHAR(255) NOT NULL,
     phone VARCHAR(15) DEFAULT NULL,
     can_take_multiple_surveys BOOLEAN NOT NULL DEFAULT FALSE,
@@ -118,22 +118,24 @@ CREATE TABLE auditors (
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE auditors_id_seq TO admin_vadim;
 GRANT ALL PRIVILEGES ON TABLE auditors TO admin_vadim;
 
+-- Рекламные компании
 CREATE TABLE advertising_campaigns (
-    id SERIAL PRIMARY KEY,  -- Уникальный идентификатор бонусной программы
-    name VARCHAR(255) NOT NULL,  -- Название бонусной программы
-    referral_link VARCHAR(2048) NOT NULL UNIQUE,  -- Реферальная ссылка, уникальная
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP  -- Дата создания записи
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    referral_link VARCHAR(2048) NOT NULL UNIQUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE advertising_campaigns_id_seq TO admin_vadim;
 GRANT ALL PRIVILEGES ON TABLE advertising_campaigns TO admin_vadim;
 
+-- Логи пользователя
 CREATE TABLE bot_user_logs (
-    id BIGSERIAL PRIMARY KEY,  -- Уникальный идентификатор записи лога
-    user_id BIGINT NOT NULL,  -- ID пользователя
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
     step VARCHAR(50) DEFAULT NULL,
-    event_type VARCHAR(50) NOT NULL,  -- Тип события (например, START, REGISTRATION_STEP, REGISTRATION_STOP)
-    event_data JSONB DEFAULT '{}',  -- Дополнительные данные события (например, шаг регистрации, введенные данные)
-    logged_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP  -- Время события
+    event_type VARCHAR(50) NOT NULL,
+    event_data JSONB DEFAULT '{}',
+    logged_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 GRANT ALL PRIVILEGES ON TABLE bot_user_logs TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE bot_user_logs_id_seq TO admin_vadim;
@@ -144,8 +146,8 @@ GRANT USAGE, SELECT, UPDATE ON SEQUENCE bot_user_logs_id_seq TO admin_vadim;
 CREATE TABLE region_settings (
     region_id SERIAL PRIMARY KEY,
     region_name VARCHAR(255) NOT NULL,
-    reservation_time_min INT NOT NULL,      -- Время резервации задания для региона
-    survey_interval INTERVAL NOT NULL DEFAULT '7 day',      -- Время резервации задания для региона
+    reservation_time_min INT NOT NULL,
+    survey_interval INTERVAL NOT NULL DEFAULT '7 day',
     polygon JSONB NOT NULL,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -175,13 +177,13 @@ GRANT USAGE, SELECT, UPDATE ON SEQUENCE operators_regions_operator_region_id_seq
 -- Таблица опросов
 CREATE TABLE surveys (
     survey_id SERIAL PRIMARY KEY,
-    region_id INT NOT NULL, -- Регион опроса
-    survey_type survey_type_enum NOT NULL,           -- Тип опроса
-    topic VARCHAR(255) NOT NULL,            -- Тематика/название опроса
-    description VARCHAR(255),               -- Описание
-    completion_limit INT NOT NULL,        -- Столько раз его можно пройти
-    active_and_completed_count INT NOT NULL DEFAULT 0,        -- Столько раз его уже прошли
-    task_price DECIMAL(10, 2) NOT NULL DEFAULT 50, -- Оплата за задание
+    region_id INT NOT NULL,
+    survey_type survey_type_enum NOT NULL,
+    topic VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    completion_limit INT NOT NULL,
+    active_and_completed_count INT NOT NULL DEFAULT 0,
+    task_price DECIMAL(10, 2) NOT NULL DEFAULT 50,
 
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -193,15 +195,14 @@ GRANT ALL PRIVILEGES ON TABLE surveys TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE surveys_survey_id_seq TO admin_vadim;
 
 -- Таблица заданий опросов
--- Создание таблицы survey_tasks
 CREATE TABLE survey_tasks (
-    survey_task_id SERIAL PRIMARY KEY, -- Идентификатор записи об опросе
-    survey_id INT NOT NULL,                  -- Идентификатор опроса
-    description VARCHAR(255) NOT NULL,       -- Описание задания
+    survey_task_id SERIAL PRIMARY KEY,
+    survey_id INT NOT NULL,
+    description VARCHAR(255) NOT NULL,
     data JSONB NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Время создания
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (survey_id) REFERENCES surveys(survey_id) ON DELETE CASCADE -- Внешний ключ на таблицу surveys
+    FOREIGN KEY (survey_id) REFERENCES surveys(survey_id) ON DELETE CASCADE
 );
 
 GRANT ALL PRIVILEGES ON TABLE survey_tasks TO admin_vadim;
@@ -238,7 +239,7 @@ CREATE TABLE survey_task_completions (
     operator_id BIGINT NOT NULL,
     result VARCHAR(255) NOT NULL,
     result_positions_var VARCHAR(255) NOT NULL,
-    reward DECIMAL(10, 2) NOT NULL, -- Фактическая награда (может отличаться от tasks.reward, если меняется со временем)
+    reward DECIMAL(10, 2) NOT NULL,
     reward_operator DECIMAL(10, 2) NOT NULL,
     video_id BIGINT,
 
@@ -252,6 +253,7 @@ CREATE TABLE survey_task_completions (
 GRANT ALL PRIVILEGES ON TABLE survey_task_completions TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE survey_task_completions_completion_id_seq TO admin_vadim;
 
+-- Таблица для аудитов, которые либо сейчас проверяются либо ждут проверки
 CREATE TABLE audit_survey_active (
     audit_survey_active_id SERIAL PRIMARY KEY,
     task_completions_ids INTEGER[] NOT NULL DEFAULT '{}',
@@ -270,7 +272,7 @@ CREATE TABLE audit_survey_active (
 GRANT ALL PRIVILEGES ON TABLE audit_survey_active TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE audit_survey_active_audit_survey_active_id_seq TO admin_vadim;
 
--- Таблица в которой зафиксированы результаты прохождения опроса
+-- Таблица в которой зафиксированы результаты проверки прохождения опроса
 CREATE TABLE audit_survey_task_completions (
     id SERIAL PRIMARY KEY,
     completion_id INT,
@@ -310,27 +312,28 @@ GRANT ALL PRIVILEGES ON TABLE withdrawal_logs TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE withdrawal_logs_withdrawal_id_seq TO admin_vadim;
 
 
+-- Таблица с общими переменными
 CREATE TABLE common_variables(
     common_vars_id SERIAL PRIMARY KEY,
     label common_variable_label UNIQUE,
     value VARCHAR(100) NOT NULL,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    update_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 GRANT ALL PRIVILEGES ON TABLE common_variables TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE common_variables_common_vars_id_seq TO admin_vadim;
 
---Таблица в которой хранится список, который ожидает вывода
+--Таблица в которой хранится список платежей, которые ожидают вывода
 CREATE TABLE pending_payments (
     pending_payments_id SERIAL PRIMARY KEY,
     user_id BIGINT DEFAULT NULL,
     auditor_id BIGINT DEFAULT NULL,
     operator_id BIGINT DEFAULT NULL,
-    amount DECIMAL(10, 2) NOT NULL,               -- Сумма платежа
-    attempts INT DEFAULT 0 NOT NULL,              -- Количество попыток проведения платежа
-    address TEXT NOT NULL,                        -- Адрес для платежа
+    amount DECIMAL(10, 2) NOT NULL,
+    attempts INT DEFAULT 0 NOT NULL,
+    wallet TEXT NOT NULL,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
@@ -344,10 +347,10 @@ GRANT USAGE, SELECT, UPDATE ON SEQUENCE pending_payments_pending_payments_id_seq
 
 -- Таблица реферальных ссылок
 CREATE TABLE referral_bonuses (
-    referred_user_id BIGINT PRIMARY KEY, --(приглашенный)
-    referrer_id BIGINT,  -- Кто получил бонус (пригласивший)
-    amount DECIMAL(10, 2)  DEFAULT 0.0, -- Сумма бонуса
-    status referral_bonuses_status_enum DEFAULT 'pending', -- когда меняется на completed, то зачисляется на баланс сумма
+    referred_user_id BIGINT PRIMARY KEY,
+    referrer_id BIGINT NOT NULL,
+    amount DECIMAL(10, 2)  DEFAULT 0.0,
+    status referral_bonuses_status_enum DEFAULT 'pending',
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     completed_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
@@ -356,7 +359,7 @@ CREATE TABLE referral_bonuses (
 );
 GRANT ALL PRIVILEGES ON TABLE referral_bonuses TO admin_vadim;
 
-
+-- Таблица видео прохождения опросов
 CREATE TABLE videos (
     video_id BIGSERIAL PRIMARY KEY,
     file_id VARCHAR(255) NOT NULL, -- Telegram file_id для отправки видео обратно

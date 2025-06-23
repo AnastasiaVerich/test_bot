@@ -236,7 +236,7 @@ export async function surveyScene(
       }),
     );
 
-    logger.error("Error in survey: " + error);
+    logger.error("Error in surveyScene: " + error);
     await ctx.reply(SURVEY_USER_SCENE.SOME_ERROR, {
       reply_markup: AuthUserKeyboard(),
     });

@@ -118,6 +118,6 @@ export async function getAllUserLogsByEvent(
 
     return logs;
   } catch (error) {
-    throw new Error(`Error getUserStartLogs: ${error}`);
+    throw new Error(`Error getAllUserLogsByEvent: ${error}`);
   }
 }

@@ -48,7 +48,6 @@ export function parseExcel(filePath: string): Record[] {
 
     // Пропускаем пустые строки
     if (isEmpty) continue;
-    console.log(1);
 
     const tasks: Task[] = [];
 

@@ -29,12 +29,12 @@ export const handleManualPayment = async (ctx: MyContext) => {
     if (availablePendingPayment.length > 0) {
       const wordStr = availablePendingPayment.map((e) => {
         const amount = e.amount;
-        const address =
-          e.address.length > 12
-            ? `${e.address.slice(0, 6)}...${e.address.slice(-6)}`
-            : e.address;
+        const wallet =
+          e.wallet.length > 12
+            ? `${e.wallet.slice(0, 6)}...${e.wallet.slice(-6)}`
+            : e.wallet;
         return {
-          label: amount + " " + address,
+          label: amount + " " + wallet,
           value:
             BUTTONS_CALLBACK_QUERIES.ThisPendingPaymentInfo + "_" + e.user_id,
         };

@@ -51,7 +51,7 @@ export async function handler_history_withdrawal(
         ),
     });
   } catch (error) {
-    logger.error("Error in keyboard balance: " + error);
+    logger.error("Error in handler_history_withdrawal: " + error);
     await ctx.reply(HANDLER_HISTORY_WITHDRAWAL.SOME_ERROR);
   }
 }

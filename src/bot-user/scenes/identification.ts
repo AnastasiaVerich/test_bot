@@ -53,7 +53,7 @@ export async function identificationScene(
   } catch (error) {
     const userId = await returnUserId(ctx);
 
-    logger.error(userId + ": Error in identification: " + error);
+    logger.error(userId + ": Error in identificationScene: " + error);
     await ctx.reply(RESPONSES.SOME_ERROR);
     return;
   }

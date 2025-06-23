@@ -62,6 +62,6 @@ export async function getAdvertisingCampaign(
 
     return result ?? null;
   } catch (error) {
-    throw new Error("Error addAdvertisingCampaign: " + error);
+    throw new Error("Error getAdvertisingCampaign: " + error);
   }
 }

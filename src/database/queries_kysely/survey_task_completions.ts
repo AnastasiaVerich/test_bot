@@ -29,7 +29,7 @@ export async function getSurveyCompletionsByOperatorId(
       .orderBy("completed_at", "desc")
       .execute();
   } catch (error) {
-    throw new Error("Error getSurveyCompletionsByUserId: " + error);
+    throw new Error("Error getSurveyCompletionsByOperatorId: " + error);
   }
 }
 

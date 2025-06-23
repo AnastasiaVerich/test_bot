@@ -37,7 +37,7 @@ export async function addAuditSurveyTaskCompletions(
 
     return res?.id ?? null;
   } catch (error) {
-    throw new Error("Error addAuditSurveyActive: " + error);
+    throw new Error("Error addAuditSurveyTaskCompletions: " + error);
   }
 }
 

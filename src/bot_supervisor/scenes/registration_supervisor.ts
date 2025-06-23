@@ -44,7 +44,7 @@ export async function registrationSupervisorScene(
     });
     return;
   } catch (error) {
-    logger.error("Error in registrationScene: " + error);
+    logger.error("Error in registrationSupervisorScene: " + error);
     await ctx.reply(REGISTRATION_SUPERVISOR_SCENE.SOME_ERROR, {
       reply_markup: RegistrationKeyboard(),
     });

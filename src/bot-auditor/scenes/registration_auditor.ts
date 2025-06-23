@@ -42,7 +42,7 @@ export async function registrationAuditorScene(
     });
     return;
   } catch (error) {
-    logger.error("Error in registrationScene: " + error);
+    logger.error("Error in registrationAuditorScene: " + error);
     await ctx.reply(REGISTRATION_AUDITOR_SCENE.SOME_ERROR, {
       reply_markup: RegistrationKeyboard(),
     });

@@ -47,7 +47,7 @@ export async function handler_history_accrual(
         ),
     });
   } catch (error) {
-    logger.error("Error in keyboard balance: " + error);
+    logger.error("Error in handler_history_accrual: " + error);
     await ctx.reply(HANDLER_HISTORY_ACCRUAL.SOME_ERROR);
   }
 }

@@ -20,7 +20,8 @@ export const FINISH_SURVEY_OPERATOR_SCENE = {
 
   ENTER_VIDEO_SUCCESS: `Видео успешно сохранено.`,
 
-  ENTERED_NOT_CORRECT_RESULT: "Пожалуйста, введите число!",
+  ENTERED_NOT_CORRECT_RESULT:
+    "Пожалуйста, введите число, которое будет больше 0!",
 
   ENTER_RESULT_POS_VAR_1: "Выберите сайт, который был на 1ой позиции",
 
@@ -56,7 +57,8 @@ export const CHECK_SURVEY_AUDITOR_SCENE = {
 
   ENTER_RESULT_OTHERWISE: `Пожалуйста, введите число, обозначающее позицию сайта при поиске.`,
 
-  ENTERED_NOT_CORRECT_RESULT: "Пожалуйста, введите число!",
+  ENTERED_NOT_CORRECT_RESULT:
+    "Пожалуйста, введите число, которое будет больше 0!",
 
   ENTER_RESULT_POS_VAR_1: "Выберите сайт, который был на 1ой позиции",
 
