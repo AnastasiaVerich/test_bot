@@ -2,37 +2,37 @@ import { Keyboard } from "grammy";
 import { BUTTONS_KEYBOARD } from "../constants/buttons";
 import { WEB_APP_URL } from "../../config/env";
 
-export const sendUserPhone = (): Keyboard =>
+export const SendUserPhoneKeyboard = (): Keyboard =>
   new Keyboard()
     .requestContact(BUTTONS_KEYBOARD.SendNumberButton)
     .resized()
     .persistent();
 
-export const ConfirmCancelButtons = (): Keyboard =>
+export const ConfirmCancelKeyboard = (): Keyboard =>
   new Keyboard()
     .text(BUTTONS_KEYBOARD.ConfirmButton)
     .text(BUTTONS_KEYBOARD.CancelButton)
     .resized()
     .oneTime();
 
-export const YesNoButtons = (): Keyboard =>
+export const YesNoKeyboard = (): Keyboard =>
   new Keyboard()
     .text(BUTTONS_KEYBOARD.YesButton)
     .text(BUTTONS_KEYBOARD.NoButton)
     .resized()
     .oneTime();
 
-export const SkipButtonKeyboard = (): Keyboard =>
+export const SkipKeyboard = (): Keyboard =>
   new Keyboard().text(BUTTONS_KEYBOARD.SkipButton).resized().oneTime();
 
-export const OnButtons = (): Keyboard =>
+export const OnCancelKeyboard = (): Keyboard =>
   new Keyboard()
     .text(BUTTONS_KEYBOARD.OnButton)
     .text(BUTTONS_KEYBOARD.CancelButton)
     .resized()
     .oneTime();
 
-export const OffButtons = (): Keyboard =>
+export const OffCancelKeyboard = (): Keyboard =>
   new Keyboard()
     .text(BUTTONS_KEYBOARD.OffButton)
     .text(BUTTONS_KEYBOARD.CancelButton)
@@ -41,7 +41,7 @@ export const OffButtons = (): Keyboard =>
 
 export const EmptyKeyboard = (): Keyboard => new Keyboard().resized().oneTime();
 
-export const sendLocation = (): Keyboard =>
+export const SendLocationKeyboard = (): Keyboard =>
   new Keyboard()
     .requestLocation(BUTTONS_KEYBOARD.GeolocationButton)
     .resized()
@@ -89,7 +89,7 @@ export const AuthSupervisorKeyboard = (): Keyboard =>
     .row()
     .resized();
 
-export const createKeyboardFromWords = (words: string[]): Keyboard => {
+export const CreateFromWordsKeyboard = (words: string[]): Keyboard => {
   const keyboard = new Keyboard();
 
   for (const word of words) {
@@ -99,7 +99,7 @@ export const createKeyboardFromWords = (words: string[]): Keyboard => {
   return keyboard.resized(); // Возвращаем адаптивную клавиатуру
 };
 
-export const WebAppKeyboardPhoto = (
+export const WebAppPhotoKeyboard = (
   userId: number,
   userPhone: string,
   type: "identification" | "registration",
@@ -120,7 +120,7 @@ export const WebAppKeyboardPhoto = (
     )
     .resized();
 
-export const WebAppKeyboardGeolocation = (userId: number): Keyboard =>
+export const WebAppGeolocationKeyboard = (userId: number): Keyboard =>
   new Keyboard()
     .webApp(
       BUTTONS_KEYBOARD.GeolocationButton,

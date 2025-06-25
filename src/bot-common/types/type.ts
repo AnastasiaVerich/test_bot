@@ -21,3 +21,4 @@ export interface LocationType {
   latitude: number;
   longitude: number;
 }
+export type entitiesType = "user" | "operator" | "auditor" | "supervisor";

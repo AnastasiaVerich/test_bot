@@ -5,7 +5,7 @@ import logger from "../../../lib/logger";
 import { AuthAuditorKeyboard } from "../../../bot-common/keyboards/keyboard";
 import { getUserAccount } from "../../../bot-common/utils/getUserTgAccount";
 import { getAuditorByIdPhoneOrTg } from "../../../database/queries_kysely/auditors";
-import { RegistrationKeyboard } from "../../../bot-common/keyboards/inlineKeyboard";
+import { RegistrationInlineKeyboard } from "../../../bot-common/keyboards/inlineKeyboard";
 
 export const handleStartCommand = async (
   ctx: MyContext,
@@ -29,7 +29,7 @@ export const handleStartCommand = async (
     if (!auditor.phone) {
       return ctx.reply(COMMAND_AUDITOR_START.WELCOME_NEW_AUDITOR, {
         parse_mode: "HTML",
-        reply_markup: RegistrationKeyboard(),
+        reply_markup: RegistrationInlineKeyboard(),
       });
     }
     return ctx.reply(COMMAND_AUDITOR_START.WELCOME_OLD_AUDITOR, {

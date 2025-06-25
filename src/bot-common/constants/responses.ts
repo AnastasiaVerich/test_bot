@@ -5,4 +5,6 @@ export const RESPONSES = {
     "Вы не авторизованы. Пожалуйста, используйте /start для регистрации.",
   YOU_IN_BLACKLIST: "Вы заблокированы.",
   SOME_ERROR: "Бот временно недоступен",
+  CANCELLED: "Отменено.",
+  WAITING: "⏳....",
 };

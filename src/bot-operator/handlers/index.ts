@@ -10,7 +10,6 @@ import {
 import { MyContext } from "../../bot-common/types/type";
 import { newSurveysHandler } from "./callback/mess_new_surveys";
 import { currentSurveysHandler } from "./callback/mess_current_surveys";
-import { cancelOperatorConversation } from "../utils/cancelOperatorConversation";
 import { createCallbackRegex } from "../../utils/callBackRegex";
 import { handleFinishSurvey } from "./callback/callback_queries_finish_survey";
 import { handleCancelSurvey } from "./callback/callback_queries_cancel_survey";
@@ -19,17 +18,31 @@ import { handleGetUserSurveyInfo } from "./callback/callback_queries_get_user_su
 import { handleBalance } from "./callback/callback_queries_balance";
 import { handler_history_accrual } from "./callback/callback_queries_history_accrual";
 import { handler_history_withdrawal } from "./callback/callback_queries_history_withdrawal";
+import { cancelConversations } from "../../bot-common/utils/cancelConversation";
+import { AuthOperatorKeyboard } from "../../bot-common/keyboards/keyboard";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.chatType("private").command("start", async (ctx) => {
-    await cancelOperatorConversation(ctx, true);
+    await cancelConversations(
+      ctx,
+      ScenesOperator,
+      AuthOperatorKeyboard(),
+      true,
+    );
     await handleStartCommand(ctx);
   });
   bot.command("chatid", async (ctx) => {
-    await cancelOperatorConversation(ctx, true);
+    await cancelConversations(
+      ctx,
+      ScenesOperator,
+      AuthOperatorKeyboard(),
+      true,
+    );
     await handleChatidCommand(ctx);
   });
-  bot.command("clean", (ctx) => cancelOperatorConversation(ctx));
+  bot.command("clean", (ctx) =>
+    cancelConversations(ctx, ScenesOperator, AuthOperatorKeyboard()),
+  );
 }
 
 export function registerCallbackQueries(bot: Bot<MyContext>): void {

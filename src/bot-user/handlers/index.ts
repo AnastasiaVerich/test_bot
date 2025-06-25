@@ -14,23 +14,26 @@ import {
 import { MyContext } from "../../bot-common/types/type";
 import { handleHelpCommand } from "./callback/command_help";
 import {
-  HelpBackKeyboard,
-  HelpKeyboard,
+  HelpBackInlineKeyboard,
+  HelpInlineKeyboard,
 } from "../../bot-common/keyboards/inlineKeyboard";
 import { COMMAND_USER_HELP } from "../../bot-common/constants/handler_command";
 import { handler_help_btns } from "./callback/callback_queries_help_btns";
-import { cancelUserConversation } from "../utils/cancelUserConversation";
+import { cancelConversations } from "../../bot-common/utils/cancelConversation";
+import { AuthUserKeyboard } from "../../bot-common/keyboards/keyboard";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.command("start", async (ctx) => {
-    await cancelUserConversation(ctx, true);
+    await cancelConversations(ctx, ScenesUser, AuthUserKeyboard(), true);
     await handleStartCommand(ctx);
   });
   bot.command("help", async (ctx) => {
-    await cancelUserConversation(ctx, true);
+    await cancelConversations(ctx, ScenesUser, AuthUserKeyboard(), true);
     await handleHelpCommand(ctx);
   });
-  bot.command("clean", (ctx) => cancelUserConversation(ctx));
+  bot.command("clean", (ctx) =>
+    cancelConversations(ctx, ScenesUser, AuthUserKeyboard()),
+  );
 }
 
 export function registerCallbackQueries(bot: Bot<MyContext>): void {
@@ -78,7 +81,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
       await handler_help_btns(
         ctx,
         COMMAND_USER_HELP.FirstQuestionAnswer,
-        HelpBackKeyboard(),
+        HelpBackInlineKeyboard(),
       );
     },
   );
@@ -88,7 +91,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
       await handler_help_btns(
         ctx,
         COMMAND_USER_HELP.SecondQuestionAnswer,
-        HelpBackKeyboard(),
+        HelpBackInlineKeyboard(),
       );
     },
   );
@@ -98,7 +101,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
       await handler_help_btns(
         ctx,
         COMMAND_USER_HELP.ThirdQuestionAnswer,
-        HelpBackKeyboard(),
+        HelpBackInlineKeyboard(),
       );
     },
   );
@@ -109,13 +112,17 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
       await handler_help_btns(
         ctx,
         COMMAND_USER_HELP.LastQuestionAnswer,
-        HelpBackKeyboard(),
+        HelpBackInlineKeyboard(),
       );
     },
   );
 
   bot.callbackQuery(COMMAND_USER_HELP.BackButton, async (ctx: MyContext) => {
-    await handler_help_btns(ctx, COMMAND_USER_HELP.HEADER, HelpKeyboard());
+    await handler_help_btns(
+      ctx,
+      COMMAND_USER_HELP.HEADER,
+      HelpInlineKeyboard(),
+    );
   });
 }
 

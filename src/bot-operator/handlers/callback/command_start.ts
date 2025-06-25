@@ -1,6 +1,6 @@
 import { Message } from "grammy/types";
 import { COMMAND_OPERATOR_START } from "../../../bot-common/constants/handler_command";
-import { RegistrationKeyboard } from "../../../bot-common/keyboards/inlineKeyboard";
+import { RegistrationInlineKeyboard } from "../../../bot-common/keyboards/inlineKeyboard";
 import { MyContext } from "../../../bot-common/types/type";
 import logger from "../../../lib/logger";
 import { getUserAccount } from "../../../bot-common/utils/getUserTgAccount";
@@ -28,7 +28,7 @@ export const handleStartCommand = async (
     if (!operator.phone) {
       return ctx.reply(COMMAND_OPERATOR_START.WELCOME_NEW_OPERATOR, {
         parse_mode: "HTML",
-        reply_markup: RegistrationKeyboard(),
+        reply_markup: RegistrationInlineKeyboard(),
       });
     }
     return ctx.reply(COMMAND_OPERATOR_START.WELCOME_OLD_OPERATOR, {

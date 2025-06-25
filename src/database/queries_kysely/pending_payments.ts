@@ -18,9 +18,9 @@ export async function getAllPendingPayment(
 
 export async function addPendingPayment(
   params: {
-    userId?: PendingPaymentsType["user_id"];
+    user_id?: PendingPaymentsType["user_id"];
     auditor_id?: PendingPaymentsType["auditor_id"];
-    operatorId?: PendingPaymentsType["operator_id"];
+    operator_id?: PendingPaymentsType["operator_id"];
     amount: PendingPaymentsType["amount"];
     wallet: PendingPaymentsType["wallet"];
   },
@@ -28,8 +28,8 @@ export async function addPendingPayment(
 ): Promise<PendingPaymentsType["user_id"] | null> {
   try {
     const {
-      userId = null,
-      operatorId = null,
+      user_id = null,
+      operator_id = null,
       auditor_id = null,
       amount,
       wallet,
@@ -38,8 +38,8 @@ export async function addPendingPayment(
     const result = await trx
       .insertInto("pending_payments")
       .values({
-        user_id: userId,
-        operator_id: operatorId,
+        user_id: user_id,
+        operator_id: operator_id,
         auditor_id: auditor_id,
         amount,
         wallet,
@@ -98,6 +98,39 @@ export async function deletePendingPayment(
   }
 }
 
+export async function getAllPendingPaymentById(
+  params: {
+    user_id?: PendingPaymentsType["user_id"];
+    auditor_id?: PendingPaymentsType["auditor_id"];
+    operator_id?: PendingPaymentsType["operator_id"];
+  },
+  trx: poolType = pool,
+): Promise<PendingPaymentsType[]> {
+  try {
+    const { user_id = null, operator_id = null, auditor_id = null } = params;
+    const result = await trx
+      .selectFrom("pending_payments")
+      .selectAll()
+      .where((eb) => {
+        const conditions = [];
+        if (user_id !== undefined) {
+          conditions.push(eb("user_id", "=", user_id));
+        }
+        if (operator_id !== undefined) {
+          conditions.push(eb("operator_id", "=", operator_id));
+        }
+        if (auditor_id !== undefined) {
+          conditions.push(eb("auditor_id", "=", auditor_id));
+        }
+        return eb.or(conditions);
+      })
+      .execute();
+
+    return result;
+  } catch (error) {
+    throw new Error("Error getAllPendingPaymentById: " + error);
+  }
+}
 export async function getAllPendingPaymentByUserId(
   userId: PendingPaymentsType["user_id"],
   trx: poolType = pool,

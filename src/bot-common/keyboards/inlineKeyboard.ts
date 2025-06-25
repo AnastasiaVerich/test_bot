@@ -2,13 +2,13 @@ import { InlineKeyboard } from "grammy";
 import { BUTTONS_CALLBACK_QUERIES } from "../constants/buttons";
 import { COMMAND_USER_HELP } from "../constants/handler_command";
 
-export const RegistrationKeyboard = (): InlineKeyboard =>
+export const RegistrationInlineKeyboard = (): InlineKeyboard =>
   new InlineKeyboard().text(
     BUTTONS_CALLBACK_QUERIES.RegistrationButtonText,
     BUTTONS_CALLBACK_QUERIES.RegistrationButton,
   );
 
-export const FinishSurveyKeyboard = (
+export const FinishSurveyInlineKeyboard = (
   survey_active_id: number,
 ): InlineKeyboard =>
   new InlineKeyboard()
@@ -21,13 +21,13 @@ export const FinishSurveyKeyboard = (
       BUTTONS_CALLBACK_QUERIES.CancelSurveyButton + "_" + survey_active_id,
     );
 
-export const IdentificationKeyboard = (): InlineKeyboard =>
+export const IdentificationInlineKeyboard = (): InlineKeyboard =>
   new InlineKeyboard().text(
     BUTTONS_CALLBACK_QUERIES.IdentificationButtonText,
     BUTTONS_CALLBACK_QUERIES.IdentificationButton,
   );
 
-export const BalanceMenu = (): InlineKeyboard =>
+export const BalanceMenuInlineKeyboard = (): InlineKeyboard =>
   new InlineKeyboard()
     .text(
       BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButtonText,
@@ -44,7 +44,7 @@ export const BalanceMenu = (): InlineKeyboard =>
       BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButton,
     );
 
-export const HelpKeyboard = (): InlineKeyboard => {
+export const HelpInlineKeyboard = (): InlineKeyboard => {
   return new InlineKeyboard()
     .text(
       COMMAND_USER_HELP.FirstQuestionButtonText,
@@ -78,20 +78,20 @@ export const CreateInlineKeyboard = (
   return keyboard;
 };
 
-export const HelpBackKeyboard = (): InlineKeyboard => {
+export const HelpBackInlineKeyboard = (): InlineKeyboard => {
   return new InlineKeyboard().text(
     COMMAND_USER_HELP.BackButtonText,
     COMMAND_USER_HELP.BackButton,
   );
 };
 
-export const TookKeyboard = (): InlineKeyboard => {
+export const TookSurveyInlineKeyboard = (): InlineKeyboard => {
   return new InlineKeyboard().text(
     BUTTONS_CALLBACK_QUERIES.TookButtonText,
     BUTTONS_CALLBACK_QUERIES.TookButton,
   );
 };
-export const TookAuditKeyboard = (): InlineKeyboard => {
+export const TookAuditSurveyInlineKeyboard = (): InlineKeyboard => {
   return new InlineKeyboard().text(
     BUTTONS_CALLBACK_QUERIES.TookAuditButtonText,
     BUTTONS_CALLBACK_QUERIES.TookAuditButton,

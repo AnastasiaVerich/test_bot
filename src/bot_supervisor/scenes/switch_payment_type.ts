@@ -1,8 +1,8 @@
 import { Keyboard } from "grammy";
 import logger from "../../lib/logger";
 import {
-  OffButtons,
-  OnButtons,
+  OffCancelKeyboard,
+  OnCancelKeyboard,
   AuthSupervisorKeyboard,
 } from "../../bot-common/keyboards/keyboard";
 import { SWITCH_PAYMENT_TYPE_SCENES } from "../../bot-common/constants/scenes";
@@ -30,17 +30,17 @@ export async function switchPaymentType(
     }
 
     let question = SWITCH_PAYMENT_TYPE_SCENES.STATE_NOW;
-    let keyboard = OnButtons();
+    let keyboard = OnCancelKeyboard();
     if (autoPayInfo.value === "ON") {
       question = question
         .replace("{status}", "включено")
         .replace("{action}", "отключить");
-      keyboard = OffButtons();
+      keyboard = OffCancelKeyboard();
     } else {
       question = question
         .replace("{status}", "отключено")
         .replace("{action}", "включить");
-      keyboard = OnButtons();
+      keyboard = OnCancelKeyboard();
     }
 
     const resultKeyboard = await onOffStep(

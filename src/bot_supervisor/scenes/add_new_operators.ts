@@ -2,7 +2,7 @@ import { Conversation } from "@grammyjs/conversations";
 import logger from "../../lib/logger";
 import { BUTTONS_KEYBOARD } from "../../bot-common/constants/buttons";
 import {
-  ConfirmCancelButtons,
+  ConfirmCancelKeyboard,
   AuthSupervisorKeyboard,
 } from "../../bot-common/keyboards/keyboard";
 import {
@@ -117,7 +117,7 @@ async function stepConfirm(
       ADD_NEW_OPERATORS_SCENE.CONFIRMATION.replace("{operator_name}", name),
       {
         parse_mode: "HTML",
-        reply_markup: ConfirmCancelButtons(),
+        reply_markup: ConfirmCancelKeyboard(),
       },
     );
 
@@ -130,7 +130,7 @@ async function stepConfirm(
           otherwise: (ctx) =>
             ctx.reply(ADD_NEW_OPERATORS_SCENE.CONFIRMATION_OTHERWISE, {
               parse_mode: "HTML",
-              reply_markup: ConfirmCancelButtons(),
+              reply_markup: ConfirmCancelKeyboard(),
             }),
         },
       );

@@ -7,8 +7,8 @@ import { findUser } from "../utils/findUser";
 import { formatTimestamp } from "../../lib/date";
 import {
   AuthUserKeyboard,
-  sendLocation,
-  WebAppKeyboardGeolocation,
+  SendLocationKeyboard,
+  WebAppGeolocationKeyboard,
 } from "../../bot-common/keyboards/keyboard";
 import { SURVEY_USER_SCENE } from "../../bot-common/constants/scenes";
 import {
@@ -250,7 +250,7 @@ async function stepLocation(
   try {
     await ctx.reply(SURVEY_USER_SCENE.ENTER_LOCATION, {
       parse_mode: "HTML",
-      reply_markup: sendLocation(),
+      reply_markup: SendLocationKeyboard(),
     });
 
     let location: LocationType | null = null;
@@ -261,7 +261,7 @@ async function stepLocation(
         otherwise: (ctx) =>
           ctx.reply(SURVEY_USER_SCENE.ENTER_LOCATION_OTHERWISE, {
             parse_mode: "HTML",
-            reply_markup: sendLocation(),
+            reply_markup: SendLocationKeyboard(),
           }),
       });
 
@@ -270,7 +270,7 @@ async function stepLocation(
       if ("forward_date" in response.message) {
         await ctx.reply(SURVEY_USER_SCENE.ENTERED_NOT_USER_LOCATION, {
           parse_mode: "HTML",
-          reply_markup: sendLocation(),
+          reply_markup: SendLocationKeyboard(),
         });
         continue;
       }
@@ -297,7 +297,7 @@ async function stepLocationApp(
   try {
     let response: GeocodeResponse | null = null;
     await ctx.reply(SURVEY_USER_SCENE.ENTER_LOCATION_APP, {
-      reply_markup: WebAppKeyboardGeolocation(userId),
+      reply_markup: WebAppGeolocationKeyboard(userId),
     });
 
     const message_web_app_data = await conversation.waitFor(
@@ -305,7 +305,7 @@ async function stepLocationApp(
       {
         otherwise: (ctx) =>
           ctx.reply(SURVEY_USER_SCENE.ENTER_LOCATION_APP_OTHERWISE, {
-            reply_markup: WebAppKeyboardGeolocation(userId),
+            reply_markup: WebAppGeolocationKeyboard(userId),
           }),
       },
     );

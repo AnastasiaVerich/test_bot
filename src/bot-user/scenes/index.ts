@@ -4,8 +4,11 @@ import { registrationUserScene } from "./registration_user";
 import { identificationScene } from "./identification";
 import { inviteScene } from "./invite";
 import { surveyScene } from "./survey";
-import { withdrawalScene } from "./withdrawal";
 import { MyContext } from "../../bot-common/types/type";
+
+import { withdrawalScene } from "../../bot-common/scenes/withdrawal";
+import { addUserLogs } from "../../database/queries_kysely/bot_user_logs";
+import { AuthUserKeyboard } from "../../bot-common/keyboards/keyboard";
 
 export enum ScenesUser {
   RegisterScene = "RegisterScene", // eslint-disable-line no-unused-vars
@@ -14,7 +17,6 @@ export enum ScenesUser {
   InviteScene = "InviteScene", // eslint-disable-line no-unused-vars
   WithdrawalScene = "WithdrawalScene", // eslint-disable-line no-unused-vars
 }
-export type ScenesUserType = (typeof ScenesUser)[keyof typeof ScenesUser];
 export function registerScenes(bot: Bot<MyContext>): void {
   // Регистрируем сцену
   bot.use(
@@ -28,6 +30,9 @@ export function registerScenes(bot: Bot<MyContext>): void {
   bot.use(createConversation(inviteScene, { id: ScenesUser.InviteScene }));
   bot.use(createConversation(surveyScene, { id: ScenesUser.SurveyScene }));
   bot.use(
-    createConversation(withdrawalScene, { id: ScenesUser.WithdrawalScene }),
+    createConversation(
+      (a, b) => withdrawalScene(a, b, "user", AuthUserKeyboard(), addUserLogs),
+      { id: ScenesUser.WithdrawalScene },
+    ),
   );
 }

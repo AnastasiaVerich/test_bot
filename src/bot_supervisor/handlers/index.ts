@@ -7,19 +7,27 @@ import {
 } from "../../bot-common/constants/buttons";
 import { ScenesSupervisor } from "../scenes";
 import { authSupervisorMiddleware } from "../middleware/authMiddleware";
-import { cancelSupervisorConversation } from "../utils/cancelSupervisorConversation";
 import { handleManualPayment } from "./mess_manual_payment";
 import { createCallbackRegex } from "../../utils/callBackRegex";
 import { handlePendingPaymentInfo } from "./callback_queries_pending_payment_info";
 import { handleGetUserLogs } from "./mess_get_user_logs";
 import { handleRestartFailedPayments } from "../../bot-operator/handlers/callback/mess_restart_failed_payments";
+import { cancelConversations } from "../../bot-common/utils/cancelConversation";
+import { AuthSupervisorKeyboard } from "../../bot-common/keyboards/keyboard";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.command("start", async (ctx) => {
-    await cancelSupervisorConversation(ctx, true);
+    await cancelConversations(
+      ctx,
+      ScenesSupervisor,
+      AuthSupervisorKeyboard(),
+      true,
+    );
     await handleStartCommand(ctx);
   });
-  bot.command("clean", (ctx) => cancelSupervisorConversation(ctx));
+  bot.command("clean", (ctx) =>
+    cancelConversations(ctx, ScenesSupervisor, AuthSupervisorKeyboard()),
+  );
 }
 
 export function registerCallbackQueries(bot: Bot<MyContext>): void {

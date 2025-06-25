@@ -42,16 +42,16 @@ async function bootstrap() {
 
     // Обработчик ошибок
     bot.catch((err) => {
-      logger.info("Ошибка в боте:", err);
+      logger.error("Ошибка в боте:", err);
     });
 
     // Запуск бота
     await bot.start().then((res) => {});
   } catch (err) {
-    logger.info("Ошибка в bootstrap:", err);
+    logger.error("Ошибка в bootstrap:", err);
   }
 }
 
 bootstrap().catch((err) => {
-  logger.info("Ошибка при запуске bootstrap:", err);
+  logger.error("Ошибка при запуске bootstrap:", err);
 });

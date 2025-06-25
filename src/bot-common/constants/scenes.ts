@@ -1,5 +1,4 @@
 import { BUTTONS_CALLBACK_QUERIES, BUTTONS_KEYBOARD } from "./buttons";
-import { linkWelcomeAuditor, linkWelcomeOperator } from "../../config/env";
 
 export const FINISH_SURVEY_OPERATOR_SCENE = {
   SURVEY_ACTIVE_NOT_FOUND: "Активный опрос отсутствует",
@@ -81,47 +80,7 @@ export const CHECK_SURVEY_AUDITOR_SCENE = {
   SUCCESS: "Проверка прохождения опроса подтверждена!",
 };
 
-export const REGISTRATION_OPERATOR_SCENE = {
-  ENTER_PHONE:
-    "Для регистрации пришлите свой номер телефона." +
-    "\n" +
-    "\n" +
-    `Нажмите на кнопку '${BUTTONS_KEYBOARD.SendNumberButton}', которая появилась внизу экрана.`,
-  ENTER_PHONE_OTHERWISE: `Пожалуйста, отправьте номер, нажав на кнопку '${BUTTONS_KEYBOARD.SendNumberButton}'.`,
-
-  ENTERED_NOT_USER_PHONE: "Пожалуйста, отправьте свой собственный номер.",
-
-  ENTERED_USER_PHONE: "Ваш номер:",
-
-  ENTER_CHAT_LINK:
-    "Создайте новый Telegram-чат и добавьте этого бота как администратора." +
-    "\n" +
-    "\n" +
-    "Затем отправьте ссылку на этот чат." +
-    "\n" +
-    "Пример: <code>https://t.me/@YourChat</code> или <code>@YourChat</code>",
-
-  ENTER_CHAT_LINK_OTHERWISE:
-    "Пожалуйста, отправьте текстовую ссылку на Telegram-чат." +
-    "\n" +
-    "Пример: <code>https://t.me/@YourChat</code>",
-
-  INVALID_CHAT_LINK:
-    "Неверный формат ссылки. Пожалуйста, отправьте корректную ссылку на Telegram-чат." +
-    "\n" +
-    "Пример: <code>https://t.me/@YourChat</code> или <code>@YourChat</code>",
-
-  BOT_NOT_ADMIN:
-    "Бот должен быть администратором в указанном чате. Пожалуйста, добавьте бота как администратора и попробуйте снова.",
-
-  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.RegistrationButtonText}'.`,
-
-  SUCCESS:
-    "Регистрация пройдена.\n\nВступите в канал для операторов, что бы получать новые опросы. Перейдите по ссылке: " +
-    linkWelcomeOperator,
-};
-
-export const REGISTRATION_AUDITOR_SCENE = {
+export const SIMPLE_REGISTRATION_SCENE = {
   ENTER_PHONE:
     "Для регистрации пришлите свой номер телефона." +
     "\n" +
@@ -135,85 +94,9 @@ export const REGISTRATION_AUDITOR_SCENE = {
 
   SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.RegistrationButtonText}'.`,
 
-  SUCCESS:
-    "Регистрация пройдена.\n\nВступите в канал для аудиторов, что бы проверять новые записи. Перейдите по ссылке: " +
-    linkWelcomeAuditor,
-};
-
-export const WITHDRAWAL_OPERATOR_SCENE = {
-  HAS_PENDING_PAYMENT: "Вы уже поставили средства на вывод.",
-
-  INVALID_BALANCE: "У вас нулевой баланс в TON.",
-
-  ENTER_AMOUNT: "Введите сумму для снятия",
-
-  ENTERED_AMOUNT_OTHERWISE: "Пожалуйста, введите сумму для снятия TON",
-
-  INVALID_AMOUNT:
-    "Введена невалидная сумма. Она должна быть больше 0.05 TON и не меньше вашего баланса (доступно: {balance} TON). Попробуйте еще раз.",
-
-  ENTERED_AMOUNT: "Введенная сумма для снятия: ",
-
-  ENTER_WALLET:
-    "Пришлите адрес вашего счета из официального Telegram-бота @wallet. Вывод денег осуществляется в TON. \n" +
-    "\n" +
-    "Внимание! Если вы ошибетесь в адресе счета, Ваши деньги безвозвратно уйдут! Для своего удобства, можете использовать встроенный в телеграм кошелек @wallet. Инструкция по созданию кошелька: https://youtu.be/T6AbwwSrb_M?si=AgjHlVdOwb2od0N1",
-
-  ENTER_WALLET_OTHERWISE: "Пожалуйста, введите кошелек.",
-
-  ENTERED_INVALID_WALLET: "Вы ввели невалидный адрес. Попробуйте ещё.",
-
-  CONFIRMATION:
-    "Подтвердите снятие <b>{amount}</b> на адрес: <b>{address}</b>.",
-
-  CONFIRMATION_OTHERWISE:
-    "Нажмите на соответсвующую кнопку для подтверждения или отклонения вывода средств.",
-
-  SUCCESS:
-    "Операция отправлена на исполнение. Ожидайте перевод в течении 24 ч.",
-  CANCELLED: "Операция была отменена.",
-
-  SELECT_SOURCE: "Выберите, как хотите вывести деньги",
-
-  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButtonText}'.`,
-};
-
-export const WITHDRAWAL_AUDITOR_SCENE = {
-  HAS_PENDING_PAYMENT: "Вы уже поставили средства на вывод.",
-
-  INVALID_BALANCE: "У вас нулевой баланс в TON.",
-
-  ENTER_AMOUNT: "Введите сумму для снятия",
-
-  ENTERED_AMOUNT_OTHERWISE: "Пожалуйста, введите сумму для снятия TON",
-
-  INVALID_AMOUNT:
-    "Введена невалидная сумма. Она должна быть больше 0.05 TON и не меньше вашего баланса (доступно: {balance} TON). Попробуйте еще раз.",
-
-  ENTERED_AMOUNT: "Введенная сумма для снятия: ",
-
-  ENTER_WALLET:
-    "Пришлите адрес вашего счета из официального Telegram-бота @wallet. Вывод денег осуществляется в TON. \n" +
-    "\n" +
-    "Внимание! Если вы ошибетесь в адресе счета, Ваши деньги безвозвратно уйдут! Для своего удобства, можете использовать встроенный в телеграм кошелек @wallet. Инструкция по созданию кошелька: https://youtu.be/T6AbwwSrb_M?si=AgjHlVdOwb2od0N1",
-
-  ENTER_WALLET_OTHERWISE: "Пожалуйста, введите кошелек.",
-
-  ENTERED_INVALID_WALLET: "Вы ввели невалидный адрес. Попробуйте ещё.",
-
-  CONFIRMATION:
-    "Подтвердите снятие <b>{amount}</b> на адрес: <b>{address}</b>.",
-
-  CONFIRMATION_OTHERWISE:
-    "Нажмите на соответсвующую кнопку для подтверждения или отклонения вывода средств.",
-
-  SUCCESS:
-    "Операция отправлена на исполнение. Ожидайте перевод в течении 24 ч.",
-  CANCELLED: "Операция была отменена.",
-
-  SELECT_SOURCE: "Выберите, как хотите вывести деньги",
-
-  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButtonText}'.`,
+  SUCCESS: "Регистрация пройдена!",
+  JOIN_THE_CHANNEL:
+    "Вступите в канал, что бы приступить к работе. Перейдите по ссылке: {link}",
 };
 
 export const IDENTIFICATION_USER_SCENE = {
@@ -306,7 +189,7 @@ export const SURVEY_USER_SCENE = {
   SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.SurveyButton}'.`,
 };
 
-export const WITHDRAWAL_USER_SCENE = {
+export const WITHDRAWAL_SCENE = {
   HAS_PENDING_PAYMENT: "Вы уже поставили средства на вывод.",
 
   INVALID_BALANCE: "У вас нулевой баланс в TON.",
@@ -341,23 +224,6 @@ export const WITHDRAWAL_USER_SCENE = {
   SELECT_SOURCE: "Выберите, как хотите вывести деньги",
 
   SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButtonText}'.`,
-};
-
-export const REGISTRATION_SUPERVISOR_SCENE = {
-  ENTER_PHONE:
-    "Для регистрации пришлите свой номер телефона." +
-    "\n" +
-    "\n" +
-    `Нажмите на кнопку '${BUTTONS_KEYBOARD.SendNumberButton}', которая появилась внизу экрана.`,
-  ENTER_PHONE_OTHERWISE: `Пожалуйста, отправьте номер, нажав на кнопку '${BUTTONS_KEYBOARD.SendNumberButton}'.`,
-
-  ENTERED_NOT_USER_PHONE: "Пожалуйста, отправьте свой собственный номер.",
-
-  ENTERED_USER_PHONE: "Ваш номер:",
-
-  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.RegistrationButtonText}'.`,
-
-  SUCCESS: "Регистрация пройдена.",
 };
 
 export const ADD_ADV_CAMPAIGN_SCENE = {

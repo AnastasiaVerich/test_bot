@@ -2,13 +2,13 @@ import { Conversation } from "@grammyjs/conversations";
 import logger from "../../lib/logger";
 import { getUserId } from "../../bot-common/utils/getUserId";
 import { BUTTONS_KEYBOARD } from "../../bot-common/constants/buttons";
-import { FinishSurveyKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
+import { FinishSurveyInlineKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
 import {
   AuthOperatorKeyboard,
-  ConfirmCancelButtons,
-  createKeyboardFromWords,
-  SkipButtonKeyboard,
-  YesNoButtons,
+  ConfirmCancelKeyboard,
+  CreateFromWordsKeyboard,
+  SkipKeyboard,
+  YesNoKeyboard,
 } from "../../bot-common/keyboards/keyboard";
 import { FINISH_SURVEY_OPERATOR_SCENE } from "../../bot-common/constants/scenes";
 import {
@@ -85,7 +85,7 @@ export async function finishSurveyScene(
       );
       if (isCompleted === null) {
         await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-          reply_markup: FinishSurveyKeyboard(surveyActiveId),
+          reply_markup: FinishSurveyInlineKeyboard(surveyActiveId),
         });
         return;
       }
@@ -100,7 +100,7 @@ export async function finishSurveyScene(
         const result_position = await countResultStep(conversation, ctx);
         if (result_position === null) {
           await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-            reply_markup: FinishSurveyKeyboard(surveyActiveId),
+            reply_markup: FinishSurveyInlineKeyboard(surveyActiveId),
           });
           return;
         }
@@ -113,7 +113,7 @@ export async function finishSurveyScene(
         );
         if (!result_positions) {
           await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-            reply_markup: FinishSurveyKeyboard(surveyActiveId),
+            reply_markup: FinishSurveyInlineKeyboard(surveyActiveId),
           });
           return;
         }
@@ -132,7 +132,7 @@ export async function finishSurveyScene(
 
     if (!resultConfirm) {
       await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-        reply_markup: FinishSurveyKeyboard(surveyActiveId),
+        reply_markup: FinishSurveyInlineKeyboard(surveyActiveId),
       });
       return;
     }
@@ -161,7 +161,7 @@ export async function finishSurveyScene(
   } catch (error) {
     logger.error("Error in finishSurveyScene: " + error);
     return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-      reply_markup: FinishSurveyKeyboard(surveyActiveId),
+      reply_markup: FinishSurveyInlineKeyboard(surveyActiveId),
     });
   }
 }
@@ -177,7 +177,7 @@ async function completedOrNotStep(
         `\n\n${survey_task.description.replaceAll("/n", "\n")}`,
       {
         parse_mode: "HTML",
-        reply_markup: YesNoButtons(),
+        reply_markup: YesNoKeyboard(),
       },
     );
 
@@ -192,7 +192,7 @@ async function completedOrNotStep(
               FINISH_SURVEY_OPERATOR_SCENE.ENTER_COMPLETED_OR_NOT_OTHERWISE,
               {
                 parse_mode: "HTML",
-                reply_markup: YesNoButtons(),
+                reply_markup: YesNoKeyboard(),
               },
             ),
         },
@@ -252,7 +252,7 @@ async function countResultPositionVarStep(
     const { positions_var } = data;
 
     await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT_POS_VAR_1, {
-      reply_markup: createKeyboardFromWords(positions_var),
+      reply_markup: CreateFromWordsKeyboard(positions_var),
     });
 
     let result_1: string | null = null;
@@ -261,7 +261,7 @@ async function countResultPositionVarStep(
       const response = await conversation.waitFor("message:text", {
         otherwise: (ctx) =>
           ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RES_POS_OTHERWISE, {
-            reply_markup: createKeyboardFromWords(positions_var),
+            reply_markup: CreateFromWordsKeyboard(positions_var),
           }),
       });
       const userInput = response.message?.text.trim() ?? "";
@@ -270,7 +270,7 @@ async function countResultPositionVarStep(
       break;
     }
     await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT_POS_VAR_2, {
-      reply_markup: createKeyboardFromWords(positions_var),
+      reply_markup: CreateFromWordsKeyboard(positions_var),
     });
 
     let result_2: string | null = null;
@@ -279,7 +279,7 @@ async function countResultPositionVarStep(
       const response = await conversation.waitFor("message:text", {
         otherwise: (ctx) =>
           ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RES_POS_OTHERWISE, {
-            reply_markup: createKeyboardFromWords(positions_var),
+            reply_markup: CreateFromWordsKeyboard(positions_var),
           }),
       });
       const userInput = response.message?.text.trim() ?? "";
@@ -288,7 +288,7 @@ async function countResultPositionVarStep(
       break;
     }
     await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT_POS_VAR_3, {
-      reply_markup: createKeyboardFromWords(positions_var),
+      reply_markup: CreateFromWordsKeyboard(positions_var),
     });
 
     let result_3: string | null = null;
@@ -297,7 +297,7 @@ async function countResultPositionVarStep(
       const response = await conversation.waitFor("message:text", {
         otherwise: (ctx) =>
           ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RES_POS_OTHERWISE, {
-            reply_markup: createKeyboardFromWords(positions_var),
+            reply_markup: CreateFromWordsKeyboard(positions_var),
           }),
       });
       const userInput = response.message?.text.trim() ?? "";
@@ -321,7 +321,7 @@ async function uploadVideoStep(
   try {
     await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_VIDEO, {
       parse_mode: "HTML",
-      reply_markup: SkipButtonKeyboard(),
+      reply_markup: SkipKeyboard(),
     });
 
     let video_id: number | null = null;
@@ -332,7 +332,7 @@ async function uploadVideoStep(
           otherwise: (ctx) =>
             ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_VIDEO_OTHERWISE, {
               parse_mode: "HTML",
-              reply_markup: SkipButtonKeyboard(),
+              reply_markup: SkipKeyboard(),
             }),
         },
       );
@@ -394,7 +394,7 @@ async function stepConfirm(
   try {
     await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.CONFIRMATION, {
       parse_mode: "HTML",
-      reply_markup: ConfirmCancelButtons(),
+      reply_markup: ConfirmCancelKeyboard(),
     });
 
     let result: string | null = null;
@@ -406,7 +406,7 @@ async function stepConfirm(
           otherwise: (ctx) =>
             ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.CONFIRMATION_OTHERWISE, {
               parse_mode: "HTML",
-              reply_markup: ConfirmCancelButtons(),
+              reply_markup: ConfirmCancelKeyboard(),
             }),
         },
       );

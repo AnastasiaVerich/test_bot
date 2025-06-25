@@ -2,7 +2,7 @@ import { Conversation } from "@grammyjs/conversations";
 import logger from "../../lib/logger";
 import {
   AuthSupervisorKeyboard,
-  YesNoButtons,
+  YesNoKeyboard,
 } from "../../bot-common/keyboards/keyboard";
 import {
   MyContext,
@@ -78,7 +78,7 @@ async function stepConfirm(
   try {
     await ctx.reply(MAKE_A_PAYMENT_SCENES.CONFIRMATION, {
       parse_mode: "HTML",
-      reply_markup: YesNoButtons(),
+      reply_markup: YesNoKeyboard(),
     });
 
     let result: string | null = null;
@@ -90,7 +90,7 @@ async function stepConfirm(
           otherwise: (ctx) =>
             ctx.reply(MAKE_A_PAYMENT_SCENES.CONFIRMATION_OTHERWISE, {
               parse_mode: "HTML",
-              reply_markup: YesNoButtons(),
+              reply_markup: YesNoKeyboard(),
             }),
         },
       );

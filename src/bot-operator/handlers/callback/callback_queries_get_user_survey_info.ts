@@ -6,7 +6,7 @@ import { AuthOperatorKeyboard } from "../../../bot-common/keyboards/keyboard";
 import { getActiveSurvey } from "../../../database/queries_kysely/survey_active";
 import { getInfoAboutSurvey } from "../../../database/services/surveyService";
 import { getAllSurveyTasks } from "../../../database/queries_kysely/survey_tasks";
-import { FinishSurveyKeyboard } from "../../../bot-common/keyboards/inlineKeyboard";
+import { FinishSurveyInlineKeyboard } from "../../../bot-common/keyboards/inlineKeyboard";
 import { getUser } from "../../../database/queries_kysely/users";
 
 export async function handleGetUserSurveyInfo(ctx: MyContext): Promise<void> {
@@ -58,7 +58,7 @@ export async function handleGetUserSurveyInfo(ctx: MyContext): Promise<void> {
     await ctx.reply(`${message}`, { parse_mode: "HTML" });
 
     await ctx.reply(HANDLER_GET_USER_SURVEY_INFO.IF_NEED_FINISH_SURVEY, {
-      reply_markup: FinishSurveyKeyboard(surveyActiveId),
+      reply_markup: FinishSurveyInlineKeyboard(surveyActiveId),
     });
   } catch (error) {
     logger.error("Error in handleCancelSurvey: " + error);

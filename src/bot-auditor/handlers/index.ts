@@ -2,7 +2,6 @@ import { Bot } from "grammy";
 import { handleStartCommand } from "./callback/command_start";
 
 import { MyContext } from "../../bot-common/types/type";
-import { cancelAuditorConversation } from "../utils/cancelAuditorConversation";
 import {
   BUTTONS_CALLBACK_QUERIES,
   BUTTONS_KEYBOARD,
@@ -12,13 +11,17 @@ import { handleTookAuditSurvey } from "./callback/handle_took_audit_survey";
 import { handleBalance } from "./callback/callback_queries_balance";
 import { handler_history_accrual } from "./callback/callback_queries_history_accrual";
 import { handler_history_withdrawal } from "./callback/callback_queries_history_withdrawal";
+import { cancelConversations } from "../../bot-common/utils/cancelConversation";
+import { AuthAuditorKeyboard } from "../../bot-common/keyboards/keyboard";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.chatType("private").command("start", async (ctx) => {
-    await cancelAuditorConversation(ctx, true);
+    await cancelConversations(ctx, ScenesAuditor, AuthAuditorKeyboard(), true);
     await handleStartCommand(ctx);
   });
-  bot.command("clean", (ctx) => cancelAuditorConversation(ctx));
+  bot.command("clean", (ctx) =>
+    cancelConversations(ctx, ScenesAuditor, AuthAuditorKeyboard()),
+  );
 }
 
 export function registerCallbackQueries(bot: Bot<MyContext>): void {

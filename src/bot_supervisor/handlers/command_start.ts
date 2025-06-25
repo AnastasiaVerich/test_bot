@@ -3,7 +3,7 @@ import { MyContext } from "../../bot-common/types/type";
 import { getUserAccount } from "../../bot-common/utils/getUserTgAccount";
 import { getSupervisorByIdPhoneOrTg } from "../../database/queries_kysely/supervisor";
 import { COMMAND_SUPERVISOR_START } from "../../bot-common/constants/handler_command";
-import { RegistrationKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
+import { RegistrationInlineKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
 import logger from "../../lib/logger";
 import { AuthSupervisorKeyboard } from "../../bot-common/keyboards/keyboard";
 
@@ -28,7 +28,7 @@ export const handleStartCommand = async (
     if (!supervisor.phone) {
       return ctx.reply(COMMAND_SUPERVISOR_START.WELCOME_NEW_SUPERVISOR, {
         parse_mode: "HTML",
-        reply_markup: RegistrationKeyboard(),
+        reply_markup: RegistrationInlineKeyboard(),
       });
     }
     return ctx.reply(COMMAND_SUPERVISOR_START.WELCOME_OLD_SUPERVISOR, {

@@ -6,7 +6,7 @@ import {
   subscribeToChannel,
 } from "../../bot-common/utils/pgNotifyUtils";
 import { channelIdAuditor } from "../../config/env";
-import { TookAuditKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
+import { TookAuditSurveyInlineKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
 import logger from "../../lib/logger";
 import { updateAuditActiveSurvey } from "../../database/queries_kysely/audit_survey_active";
 
@@ -22,7 +22,7 @@ async function processRecord(
       bot,
       message,
       channelIdAuditor,
-      TookAuditKeyboard(),
+      TookAuditSurveyInlineKeyboard(),
     );
     if (messageId !== null) {
       const res = await updateAuditActiveSurvey(audit_survey_active_id, {

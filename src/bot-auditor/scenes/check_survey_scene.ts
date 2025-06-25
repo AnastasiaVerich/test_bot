@@ -4,9 +4,9 @@ import logger from "../../lib/logger";
 import { getUserId } from "../../bot-common/utils/getUserId";
 import {
   AuthAuditorKeyboard,
-  ConfirmCancelButtons,
-  createKeyboardFromWords,
-  YesNoButtons,
+  ConfirmCancelKeyboard,
+  CreateFromWordsKeyboard,
+  YesNoKeyboard,
 } from "../../bot-common/keyboards/keyboard";
 import { CHECK_SURVEY_AUDITOR_SCENE } from "../../bot-common/constants/scenes";
 import {
@@ -185,7 +185,7 @@ async function completedOrNotStep(
         `\n\n${survey_task.description.replaceAll("/n", "\n")}`,
       {
         parse_mode: "HTML",
-        reply_markup: YesNoButtons(),
+        reply_markup: YesNoKeyboard(),
       },
     );
 
@@ -200,7 +200,7 @@ async function completedOrNotStep(
               CHECK_SURVEY_AUDITOR_SCENE.ENTER_COMPLETED_OR_NOT_OTHERWISE,
               {
                 parse_mode: "HTML",
-                reply_markup: YesNoButtons(),
+                reply_markup: YesNoKeyboard(),
               },
             ),
         },
@@ -258,7 +258,7 @@ async function countResultPositionVarStep(
     const { positions_var } = data;
 
     await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_RESULT_POS_VAR_1, {
-      reply_markup: createKeyboardFromWords(positions_var),
+      reply_markup: CreateFromWordsKeyboard(positions_var),
     });
 
     let result_1: string | null = null;
@@ -267,7 +267,7 @@ async function countResultPositionVarStep(
       const response = await conversation.waitFor("message:text", {
         otherwise: (ctx) =>
           ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_RES_POS_OTHERWISE, {
-            reply_markup: createKeyboardFromWords(positions_var),
+            reply_markup: CreateFromWordsKeyboard(positions_var),
           }),
       });
       const userInput = response.message?.text.trim() ?? "";
@@ -276,7 +276,7 @@ async function countResultPositionVarStep(
       break;
     }
     await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_RESULT_POS_VAR_2, {
-      reply_markup: createKeyboardFromWords(positions_var),
+      reply_markup: CreateFromWordsKeyboard(positions_var),
     });
 
     let result_2: string | null = null;
@@ -285,7 +285,7 @@ async function countResultPositionVarStep(
       const response = await conversation.waitFor("message:text", {
         otherwise: (ctx) =>
           ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_RES_POS_OTHERWISE, {
-            reply_markup: createKeyboardFromWords(positions_var),
+            reply_markup: CreateFromWordsKeyboard(positions_var),
           }),
       });
       const userInput = response.message?.text.trim() ?? "";
@@ -294,7 +294,7 @@ async function countResultPositionVarStep(
       break;
     }
     await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_RESULT_POS_VAR_3, {
-      reply_markup: createKeyboardFromWords(positions_var),
+      reply_markup: CreateFromWordsKeyboard(positions_var),
     });
 
     let result_3: string | null = null;
@@ -303,7 +303,7 @@ async function countResultPositionVarStep(
       const response = await conversation.waitFor("message:text", {
         otherwise: (ctx) =>
           ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTER_RES_POS_OTHERWISE, {
-            reply_markup: createKeyboardFromWords(positions_var),
+            reply_markup: CreateFromWordsKeyboard(positions_var),
           }),
       });
       const userInput = response.message?.text.trim() ?? "";
@@ -325,7 +325,7 @@ async function stepConfirm(
   try {
     await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.CONFIRMATION, {
       parse_mode: "HTML",
-      reply_markup: ConfirmCancelButtons(),
+      reply_markup: ConfirmCancelKeyboard(),
     });
 
     let result: string | null = null;
@@ -337,7 +337,7 @@ async function stepConfirm(
           otherwise: (ctx) =>
             ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.CONFIRMATION_OTHERWISE, {
               parse_mode: "HTML",
-              reply_markup: ConfirmCancelButtons(),
+              reply_markup: ConfirmCancelKeyboard(),
             }),
         },
       );

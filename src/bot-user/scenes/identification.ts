@@ -2,12 +2,12 @@ import logger from "../../lib/logger";
 import { getUserId, returnUserId } from "../../bot-common/utils/getUserId";
 import { RESPONSES } from "../../bot-common/constants/responses";
 import {
-  IdentificationKeyboard,
-  RegistrationKeyboard,
+  IdentificationInlineKeyboard,
+  RegistrationInlineKeyboard,
 } from "../../bot-common/keyboards/inlineKeyboard";
 import {
   AuthUserKeyboard,
-  WebAppKeyboardPhoto,
+  WebAppPhotoKeyboard,
 } from "../../bot-common/keyboards/keyboard";
 import { IDENTIFICATION_USER_SCENE } from "../../bot-common/constants/scenes";
 import {
@@ -32,7 +32,7 @@ export async function identificationScene(
     );
     if (!user) {
       await ctx.reply(IDENTIFICATION_USER_SCENE.USER_NOT_EXIST, {
-        reply_markup: RegistrationKeyboard(),
+        reply_markup: RegistrationInlineKeyboard(),
       });
       return;
     }
@@ -46,7 +46,7 @@ export async function identificationScene(
     const response = await photoStep(conversation, ctx, userId);
     if (!response) {
       await ctx.reply(IDENTIFICATION_USER_SCENE.SOME_ERROR, {
-        reply_markup: IdentificationKeyboard(),
+        reply_markup: IdentificationInlineKeyboard(),
       });
     }
     return;
@@ -68,7 +68,7 @@ export async function photoStep(
     let result = null;
 
     await ctx.reply(IDENTIFICATION_USER_SCENE.VERIFY_BY_PHOTO, {
-      reply_markup: WebAppKeyboardPhoto(userId, "", "identification", "1"),
+      reply_markup: WebAppPhotoKeyboard(userId, "", "identification", "1"),
     });
 
     const message_web_app_data = await conversation.waitFor(
@@ -76,7 +76,7 @@ export async function photoStep(
       {
         otherwise: (ctx) =>
           ctx.reply(IDENTIFICATION_USER_SCENE.VERIFY_BY_PHOTO_OTHERWISE, {
-            reply_markup: WebAppKeyboardPhoto(
+            reply_markup: WebAppPhotoKeyboard(
               userId,
               "",
               "identification",
@@ -117,7 +117,7 @@ export async function photoStep(
         default: {
           result = null;
           await ctx.reply(IDENTIFICATION_USER_SCENE.SOME_ERROR, {
-            reply_markup: IdentificationKeyboard(),
+            reply_markup: IdentificationInlineKeyboard(),
           });
         }
       }

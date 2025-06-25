@@ -3,13 +3,13 @@ import logger from "../../lib/logger";
 import { getUserId } from "../../bot-common/utils/getUserId";
 
 import {
-  IdentificationKeyboard,
-  RegistrationKeyboard,
+  IdentificationInlineKeyboard,
+  RegistrationInlineKeyboard,
 } from "../../bot-common/keyboards/inlineKeyboard";
 import {
   AuthUserKeyboard,
-  sendUserPhone,
-  WebAppKeyboardPhoto,
+  SendUserPhoneKeyboard,
+  WebAppPhotoKeyboard,
 } from "../../bot-common/keyboards/keyboard";
 import { REGISTRATION_USER_SCENE } from "../../bot-common/constants/scenes";
 import {
@@ -36,7 +36,7 @@ export async function registrationUserScene(
     );
     if (user) {
       await ctx.reply(REGISTRATION_USER_SCENE.USER_EXIST, {
-        reply_markup: IdentificationKeyboard(),
+        reply_markup: IdentificationInlineKeyboard(),
       });
       return;
     }
@@ -69,7 +69,7 @@ export async function registrationUserScene(
       );
 
       await ctx.reply(REGISTRATION_USER_SCENE.SOME_ERROR, {
-        reply_markup: RegistrationKeyboard(),
+        reply_markup: RegistrationInlineKeyboard(),
       });
       return;
     }
@@ -96,7 +96,7 @@ export async function registrationUserScene(
       );
 
       await ctx.reply(REGISTRATION_USER_SCENE.SOME_ERROR, {
-        reply_markup: RegistrationKeyboard(),
+        reply_markup: RegistrationInlineKeyboard(),
       });
 
       return;
@@ -134,7 +134,7 @@ export async function registrationUserScene(
 
     logger.error("Error in registrationScene: " + error);
     await ctx.reply(REGISTRATION_USER_SCENE.SOME_ERROR, {
-      reply_markup: RegistrationKeyboard(),
+      reply_markup: RegistrationInlineKeyboard(),
     });
   }
 }
@@ -147,7 +147,7 @@ async function phoneStep(
   try {
     await ctx.reply(REGISTRATION_USER_SCENE.ENTER_PHONE, {
       parse_mode: "HTML",
-      reply_markup: sendUserPhone(),
+      reply_markup: SendUserPhoneKeyboard(),
     });
 
     let phoneNumber: any = null;
@@ -157,7 +157,7 @@ async function phoneStep(
         otherwise: (ctx) =>
           ctx.reply(REGISTRATION_USER_SCENE.ENTER_PHONE_OTHERWISE, {
             parse_mode: "HTML",
-            reply_markup: sendUserPhone(),
+            reply_markup: SendUserPhoneKeyboard(),
           }),
       });
 
@@ -169,7 +169,7 @@ async function phoneStep(
       if (contactUserId !== userId) {
         await ctx.reply(REGISTRATION_USER_SCENE.ENTERED_NOT_USER_PHONE, {
           parse_mode: "HTML",
-          reply_markup: sendUserPhone(),
+          reply_markup: SendUserPhoneKeyboard(),
         });
         continue;
       }
@@ -248,7 +248,7 @@ async function photoStep(
       }
     } else {
       await ctx.reply(REGISTRATION_USER_SCENE.VERIFY_BY_PHOTO, {
-        reply_markup: WebAppKeyboardPhoto(
+        reply_markup: WebAppPhotoKeyboard(
           userId,
           userPhone,
           "registration",
@@ -261,7 +261,7 @@ async function photoStep(
         {
           otherwise: (ctx) =>
             ctx.reply(REGISTRATION_USER_SCENE.VERIFY_BY_PHOTO_OTHERWISE, {
-              reply_markup: WebAppKeyboardPhoto(
+              reply_markup: WebAppPhotoKeyboard(
                 userId,
                 userPhone,
                 "registration",
@@ -290,7 +290,7 @@ async function photoStep(
           }),
         );
         await ctx.reply(REGISTRATION_USER_SCENE.USER_EXIST, {
-          reply_markup: IdentificationKeyboard(),
+          reply_markup: IdentificationInlineKeyboard(),
         });
         break;
       case "user_is_block":

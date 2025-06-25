@@ -1,6 +1,6 @@
 import logger from "../../../lib/logger";
 import { HANDLER_BALANCE } from "../../../bot-common/constants/handler_callback_queries";
-import { BalanceMenu } from "../../../bot-common/keyboards/inlineKeyboard";
+import { BalanceMenuInlineKeyboard } from "../../../bot-common/keyboards/inlineKeyboard";
 import { MyContext } from "../../../bot-common/types/type";
 import { getUserId } from "../../../bot-common/utils/getUserId";
 import { getCommonVariableByLabel } from "../../../database/queries_kysely/common_variables";
@@ -50,7 +50,7 @@ export async function handleBalance(ctx: MyContext): Promise<any | void> {
     } else {
       return ctx.reply(message, {
         parse_mode: "Markdown",
-        reply_markup: BalanceMenu(),
+        reply_markup: BalanceMenuInlineKeyboard(),
       });
     }
   } catch (error) {
