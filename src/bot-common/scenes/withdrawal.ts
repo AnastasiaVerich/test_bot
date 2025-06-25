@@ -6,11 +6,6 @@ import logger from "../../lib/logger";
 import { getCommonVariableByLabel } from "../../database/queries_kysely/common_variables";
 import { addUserLogs } from "../../database/queries_kysely/bot_user_logs";
 import {
-  confirmWithdrawalMoney,
-  getBalanceF,
-  hasPendingPayment,
-} from "../../database/services/moneyService";
-import {
   entitiesType,
   MyContext,
   MyConversation,
@@ -21,6 +16,11 @@ import { WITHDRAWAL_SCENE } from "../constants/scenes";
 import { BalanceMenuInlineKeyboard } from "../keyboards/inlineKeyboard";
 import { BUTTONS_KEYBOARD } from "../constants/buttons";
 import { ConfirmCancelKeyboard, EmptyKeyboard } from "../keyboards/keyboard";
+import {
+  confirmWithdrawalMoney,
+  getBalanceF,
+  hasPendingPayment,
+} from "../../database/services/paymentService";
 
 export async function withdrawalScene(
   conversation: MyConversation,

@@ -37,7 +37,7 @@ export async function finishSurveyScene(
     const result: {
       survey_task_id: number;
       isCompleted: boolean;
-      reward?: number;
+      reward_user?: number;
       reward_operator?: number;
       result?: string;
       result_positions?: string;
@@ -93,7 +93,7 @@ export async function finishSurveyScene(
         result[index] = {
           isCompleted: true,
           survey_task_id: survey_task.survey_task_id,
-          reward: surveyData.task_price,
+          reward_user: surveyData.task_price,
           reward_operator: surveyData.task_price / 2,
         };
 
@@ -234,7 +234,7 @@ async function countResultStep(
         );
         continue;
       }
-      result_position = number;
+      result_position = number.toString();
       break;
     }
     return result_position;

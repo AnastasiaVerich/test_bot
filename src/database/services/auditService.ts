@@ -6,15 +6,22 @@ import {
 import { addAuditSurveyTaskCompletions } from "../queries_kysely/audit_survey_task_completions";
 import { updateAuditorByAuditorId } from "../queries_kysely/auditors";
 import { AuditorSurveyActiveType } from "../db-types";
+import { updateSurveyCompletion } from "../queries_kysely/survey_task_completions";
+import { updateUserByUserId } from "../queries_kysely/users";
+import { updateOperatorByOperatorId } from "../queries_kysely/operators";
 
 export async function auditorCompletedAuditSurvey(
   params: {
     audit_survey_active_id: number;
     auditor_id: number;
+    user_id: number;
+    operator_id: number;
   },
   result: {
     isCompleted: boolean;
     reward_auditor: number;
+    reward_user: number;
+    reward_operator: number;
     result: string | null;
     result_positions: string | null;
     description: string | null;
@@ -22,7 +29,7 @@ export async function auditorCompletedAuditSurvey(
   }[],
 ): Promise<any> {
   try {
-    const { audit_survey_active_id, auditor_id } = params;
+    const { audit_survey_active_id, auditor_id, user_id, operator_id } = params;
 
     return await pool.transaction().execute(async (trx) => {
       const isDeleteAuditActiveSurveyId = await deleteAuditActiveSurvey(
@@ -33,7 +40,9 @@ export async function auditorCompletedAuditSurvey(
         throw new Error("AUDIT Survey active delete failed");
       }
 
-      let reward = 0;
+      let reward_auditor = 0;
+      let reward_user = 0;
+      let reward_operator = 0;
       for (const item of result) {
         const auditCompletedTaskId = await addAuditSurveyTaskCompletions(
           {
@@ -49,19 +58,55 @@ export async function auditorCompletedAuditSurvey(
         if (!auditCompletedTaskId) {
           throw new Error("Survey Completion add failed");
         }
-        reward += Number(item.reward_auditor);
+        reward_auditor += Number(item.reward_auditor);
+        if (item.completed_id) {
+          const updateCompletedTaskId = await updateSurveyCompletion(
+            item.completed_id,
+            {
+              reward_user: item.reward_user,
+              reward_operator: item.reward_operator,
+            },
+          );
+          if (!updateCompletedTaskId) {
+            throw new Error("Survey updateCompletedTaskId");
+          }
+          reward_user += Number(item.reward_user);
+          reward_operator += Number(item.reward_operator);
+        }
       }
 
       const isBalanceUpdate = await updateAuditorByAuditorId(
         auditor_id,
         {
-          add_balance: reward,
+          add_balance: reward_auditor,
         },
         trx,
       );
 
       if (!isBalanceUpdate) {
         throw new Error("UpdateBalance filed");
+      }
+      const isUserBalanceUpdate = await updateUserByUserId(
+        user_id,
+        {
+          add_balance: reward_user,
+        },
+        trx,
+      );
+
+      if (!isUserBalanceUpdate) {
+        throw new Error("isUserBalanceUpdate filed");
+      }
+      const isOperatorBalanceUpdate = await updateOperatorByOperatorId(
+        operator_id,
+        {
+          add_balance: reward_operator,
+        },
+        trx,
+      );
+
+      if (!isOperatorBalanceUpdate) {
+        throw new Error("isOperatorBalanceUpdate filed");
       }
     });
   } catch (error) {

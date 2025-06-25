@@ -4,6 +4,8 @@ import { AuditorSurveyActiveType } from "../db-types";
 export async function addAuditSurveyActive(
   params: {
     survey_id: AuditorSurveyActiveType["survey_id"];
+    operator_id: AuditorSurveyActiveType["operator_id"];
+    user_id: AuditorSurveyActiveType["user_id"];
     auditor_id: AuditorSurveyActiveType["auditor_id"];
     video_id: AuditorSurveyActiveType["video_id"];
     task_completions_ids: AuditorSurveyActiveType["task_completions_ids"];
@@ -11,7 +13,14 @@ export async function addAuditSurveyActive(
   trx: poolType = pool,
 ): Promise<AuditorSurveyActiveType["audit_survey_active_id"] | null> {
   try {
-    const { task_completions_ids, survey_id, auditor_id, video_id } = params;
+    const {
+      task_completions_ids,
+      survey_id,
+      auditor_id,
+      operator_id,
+      user_id,
+      video_id,
+    } = params;
 
     const result = await trx
       .insertInto("audit_survey_active")
@@ -20,6 +29,8 @@ export async function addAuditSurveyActive(
         survey_id: survey_id,
         auditor_id: auditor_id,
         video_id: video_id,
+        operator_id: operator_id,
+        user_id: user_id,
         message_id: null,
       })
       .returning("audit_survey_active_id")

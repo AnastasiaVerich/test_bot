@@ -239,7 +239,7 @@ CREATE TABLE survey_task_completions (
     operator_id BIGINT NOT NULL,
     result VARCHAR(255) NOT NULL,
     result_positions_var VARCHAR(255) NOT NULL,
-    reward DECIMAL(10, 2) NOT NULL,
+    reward_user DECIMAL(10, 2) NOT NULL,
     reward_operator DECIMAL(10, 2) NOT NULL,
     video_id BIGINT,
 
@@ -259,11 +259,15 @@ CREATE TABLE audit_survey_active (
     task_completions_ids INTEGER[] NOT NULL DEFAULT '{}',
     survey_id INT NOT NULL,
     auditor_id BIGINT,
+    user_id BIGINT,
+    operator_id BIGINT,
     video_id BIGINT,
     message_id BIGINT,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL,
+    FOREIGN KEY (operator_id) REFERENCES operators(operator_id) ON DELETE SET NULL,
     FOREIGN KEY (auditor_id) REFERENCES auditors(auditor_id) ON DELETE SET NULL,
     FOREIGN KEY (survey_id) REFERENCES surveys(survey_id) ON DELETE CASCADE,
     FOREIGN KEY (video_id) REFERENCES videos(video_id) ON DELETE SET NULL

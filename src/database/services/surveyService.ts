@@ -260,7 +260,7 @@ export async function userCompletedSurvey(
     isCompleted: boolean;
     result?: string;
     result_positions?: string;
-    reward?: number;
+    reward_user?: number;
     reward_operator?: number;
   }[],
 ): Promise<any> {
@@ -282,7 +282,7 @@ export async function userCompletedSurvey(
       if (!isDeleteActiveSurveyId) {
         throw new Error("Survey active delete failed");
       }
-      let reward = 0;
+      let reward_user = 0;
       let reward_operator = 0;
       const task_completions_id: number[] = [];
       for (const item of result) {
@@ -290,7 +290,7 @@ export async function userCompletedSurvey(
           item.isCompleted &&
           item.result !== undefined &&
           item.result_positions !== undefined &&
-          item.reward !== undefined &&
+          item.reward_user !== undefined &&
           item.reward_operator !== undefined
         ) {
           const completedTaskId = await addSurveyCompletion(
@@ -301,8 +301,8 @@ export async function userCompletedSurvey(
               operator_id: operator_id,
               result_main: item.result,
               result_positions: item.result_positions,
-              reward: item.reward,
-              reward_operator: item.reward_operator,
+              reward_user: !videoId ? item.reward_user : 0,
+              reward_operator: !videoId ? item.reward_operator : 0,
               video_id: videoId,
             },
             trx,
@@ -311,28 +311,32 @@ export async function userCompletedSurvey(
             throw new Error("Survey Completion add failed");
           }
           task_completions_id.push(completedTaskId);
-          reward += Number(item.reward);
+          reward_user += Number(item.reward_user);
           reward_operator += Number(item.reward_operator);
         }
       }
 
-      const addAuditSurveyActiveId = await addAuditSurveyActive(
-        {
-          survey_id: survey_id,
-          auditor_id: null,
-          video_id: videoId,
-          task_completions_ids: task_completions_id,
-        },
-        trx,
-      );
-      if (!addAuditSurveyActiveId) {
-        throw new Error("Audit survey active delete failed");
+      if (videoId) {
+        const addAuditSurveyActiveId = await addAuditSurveyActive(
+          {
+            survey_id: survey_id,
+            auditor_id: null,
+            video_id: videoId,
+            task_completions_ids: task_completions_id,
+            user_id: user_id,
+            operator_id: operator_id,
+          },
+          trx,
+        );
+        if (!addAuditSurveyActiveId) {
+          throw new Error("Audit survey active delete failed");
+        }
       }
 
       const isBalanceUpdate = await updateUserByUserId(
         user_id,
         {
-          add_balance: reward,
+          add_balance: !videoId ? reward_user : 0,
           notifyReason: "finish_survey",
           interval_survey_lock_until: survey_interval,
         },
@@ -341,7 +345,7 @@ export async function userCompletedSurvey(
       const isBalanceOperatorUpdate = await updateOperatorByOperatorId(
         operator_id,
         {
-          add_balance: reward_operator,
+          add_balance: !videoId ? reward_operator : 0,
         },
         trx,
       );

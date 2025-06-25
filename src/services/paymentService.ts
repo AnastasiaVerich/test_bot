@@ -81,11 +81,19 @@ export async function executePendingPayments(): Promise<void> {
               case "big gas":
                 {
                   pass = true;
+                  logger.error(
+                    "Error in payment:big gas:",
+                    payment.pending_payments_id,
+                  );
                 }
                 break;
               case "little balance":
                 {
                   pass = true;
+                  logger.error(
+                    "Error in payment:little balance:",
+                    payment.pending_payments_id,
+                  );
                 }
                 break;
               case "not confirmed": {

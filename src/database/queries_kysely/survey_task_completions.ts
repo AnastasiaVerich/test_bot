@@ -59,7 +59,7 @@ export async function addSurveyCompletion(
     operator_id: SurveyCompletionsType["operator_id"];
     result_main: SurveyCompletionsType["result"];
     result_positions: SurveyCompletionsType["result_positions_var"];
-    reward: SurveyCompletionsType["reward"];
+    reward_user: SurveyCompletionsType["reward_user"];
     reward_operator: SurveyCompletionsType["reward_operator"];
     video_id: SurveyCompletionsType["video_id"];
   },
@@ -73,7 +73,7 @@ export async function addSurveyCompletion(
       operator_id,
       result_main,
       result_positions,
-      reward,
+      reward_user,
       reward_operator,
       video_id,
     } = params;
@@ -85,7 +85,7 @@ export async function addSurveyCompletion(
         survey_task_id: survey_task_id,
         user_id: user_id,
         operator_id: operator_id,
-        reward: reward,
+        reward_user: reward_user,
         result: result_main,
         result_positions_var: result_positions,
         reward_operator: reward_operator,
@@ -97,5 +97,39 @@ export async function addSurveyCompletion(
     return result?.completion_id ?? null;
   } catch (error) {
     throw new Error("Error addSurveyCompletion: " + error);
+  }
+}
+
+export async function updateSurveyCompletion(
+  completion_id: SurveyCompletionsType["completion_id"],
+  params: {
+    reward_user?: SurveyCompletionsType["reward_user"];
+    reward_operator?: SurveyCompletionsType["reward_operator"];
+  },
+  trx: poolType = pool,
+): Promise<SurveyCompletionsType["completion_id"] | null> {
+  try {
+    const { reward_user, reward_operator } = params;
+
+    const set: Partial<SurveyCompletionsType> = {};
+
+    if (reward_user !== undefined) {
+      set.reward_user = reward_user;
+    }
+    if (reward_operator !== undefined) {
+      set.reward_operator = reward_operator;
+    }
+
+    const result = await trx
+      .updateTable("survey_task_completions")
+      .set(set)
+      .where("completion_id", "=", completion_id)
+
+      .returning("completion_id")
+      .executeTakeFirst();
+
+    return result?.completion_id ?? null;
+  } catch (error) {
+    throw new Error("Error updateSurveyCompletion: " + error);
   }
 }

@@ -15,7 +15,10 @@ import {
   MyConversationContext,
 } from "../../bot-common/types/type";
 import { getVideoByVideoId } from "../../database/queries_kysely/videos";
-import { SurveyTasksType } from "../../database/db-types";
+import {
+  SurveyCompletionsType,
+  SurveyTasksType,
+} from "../../database/db-types";
 import { BUTTONS_KEYBOARD } from "../../bot-common/constants/buttons";
 import { getAuditSurveyActiveByAuditorId } from "../../database/queries_kysely/audit_survey_active";
 import { getInfoAboutSurvey } from "../../database/services/surveyService";
@@ -30,6 +33,8 @@ export async function checkSurveyScene(
   try {
     const result: {
       isCompleted: boolean;
+      reward_user: number;
+      reward_operator: number;
       reward_auditor: number;
       result: string | null;
       result_positions: string | null;
@@ -43,6 +48,10 @@ export async function checkSurveyScene(
     const auditSurveyActive = await getAuditSurveyActiveByAuditorId(auditor_id);
     if (!auditSurveyActive) {
       return ctx.reply("Нет опросов для проверки");
+      //что-то придумать.
+    }
+    if (!auditSurveyActive.user_id || !auditSurveyActive.operator_id) {
+      return ctx.reply("Что-то пошло не так");
       //что-то придумать.
     }
 
@@ -72,11 +81,14 @@ export async function checkSurveyScene(
       });
     }
 
-    const operatorResult: any = {};
+    interface operatorResultInterface {
+      [key: string]: SurveyCompletionsType; // Для хранения состояния сцен
+    }
+    const operatorResult: operatorResultInterface = {};
     for (const el of auditSurveyActive.task_completions_ids) {
       const res = await getSurveyTaskCompletionByCompletionId(el);
       if (res) {
-        operatorResult[res.survey_task_id] = res.completion_id;
+        operatorResult[res.survey_task_id] = res;
       }
     }
 
@@ -101,10 +113,13 @@ export async function checkSurveyScene(
         result[index] = {
           isCompleted: true,
           reward_auditor: surveyData.task_price / 2,
+          reward_user: 0,
+          reward_operator: 0,
           result: null,
           result_positions: null,
           description: null,
-          completed_id: operatorResult?.[survey_task.survey_task_id] ?? null,
+          completed_id:
+            operatorResult?.[survey_task.survey_task_id]?.completion_id ?? null,
         };
 
         const result_position = await countResultStep(conversation, ctx);
@@ -128,14 +143,28 @@ export async function checkSurveyScene(
           return;
         }
         result[index].result_positions = result_positions.join(", ");
+
+        if (
+          result[index].result_positions ===
+            operatorResult?.[survey_task.survey_task_id]
+              ?.result_positions_var &&
+          result[index].result ===
+            operatorResult?.[survey_task.survey_task_id]?.result
+        ) {
+          result[index].reward_user = surveyData.task_price;
+          result[index].reward_operator = surveyData.task_price / 2;
+        }
       } else {
         result[index] = {
           isCompleted: false,
           reward_auditor: surveyData.task_price / 2,
+          reward_user: 0,
+          reward_operator: 0,
           result: null,
           result_positions: null,
           description: null,
-          completed_id: operatorResult?.[survey_task.survey_task_id] ?? null,
+          completed_id:
+            operatorResult?.[survey_task.survey_task_id]?.completion_id ?? null,
         };
       }
     }
@@ -154,6 +183,8 @@ export async function checkSurveyScene(
         {
           audit_survey_active_id: auditSurveyActive.audit_survey_active_id,
           auditor_id: auditor_id,
+          user_id: auditSurveyActive.user_id,
+          operator_id: auditSurveyActive.operator_id,
         },
         result,
       );
@@ -240,7 +271,7 @@ async function countResultStep(
         await ctx.reply(CHECK_SURVEY_AUDITOR_SCENE.ENTERED_NOT_CORRECT_RESULT);
         continue;
       }
-      result_position = number;
+      result_position = number.toString();
       break;
     }
     return result_position;

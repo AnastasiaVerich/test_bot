@@ -25,7 +25,7 @@ export async function handler_history_accrual(
         ? surveyAccrualHistory
             .slice(0, 20) // Ограничиваем до 5 последних операций
             .map((e) => {
-              const amount = e.reward;
+              const amount = e.reward_user;
               return `💸 *${amount} ${HANDLER_HISTORY_ACCRUAL.RUB}.* — ${formatTimestamp(Number(e.completed_at))}`;
             })
             .join("\n")

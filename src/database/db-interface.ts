@@ -169,7 +169,7 @@ export interface SurveyCompletionsEntity {
   operator_id: number; // ID оператора
   result: string; // На каком месте находится поисковой сайт
   result_positions_var: string; // что находится на 1-3 местах
-  reward: number; // награда для пользователя
+  reward_user: number; // награда для пользователя
   reward_operator: number; // награда для оператора
   video_id: Generated<number | null>; // ID видео прохождения опроса
 
@@ -183,6 +183,8 @@ export interface AuditorSurveyActiveEntity {
   survey_id: number; // id опроса
   message_id: number | null; // ID сообщения в тг-канале аудитов
   auditor_id: number | null; // ID аудитора, который будет проверять выполнение
+  user_id: number | null; // ID аудитора, который будет проверять выполнение
+  operator_id: number | null; // ID аудитора, который будет проверять выполнение
   video_id: number | null; // ID видео прохождения опроса
 
   created_at: Generated<string>; // Дата создания
