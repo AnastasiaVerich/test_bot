@@ -2,14 +2,14 @@ import fs from "fs/promises";
 import path from "path";
 import os from "os";
 import { InputFile } from "grammy";
-import { MyContext } from "../../bot-common/types/type";
-import logger from "../../lib/logger";
-import { HANDLER_GET_USER_LOGS } from "../../bot-common/constants/handler_messages";
+import { MyContext } from "../../../bot-common/types/type";
+import logger from "../../../lib/logger";
+import { HANDLER_GET_USER_LOGS } from "../../../bot-common/constants/handler_messages";
 import {
   getUserRegistrationMetrics,
   UserMetrics,
-} from "../../database/services/logService";
-import { getUserId } from "../../bot-common/utils/getUserId";
+} from "../../../database/services/logService";
+import { getUserId } from "../../../bot-common/utils/getUserId";
 
 export const handleGetUserLogs = async (ctx: MyContext) => {
   try {

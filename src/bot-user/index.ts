@@ -11,9 +11,9 @@ import {
 import logger from "../lib/logger";
 import { client } from "../database/dbClient";
 import { MyContext } from "../bot-common/types/type";
-import { subscribeReservationEnded } from "./subscribe/reservation_ended";
-import { subscribeOperatorAssigned } from "./subscribe/operator_assigned";
-import { subscribeFinishSurveyNotification } from "./subscribe/finish_survey_notification";
+import { subscribeUser_notifyReservationEnd } from "./subscribe/notify_survey_reservation_end";
+import { subscribeUser_notifyOperatorTakeSurvey } from "./subscribe/notify_operator_take_survey";
+import { subscribeUser_notifySurveyFinish } from "./subscribe/notify_survey_finish";
 import { errorMiddleware } from "../bot-common/middleware/errorMiddleware";
 import { PsqlConversationAdapter } from "../services/psqlConversationAdapter";
 
@@ -38,9 +38,9 @@ async function bootstrap() {
     registerScenes(bot);
     registerCallbackQueries(bot);
     registerMessage(bot);
-    void subscribeOperatorAssigned(bot);
-    void subscribeReservationEnded(bot);
-    void subscribeFinishSurveyNotification(bot);
+    void subscribeUser_notifyOperatorTakeSurvey(bot);
+    void subscribeUser_notifyReservationEnd(bot);
+    void subscribeUser_notifySurveyFinish(bot);
 
     // Обработчик ошибок
     bot.catch((err) => {

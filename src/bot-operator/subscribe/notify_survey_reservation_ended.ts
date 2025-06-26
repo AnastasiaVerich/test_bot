@@ -8,6 +8,7 @@ import logger from "../../lib/logger";
 import { cancelTakeSurveyByUser } from "../../database/services/surveyService";
 import { SurveyActiveType } from "../../database/db-types";
 import { getUser } from "../../database/queries_kysely/users";
+import { getAllActiveSurveysWhereReservationEnd } from "../../database/queries_kysely/survey_active";
 
 async function processRecord(
   bot: Bot<MyContext>,
@@ -52,13 +53,13 @@ async function processRecord(
   }
 }
 
-export async function subscribeReservationEndedOper(
+export async function subscribeOperator_reservationSurveyEnded(
   bot: Bot<MyContext>,
 ): Promise<void> {
-  const query = `
-        SELECT *
-        FROM survey_active
-        WHERE is_reservation_end IS TRUE
-    `;
-  await subscribeToChannel(bot, "reservation_ended", query, processRecord);
+  await subscribeToChannel(
+    bot,
+    "reservation_ended",
+    getAllActiveSurveysWhereReservationEnd,
+    processRecord,
+  );
 }

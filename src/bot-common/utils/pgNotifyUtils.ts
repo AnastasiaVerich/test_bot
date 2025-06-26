@@ -60,14 +60,13 @@ export async function subscribeToNotifications(
 }
 
 export async function checkMissedRecords<T>(
-  client: Client,
   bot: Bot<MyContext>,
-  query: string,
+  query: () => any,
   processRecord: (bot: Bot<MyContext>, record: T) => Promise<void>,
 ): Promise<void> {
   try {
-    const result = await client.query(query);
-    for (const record of result.rows as T[]) {
+    const result = await query();
+    for (const record of result as T[]) {
       await processRecord(bot, record);
     }
   } catch (error) {
@@ -80,6 +79,7 @@ export function handleNotifications<T>(
   bot: Bot<MyContext>,
   channel: string,
   processRecord: (bot: Bot<MyContext>, record: T) => Promise<void>,
+  query: (() => any) | null,
 ): void {
   client.on("notification", async (msg) => {
     if (msg.channel === channel && msg.payload) {
@@ -93,7 +93,7 @@ export function handleNotifications<T>(
   });
   client.on("error", (error) => {
     logger.info("Ошибка клиента уведомлений:", error);
-    void reconnectNotifyClient(client, bot, channel, processRecord);
+    void reconnectNotifyClient(client, bot, channel, processRecord, query);
   });
 }
 
@@ -102,20 +102,18 @@ export async function reconnectNotifyClient<T>(
   bot: Bot<MyContext>,
   channel: string,
   processRecord: (bot: Bot<MyContext>, record: T) => Promise<void>,
+  query: (() => any) | null,
 ): Promise<void> {
   try {
     await connectPgClient(client, "клиент уведомлений");
     await subscribeToNotifications(client, channel);
-    await checkMissedRecords(
-      client,
-      bot,
-      `/* соответствующий SQL-запрос */`,
-      processRecord,
-    );
+    if (query) {
+      await checkMissedRecords(bot, query, processRecord);
+    }
   } catch (err) {
     logger.info("Ошибка переподключения:", err);
     setTimeout(
-      () => reconnectNotifyClient(client, bot, channel, processRecord),
+      () => reconnectNotifyClient(client, bot, channel, processRecord, query),
       5000,
     );
   }
@@ -124,7 +122,7 @@ export async function reconnectNotifyClient<T>(
 export async function subscribeToChannel<T>(
   bot: Bot<MyContext>,
   channel: string,
-  query: string | null,
+  query: (() => any) | null,
   processRecord: (bot: Bot<MyContext>, record: T) => Promise<void>,
 ): Promise<void> {
   const pgClient = new Client(pgConfig);
@@ -133,9 +131,9 @@ export async function subscribeToChannel<T>(
     await connectPgClient(pgClient, "основной клиент");
     await connectPgClient(pgNotifyClient, "клиент уведомлений");
     await subscribeToNotifications(pgNotifyClient, channel);
-    handleNotifications(pgNotifyClient, bot, channel, processRecord);
+    handleNotifications(pgNotifyClient, bot, channel, processRecord, query);
     if (query) {
-      await checkMissedRecords(pgClient, bot, query, processRecord);
+      await checkMissedRecords(bot, query, processRecord);
     }
   } catch (err) {
     logger.info("Ошибка инициализации:", err);

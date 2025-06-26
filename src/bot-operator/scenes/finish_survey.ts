@@ -1,8 +1,4 @@
-import { unlink } from "fs/promises";
-import { tmpdir } from "os";
-import { join } from "path";
-import { createReadStream, createWriteStream } from "fs";
-import ffmpeg from "fluent-ffmpeg";
+import { Bot } from "grammy";
 import logger from "../../lib/logger";
 import { getUserId } from "../../bot-common/utils/getUserId";
 import { BUTTONS_KEYBOARD } from "../../bot-common/constants/buttons";
@@ -13,6 +9,7 @@ import {
 } from "../../bot-common/keyboards/keyboard";
 import { FINISH_SURVEY_OPERATOR_SCENE } from "../../bot-common/constants/scenes";
 import {
+  MyContext,
   MyConversation,
   MyConversationContext,
 } from "../../bot-common/types/type";
@@ -23,17 +20,18 @@ import {
   getInfoAboutSurvey,
   userCompletedSurvey,
 } from "../../database/services/surveyService";
-import { token_operator } from "../../config/env";
 import { addVideo } from "../../database/queries_kysely/videos";
 import { confirmStep } from "../../bot-auditor/scenes/common_step/conform_or_not";
 import {
   TaskResult,
   tasks_result,
 } from "../../bot-auditor/scenes/common_step/tasks_result";
+import { channelIdVideoSharing } from "../../config/env";
 
 export async function finishSurveyScene(
   conversation: MyConversation,
   ctx: MyConversationContext,
+  bot: Bot<MyContext>,
   arg: { state: { surveyActiveId: number } },
 ) {
   let surveyActiveId = arg.state.surveyActiveId;
@@ -76,7 +74,12 @@ export async function finishSurveyScene(
       surveyData.task_price,
     );
 
-    const videoId = await uploadVideoStep(conversation, ctx, surveyActiveId);
+    const videoId = await uploadVideoStep(
+      conversation,
+      ctx,
+      surveyActiveId,
+      bot,
+    );
 
     const resultConfirm = await confirmStep(conversation, ctx);
 
@@ -121,6 +124,7 @@ async function uploadVideoStep(
   conversation: MyConversation,
   ctx: MyConversationContext,
   surveyActiveId: number,
+  bot: Bot<MyContext>,
 ): Promise<number | null> {
   try {
     await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_VIDEO, {
@@ -164,62 +168,24 @@ async function uploadVideoStep(
       const fileName =
         video.file_name || `survey_${surveyActiveId}_${Date.now()}.mp4`;
 
-      // Получение file_path и загрузка видео
-      const file = await ctx.api.getFile(fileId);
-      const fileUrl = `https://api.telegram.org/file/bot${token_operator}/${file.file_path}`;
-
-      // Загрузка видеофайла (опционально, если нужен video_data)
-      let videoData: Buffer | null = null;
-
-      const response2 = await fetch(fileUrl);
-      const arrayBuffer = await response2.arrayBuffer();
-      videoData = Buffer.from(arrayBuffer);
-
-      // Сжатие видео
-      const tempInputPath = join(tmpdir(), `input_${fileId}.mp4`);
-      const tempOutputPath = join(tmpdir(), `output_${fileId}.mp4`);
-      await new Promise((resolve, reject) => {
-        createWriteStream(tempInputPath)
-          .on("finish", resolve)
-          .on("error", reject)
-          .end(videoData);
-      });
-      await new Promise((resolve, reject) => {
-        ffmpeg(tempInputPath)
-          .outputOptions([
-            "-vcodec libx264", // Кодек H.264
-            "-crf 28", // Контроль качества (28 — баланс между качеством и размером)
-            "-preset fast", // Скорость сжатия
-            "-vf scale=1280:720", // Уменьшение разрешения до 720p
-            "-acodec aac", // Аудиокодек
-            "-b:a 128k", // Битрейт аудио
-          ])
-          .output(tempOutputPath)
-          .on("end", resolve)
-          .on("error", reject)
-          .run();
-      });
-
-      // Чтение сжатого видео
-      videoData = await new Promise((resolve, reject) => {
-        const chunks: Buffer[] = [];
-        createReadStream(tempOutputPath)
-          .on("data", (chunk) => chunks.push(Buffer.from(chunk)))
-          .on("end", () => resolve(Buffer.concat(chunks)))
-          .on("error", reject);
-      });
-
-      // Удаление временных файлов
-      await Promise.all([unlink(tempInputPath), unlink(tempOutputPath)]);
-      // Сохранение в базу данных onversation.external
       video_id = await conversation.external(() =>
-        addVideo(fileId, videoData, fileName, mimeType),
+        addVideo(fileId, null, fileName, mimeType),
       );
+      const chatId = ctx.callbackQuery?.message?.chat.id;
+      if (chatId && video_id) {
+        await conversation.external(() =>
+          bot.api.copyMessage(
+            channelIdVideoSharing,
+            chatId,
+            response.message.message_id,
+            { caption: video_id?.toString() },
+          ),
+        );
+      }
 
       await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_VIDEO_SUCCESS);
       break;
     }
-
     return video_id;
   } catch (error) {
     await ctx.reply("Видео не сохранилось");

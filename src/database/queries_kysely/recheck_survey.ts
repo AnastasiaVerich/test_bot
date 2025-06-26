@@ -116,3 +116,18 @@ export async function updateRecheckSurvey(
     throw new Error("Error updateRecheckSurvey: " + error);
   }
 }
+
+export async function getAllRecheckWhereOperatorNotNotify(
+  trx: poolType = pool,
+): Promise<RecheckSurveyType[]> {
+  try {
+    return await trx
+      .selectFrom("recheck_survey")
+      .selectAll()
+      .where("operator_id", "is not", null)
+      .where("is_operator_notified", "is", false)
+      .execute();
+  } catch (error) {
+    throw new Error("Error getAllRecheckWhereOperatorNotNotify: " + error);
+  }
+}

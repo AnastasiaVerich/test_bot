@@ -1,11 +1,11 @@
-import { getCommonVariableByLabel } from "../../database/queries_kysely/common_variables";
-import { AuthSupervisorKeyboard } from "../../bot-common/keyboards/keyboard";
-import { getAllPendingPayment } from "../../database/queries_kysely/pending_payments";
-import { BUTTONS_CALLBACK_QUERIES } from "../../bot-common/constants/buttons";
-import { CreateInlineKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
-import { MyContext } from "../../bot-common/types/type";
-import logger from "../../lib/logger";
-import { HANDLER_MANUAL_PAYMENT } from "../../bot-common/constants/handler_messages";
+import { getCommonVariableByLabel } from "../../../database/queries_kysely/common_variables";
+import { AuthSupervisorKeyboard } from "../../../bot-common/keyboards/keyboard";
+import { getAllPendingPayment } from "../../../database/queries_kysely/pending_payments";
+import { BUTTONS_CALLBACK_QUERIES } from "../../../bot-common/constants/buttons";
+import { CreateInlineKeyboard } from "../../../bot-common/keyboards/inlineKeyboard";
+import { MyContext } from "../../../bot-common/types/type";
+import logger from "../../../lib/logger";
+import { HANDLER_MANUAL_PAYMENT } from "../../../bot-common/constants/handler_messages";
 
 export const handleManualPayment = async (ctx: MyContext) => {
   try {

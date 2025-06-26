@@ -6,7 +6,10 @@ import {
 } from "../../bot-common/utils/pgNotifyUtils";
 import logger from "../../lib/logger";
 import { getOperatorByIdPhoneOrTg } from "../../database/queries_kysely/operators";
-import { updateActiveSurvey } from "../../database/queries_kysely/survey_active";
+import {
+  getAllActiveSurveysWithOperatorWithoutUserNotify,
+  updateActiveSurvey,
+} from "../../database/queries_kysely/survey_active";
 import { SurveyActiveType } from "../../database/db-types";
 import { getUser } from "../../database/queries_kysely/users";
 
@@ -57,15 +60,13 @@ async function processRecord(
   }
 }
 
-export async function subscribeOperatorAssigned(
+export async function subscribeUser_notifyOperatorTakeSurvey(
   bot: Bot<MyContext>,
 ): Promise<void> {
-  const query = `
-        SELECT *
-        FROM survey_active
-        WHERE operator_id IS NOT NULL
-        AND is_user_notified IS FALSE
-        ORDER BY created_at ASC
-    `;
-  await subscribeToChannel(bot, "operator_assigned", query, processRecord);
+  await subscribeToChannel(
+    bot,
+    "operator_assigned",
+    getAllActiveSurveysWithOperatorWithoutUserNotify,
+    processRecord,
+  );
 }

@@ -16,7 +16,7 @@ import {
   registerMessage,
 } from "./handlers";
 import { registerScenes } from "./scenes";
-import { subscribeAuditNotify } from "./subscribe/notify_audit_survey_active";
+import { subscribeAuditor_newFreeAudit } from "./subscribe/new_free_audit";
 
 async function bootstrap() {
   try {
@@ -38,7 +38,7 @@ async function bootstrap() {
     registerCallbackQueries(bot);
     registerMessage(bot);
 
-    void subscribeAuditNotify(bot);
+    void subscribeAuditor_newFreeAudit(bot);
 
     // Обработчик ошибок
     bot.catch((err) => {

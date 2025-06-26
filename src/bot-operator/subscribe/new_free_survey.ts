@@ -7,7 +7,10 @@ import {
 } from "../../bot-common/utils/pgNotifyUtils";
 import logger from "../../lib/logger";
 import { TookSurveyInlineKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
-import { updateActiveSurvey } from "../../database/queries_kysely/survey_active";
+import {
+  getAllNewActiveSurveysWithoutOperator,
+  updateActiveSurvey,
+} from "../../database/queries_kysely/survey_active";
 import { SurveyActiveType } from "../../database/db-types";
 
 async function processRecord(
@@ -43,13 +46,13 @@ async function processRecord(
   }
 }
 
-export async function subscribeNotify(bot: Bot<MyContext>): Promise<void> {
-  const query = `
-        SELECT survey_active_id, survey_id, user_id, created_at
-      FROM survey_active
-      WHERE operator_id IS NULL
-        AND message_id IS NULL
-      ORDER BY created_at ASC
-    `;
-  await subscribeToChannel(bot, "survey_active_insert", query, processRecord);
+export async function subscribeOperator_newFreeSurvey(
+  bot: Bot<MyContext>,
+): Promise<void> {
+  await subscribeToChannel(
+    bot,
+    "survey_active_insert",
+    getAllNewActiveSurveysWithoutOperator,
+    processRecord,
+  );
 }

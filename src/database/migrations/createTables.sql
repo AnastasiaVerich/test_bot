@@ -395,7 +395,9 @@ GRANT ALL PRIVILEGES ON TABLE referral_bonuses TO admin_vadim;
 -- Таблица видео прохождения опросов
 CREATE TABLE videos (
     video_id BIGSERIAL PRIMARY KEY,
-    file_id VARCHAR(255) NOT NULL, -- Telegram file_id для отправки видео обратно
+    file_id_operator VARCHAR(255) NOT NULL, -- Telegram file_id для отправки видео обратно
+    file_id_auditor VARCHAR(255) NOT NULL, -- Telegram file_id для отправки видео обратно
+    file_id_supervisor VARCHAR(255) NOT NULL, -- Telegram file_id для отправки видео обратно
     video_data BYTEA, -- Видеофайл в бинарном формате
     file_name VARCHAR(255), -- Имя файла (опционально)
     mime_type VARCHAR(100), -- Тип файла (например, video/mp4)

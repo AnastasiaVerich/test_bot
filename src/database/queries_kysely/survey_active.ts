@@ -256,3 +256,49 @@ export async function deleteActiveSurvey(
     throw new Error("Error deleteActiveSurvey: " + error);
   }
 }
+
+export async function getAllActiveSurveysWhereReservationEnd(
+  trx: poolType = pool,
+): Promise<SurveyActiveType[]> {
+  try {
+    return await trx
+      .selectFrom("survey_active")
+      .selectAll()
+      .where("is_reservation_end", "is", true)
+      .execute();
+  } catch (error) {
+    throw new Error("Error getAllActiveSurveysWhereReservationEnd: " + error);
+  }
+}
+
+export async function getAllNewActiveSurveysWithoutOperator(
+  trx: poolType = pool,
+): Promise<SurveyActiveType[]> {
+  try {
+    return await trx
+      .selectFrom("survey_active")
+      .selectAll()
+      .where("operator_id", "is", null)
+      .where("message_id", "is", null)
+      .execute();
+  } catch (error) {
+    throw new Error("Error getAllNewActiveSurveysWithoutOperator: " + error);
+  }
+}
+
+export async function getAllActiveSurveysWithOperatorWithoutUserNotify(
+  trx: poolType = pool,
+): Promise<SurveyActiveType[]> {
+  try {
+    return await trx
+      .selectFrom("survey_active")
+      .selectAll()
+      .where("operator_id", "is not", null)
+      .where("is_user_notified", "is", false)
+      .execute();
+  } catch (error) {
+    throw new Error(
+      "Error getAllActiveSurveysWithOperatorWithoutUserNotify: " + error,
+    );
+  }
+}

@@ -5,7 +5,10 @@ import {
   subscribeToChannel,
 } from "../../bot-common/utils/pgNotifyUtils";
 import { formatTimestamp } from "../../lib/date";
-import { updateUserByUserId } from "../../database/queries_kysely/users";
+import {
+  getAllUsersWhereNotifyFinishSurvey,
+  updateUserByUserId,
+} from "../../database/queries_kysely/users";
 import { UsersType } from "../../database/db-types";
 import logger from "../../lib/logger";
 
@@ -32,18 +35,13 @@ async function processRecord(
   }
 }
 
-export async function subscribeFinishSurveyNotification(
+export async function subscribeUser_notifySurveyFinish(
   bot: Bot<MyContext>,
 ): Promise<void> {
-  const query = `
-        SELECT *
-        FROM users
-        WHERE notify_reason = 'finish_survey'
-    `;
   await subscribeToChannel(
     bot,
     "finish_survey_notification",
-    query,
+    getAllUsersWhereNotifyFinishSurvey,
     processRecord,
   );
 }

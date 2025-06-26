@@ -24,6 +24,7 @@ export async function addAdvertisingCampaign(
     throw new Error("Error addAdvertisingCampaign: " + error);
   }
 }
+
 export async function getAdvertisingCampaign(
   params: {
     id?: AdvertisingCampaignsType["id"];

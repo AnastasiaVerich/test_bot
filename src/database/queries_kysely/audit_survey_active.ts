@@ -149,3 +149,18 @@ export async function setAuditActiveSurveyAuditorIdIfNull(
     throw new Error("Error setAuditActiveSurveyAuditorIdIfNull: " + error);
   }
 }
+
+export async function getAllAuditNewSurveyActive(
+  trx: poolType = pool,
+): Promise<AuditorSurveyActiveType[]> {
+  try {
+    return await trx
+      .selectFrom("audit_survey_active")
+      .selectAll()
+      .where("auditor_id", "is", null)
+      .where("message_id", "is", null)
+      .execute();
+  } catch (error) {
+    throw new Error("Error getAuditSurveyActiveByMessageId: " + error);
+  }
+}

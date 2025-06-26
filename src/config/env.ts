@@ -19,6 +19,9 @@ export const linkWelcomeOperator = process.env.LINK_WELCOME__OPERATOR ?? "";
 export const channelIdAuditor = process.env.CHANNEL_ID__AUDITOR ?? "";
 export const linkWelcomeAuditor = process.env.LINK_WELCOME__AUDITOR ?? "";
 
+export const channelIdVideoSharing =
+  process.env.CHANNEL_ID__VIDEO_SHARING ?? "";
+
 export const convertApiKey = process.env.CONVERT_API_KEY ?? ""; // https://pro.coinmarketcap.com/account/
 
 export const DB_USER = process.env.DB_USER ?? "";

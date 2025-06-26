@@ -177,3 +177,17 @@ export async function getUserBalance(
     throw new Error("Error getUserBalance: " + error);
   }
 }
+
+export async function getAllUsersWhereNotifyFinishSurvey(
+  trx: poolType = pool,
+): Promise<UsersType[]> {
+  try {
+    return trx
+      .selectFrom("users")
+      .selectAll()
+      .where("notify_reason", "=", "finish_survey")
+      .execute();
+  } catch (error) {
+    throw new Error("Error getAllUsersWhereNotifyFinishSurvey: " + error);
+  }
+}

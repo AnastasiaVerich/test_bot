@@ -1,11 +1,11 @@
 import { Message } from "grammy/types";
-import { MyContext } from "../../bot-common/types/type";
-import { getUserAccount } from "../../bot-common/utils/getUserTgAccount";
-import { getSupervisorByIdPhoneOrTg } from "../../database/queries_kysely/supervisor";
-import { COMMAND_SUPERVISOR_START } from "../../bot-common/constants/handler_command";
-import { RegistrationInlineKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
-import logger from "../../lib/logger";
-import { AuthSupervisorKeyboard } from "../../bot-common/keyboards/keyboard";
+import { MyContext } from "../../../bot-common/types/type";
+import { getUserAccount } from "../../../bot-common/utils/getUserTgAccount";
+import { getSupervisorByIdPhoneOrTg } from "../../../database/queries_kysely/supervisor";
+import { COMMAND_SUPERVISOR_START } from "../../../bot-common/constants/handler_command";
+import { RegistrationInlineKeyboard } from "../../../bot-common/keyboards/inlineKeyboard";
+import logger from "../../../lib/logger";
+import { AuthSupervisorKeyboard } from "../../../bot-common/keyboards/keyboard";
 
 export const handleStartCommand = async (
   ctx: MyContext,

@@ -8,11 +8,12 @@ import {
 } from "../../bot-common/constants/buttons";
 import { ScenesAuditor } from "../scenes";
 import { handleTookAuditSurvey } from "./callback/handle_took_audit_survey";
-import { handleBalance } from "./callback/callback_queries_balance";
 import { handler_history_accrual } from "./callback/callback_queries_history_accrual";
 import { handler_history_withdrawal } from "./callback/callback_queries_history_withdrawal";
 import { cancelConversations } from "../../bot-common/utils/cancelConversation";
 import { AuthAuditorKeyboard } from "../../bot-common/keyboards/keyboard";
+import { handleGroupVideo } from "./callback/mess__group_video";
+import { handleBalance } from "./callback/mess__balance";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.chatType("private").command("start", async (ctx) => {
@@ -78,5 +79,9 @@ export function registerMessage(bot: Bot<MyContext>): void {
     } else if (ctx.message.text === BUTTONS_KEYBOARD.BalanceButton) {
       await handleBalance(ctx);
     }
+  });
+  bot.on("channel_post:video", async (ctx: MyContext) => {
+    console.log(1212211);
+    await handleGroupVideo(ctx);
   });
 }

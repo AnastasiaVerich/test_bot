@@ -34,7 +34,7 @@ export function registerScenes(bot: Bot<MyContext>): void {
     ),
   );
   bot.use(
-    createConversation(finishSurveyScene, {
+    createConversation((a, b, arg) => finishSurveyScene(a, b, bot, arg), {
       id: ScenesOperator.FinishSurveyScene,
     }),
   );

@@ -266,7 +266,9 @@ export interface ReferralBonusesEntity {
 
 export interface VideosEntity {
   video_id: Generated<number>;
-  file_id: string; //elegram file_id для отправки видео обратно, если в том же боте
+  file_id_operator: string | null; //telegram file_id для отправки видео обратно, если в том же боте
+  file_id_auditor: string | null; //telegram file_id для отправки видео обратно, если в том же боте
+  file_id_supervisor: string | null; //telegram file_id для отправки видео обратно, если в том же боте
   video_data: Buffer | null; // Видеофайл в бинарном формате
   file_name: string | null; // Имя файла
   mime_type: string | null; //Тип файла

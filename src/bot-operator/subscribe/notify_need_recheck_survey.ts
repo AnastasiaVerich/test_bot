@@ -6,7 +6,10 @@ import {
 } from "../../bot-common/utils/pgNotifyUtils";
 import logger from "../../lib/logger";
 import { RecheckSurveyType } from "../../database/db-types";
-import { updateRecheckSurvey } from "../../database/queries_kysely/recheck_survey";
+import {
+  getAllRecheckWhereOperatorNotNotify,
+  updateRecheckSurvey,
+} from "../../database/queries_kysely/recheck_survey";
 
 async function processRecord(
   bot: Bot<MyContext>,
@@ -39,20 +42,13 @@ async function processRecord(
   }
 }
 
-export async function subscribeRecheckOperatorAssigned(
+export async function subscribeOperator_notifyRecheckSurvey(
   bot: Bot<MyContext>,
 ): Promise<void> {
-  const query = `
-        SELECT *
-        FROM recheck_survey
-        WHERE operator_id IS NOT NULL
-        AND is_operator_notified IS FALSE
-        ORDER BY created_at ASC
-    `;
   await subscribeToChannel(
     bot,
     "recheck_operator_assigned",
-    query,
+    getAllRecheckWhereOperatorNotNotify,
     processRecord,
   );
 }

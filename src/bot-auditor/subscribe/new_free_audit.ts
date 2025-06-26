@@ -8,7 +8,10 @@ import {
 import { channelIdAuditor } from "../../config/env";
 import { TookAuditSurveyInlineKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
 import logger from "../../lib/logger";
-import { updateAuditActiveSurvey } from "../../database/queries_kysely/audit_survey_active";
+import {
+  getAllAuditNewSurveyActive,
+  updateAuditActiveSurvey,
+} from "../../database/queries_kysely/audit_survey_active";
 
 async function processRecord(
   bot: Bot<MyContext>,
@@ -46,18 +49,13 @@ async function processRecord(
   }
 }
 
-export async function subscribeAuditNotify(bot: Bot<MyContext>): Promise<void> {
-  const query = `
-        SELECT *
-      FROM audit_survey_active
-      WHERE auditor_id IS NULL
-        AND message_id IS NULL
-      ORDER BY created_at ASC
-    `;
+export async function subscribeAuditor_newFreeAudit(
+  bot: Bot<MyContext>,
+): Promise<void> {
   await subscribeToChannel(
     bot,
     "audit_survey_active_insert",
-    query,
+    getAllAuditNewSurveyActive,
     processRecord,
   );
 }

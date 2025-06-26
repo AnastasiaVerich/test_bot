@@ -1,9 +1,9 @@
-import { HANDLER_PENDING_PAYMENT_INFO } from "../../bot-common/constants/handler_callback_queries";
-import { BUTTONS_CALLBACK_QUERIES } from "../../bot-common/constants/buttons";
-import { MyContext } from "../../bot-common/types/type";
-import logger from "../../lib/logger";
-import { AuthSupervisorKeyboard } from "../../bot-common/keyboards/keyboard";
-import { ScenesSupervisor } from "../scenes";
+import { HANDLER_PENDING_PAYMENT_INFO } from "../../../bot-common/constants/handler_callback_queries";
+import { BUTTONS_CALLBACK_QUERIES } from "../../../bot-common/constants/buttons";
+import { MyContext } from "../../../bot-common/types/type";
+import logger from "../../../lib/logger";
+import { AuthSupervisorKeyboard } from "../../../bot-common/keyboards/keyboard";
+import { ScenesSupervisor } from "../../scenes";
 
 export async function handlePendingPaymentInfo(ctx: MyContext): Promise<void> {
   try {
