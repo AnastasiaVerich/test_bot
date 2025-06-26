@@ -1,4 +1,3 @@
-import { InputFile } from "grammy";
 import logger from "../../lib/logger";
 import { getUserId } from "../../bot-common/utils/getUserId";
 import { BUTTONS_KEYBOARD } from "../../bot-common/constants/buttons";
@@ -61,17 +60,15 @@ export async function recheckSurveyScene(
       return ctx.reply("Видео нет.");
     }
     const video = await getVideoByVideoId(recheckSurvey.video_id);
-    if (!video || !video.video_data || !video.file_name) {
-      return ctx.reply("Видео для этого опроса не найдено.");
-    }
 
-    const fileName = `survey.mp4`;
-    const inputFile = new InputFile(video.video_data, fileName);
-    await ctx.reply("Ожидайте, видео отправляется ...");
-    const videoReply = await ctx.replyWithVideo(inputFile, {
-      caption: `Видео для опроса`,
-    });
-    if (!videoReply || !videoReply.message_id) {
+    if (video?.file_id_operator) {
+      const videoReply = await ctx.replyWithVideo(video?.file_id_operator, {
+        caption: `Видео для опроса`,
+      });
+      if (!videoReply || !videoReply.message_id) {
+        return ctx.reply("видео не отправилось");
+      }
+    } else {
       return ctx.reply("видео не отправилось");
     }
 

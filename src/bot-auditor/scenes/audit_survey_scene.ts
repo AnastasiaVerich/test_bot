@@ -50,12 +50,7 @@ export async function checkSurveyScene(
     }
 
     const video = await getVideoByVideoId(auditSurveyActive.video_id);
-    // if (!video || !video.video_data || !video.file_name) {
-    //   return ctx.reply("Видео для этого опроса не найдено.");
-    // }
-    //
-    // const fileName = `survey.mp4`;
-    // const inputFile = new InputFile(video.video_data, fileName);
+
     await ctx.reply("Ожидайте, видео отправляется ...");
     if (video?.file_id_auditor) {
       const videoReply = await ctx.replyWithVideo(video?.file_id_auditor, {
