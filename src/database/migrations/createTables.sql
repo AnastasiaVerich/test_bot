@@ -261,6 +261,7 @@ CREATE TABLE recheck_survey (
     task_completions_ids INTEGER[] NOT NULL DEFAULT '{}',
     audit_task_ids INTEGER[] NOT NULL DEFAULT '{}',
     survey_id INT NOT NULL,
+    is_operator_notified BOOLEAN NOT NULL DEFAULT FALSE
     user_id BIGINT,
     operator_id BIGINT,
     video_id BIGINT,
@@ -458,6 +459,26 @@ AFTER UPDATE OF operator_id ON survey_active
 FOR EACH ROW
 WHEN (NEW.operator_id IS NOT NULL AND NEW.is_user_notified IS FALSE)
 EXECUTE FUNCTION notify_operator_assigned();
+
+
+
+
+-- Функция для отправки NOTIFY при is_operator_notified === false
+CREATE OR REPLACE FUNCTION notify_recheck_operator_assigned() RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.operator_id IS NOT NULL AND NEW.is_operator_notified IS FALSE THEN
+    PERFORM pg_notify('recheck_operator_assigned', row_to_json(NEW)::text);
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Триггер на таблицу recheck_survey
+CREATE OR REPLACE TRIGGER recheck_operator_assigned_trigger
+AFTER INSERT OR UPDATE OF operator_id, is_operator_notified ON recheck_survey
+FOR EACH ROW
+WHEN (NEW.operator_id IS NOT NULL AND NEW.is_operator_notified IS FALSE)
+EXECUTE FUNCTION notify_recheck_operator_assigned();
 
 
 

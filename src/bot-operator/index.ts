@@ -18,6 +18,7 @@ import { MyContext } from "../bot-common/types/type";
 import { subscribeReservationEndedOper } from "./subscribe/reservation_ended__oper";
 import { PsqlConversationAdapter } from "../services/psqlConversationAdapter";
 import { errorMiddleware } from "../bot-common/middleware/errorMiddleware";
+import { subscribeRecheckOperatorAssigned } from "./subscribe/recheck_operator_assigned";
 
 async function bootstrap() {
   try {
@@ -42,6 +43,7 @@ async function bootstrap() {
 
     void subscribeNotify(bot);
     void subscribeReservationEndedOper(bot);
+    void subscribeRecheckOperatorAssigned(bot);
     // Обработчик ошибок
     bot.catch((err) => {
       logger.info("Ошибка в боте:", err);

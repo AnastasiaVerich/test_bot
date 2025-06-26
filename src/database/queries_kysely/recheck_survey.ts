@@ -81,3 +81,38 @@ export async function deleteRecheckSurvey(
     throw new Error("Error deleteActiveSurvey: " + error);
   }
 }
+
+export async function updateRecheckSurvey(
+  recheck_survey_id: RecheckSurveyType["recheck_survey_id"],
+  params: {
+    is_operator_notified?: RecheckSurveyType["is_operator_notified"];
+  },
+  trx: poolType = pool,
+): Promise<RecheckSurveyType["recheck_survey_id"] | null> {
+  try {
+    const { is_operator_notified } = params;
+
+    if (is_operator_notified === undefined) {
+      throw new Error(
+        `At least one ( ${Object.keys(params).join(", ")} )  must be provided.`,
+      );
+    }
+
+    const set: Partial<RecheckSurveyType> = {};
+
+    if (is_operator_notified !== undefined) {
+      set.is_operator_notified = is_operator_notified;
+    }
+
+    const result = await trx
+      .updateTable("recheck_survey")
+      .set(set)
+      .where("recheck_survey_id", "=", recheck_survey_id)
+      .returning("recheck_survey_id")
+      .executeTakeFirst();
+
+    return result?.recheck_survey_id ?? null;
+  } catch (error) {
+    throw new Error("Error updateRecheckSurvey: " + error);
+  }
+}

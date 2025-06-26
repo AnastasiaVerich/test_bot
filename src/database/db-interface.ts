@@ -182,6 +182,7 @@ export interface RecheckSurveyEntity {
   recheck_survey_id: Generated<number>;
   audit_task_ids: number[]; // массив айди выполненных заданий, которые оператор отметил
   survey_id: number; // id опроса
+  is_operator_notified: Generated<boolean>; // id опроса
   user_id: number | null; // ID аудитора, который будет проверять выполнение
   operator_id: number | null; // ID аудитора, который будет проверять выполнение
   video_id: number | null; // ID видео прохождения опроса
