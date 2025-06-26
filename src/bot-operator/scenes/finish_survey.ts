@@ -1,18 +1,18 @@
-import { Conversation } from "@grammyjs/conversations";
+import { unlink } from "fs/promises";
+import { tmpdir } from "os";
+import { join } from "path";
+import { createReadStream, createWriteStream } from "fs";
+import ffmpeg from "fluent-ffmpeg";
 import logger from "../../lib/logger";
 import { getUserId } from "../../bot-common/utils/getUserId";
 import { BUTTONS_KEYBOARD } from "../../bot-common/constants/buttons";
 import { FinishSurveyInlineKeyboard } from "../../bot-common/keyboards/inlineKeyboard";
 import {
   AuthOperatorKeyboard,
-  ConfirmCancelKeyboard,
-  CreateFromWordsKeyboard,
   SkipKeyboard,
-  YesNoKeyboard,
 } from "../../bot-common/keyboards/keyboard";
 import { FINISH_SURVEY_OPERATOR_SCENE } from "../../bot-common/constants/scenes";
 import {
-  MyContext,
   MyConversation,
   MyConversationContext,
 } from "../../bot-common/types/type";
@@ -23,9 +23,13 @@ import {
   getInfoAboutSurvey,
   userCompletedSurvey,
 } from "../../database/services/surveyService";
-import { SurveyTasksType } from "../../database/db-types";
 import { token_operator } from "../../config/env";
 import { addVideo } from "../../database/queries_kysely/videos";
+import { confirmStep } from "../../bot-auditor/scenes/common_step/conform_or_not";
+import {
+  TaskResult,
+  tasks_result,
+} from "../../bot-auditor/scenes/common_step/tasks_result";
 
 export async function finishSurveyScene(
   conversation: MyConversation,
@@ -34,14 +38,7 @@ export async function finishSurveyScene(
 ) {
   let surveyActiveId = arg.state.surveyActiveId;
   try {
-    const result: {
-      survey_task_id: number;
-      isCompleted: boolean;
-      reward_user?: number;
-      reward_operator?: number;
-      result?: string;
-      result_positions?: string;
-    }[] = await conversation.external(() => []);
+    let result: TaskResult[] = [];
 
     const operator_id = await conversation.external(() => getUserId(ctx));
     if (!operator_id) return;
@@ -51,7 +48,6 @@ export async function finishSurveyScene(
     });
     if (!operator) {
       return;
-      //что-то придумать.
     }
 
     const surveyActive = await getActiveSurvey({
@@ -65,7 +61,7 @@ export async function finishSurveyScene(
 
     const surveyData = await getInfoAboutSurvey(surveyActive.survey_id);
     if (!surveyData) {
-      return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SURVEY_ACTIVE_NOT_FOUND, {
+      return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SURVEY_DATA_NOT_FOUND, {
         reply_markup: { remove_keyboard: true },
       });
     }
@@ -73,62 +69,16 @@ export async function finishSurveyScene(
       getAllSurveyTasks(surveyActive.survey_id),
     );
 
-    //скиньте видео
-    //сколько выполнил заданий
-    //подтвердить
-    for (const survey_task of survey_tasks) {
-      const index = survey_tasks.indexOf(survey_task);
-      const isCompleted = await completedOrNotStep(
-        conversation,
-        ctx,
-        survey_task,
-      );
-      if (isCompleted === null) {
-        await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-          reply_markup: FinishSurveyInlineKeyboard(surveyActiveId),
-        });
-        return;
-      }
-      if (isCompleted === BUTTONS_KEYBOARD.YesButton) {
-        result[index] = {
-          isCompleted: true,
-          survey_task_id: survey_task.survey_task_id,
-          reward_user: surveyData.task_price,
-          reward_operator: surveyData.task_price / 2,
-        };
-
-        const result_position = await countResultStep(conversation, ctx);
-        if (result_position === null) {
-          await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-            reply_markup: FinishSurveyInlineKeyboard(surveyActiveId),
-          });
-          return;
-        }
-        result[index].result = result_position;
-
-        const result_positions = await countResultPositionVarStep(
-          conversation,
-          ctx,
-          survey_task.data,
-        );
-        if (!result_positions) {
-          await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
-            reply_markup: FinishSurveyInlineKeyboard(surveyActiveId),
-          });
-          return;
-        }
-        result[index].result_positions = result_positions.join(", ");
-      } else {
-        result[index] = {
-          isCompleted: false,
-          survey_task_id: survey_task.survey_task_id,
-        };
-      }
-    }
+    result = await tasks_result(
+      conversation,
+      ctx,
+      survey_tasks,
+      surveyData.task_price,
+    );
 
     const videoId = await uploadVideoStep(conversation, ctx, surveyActiveId);
 
-    const resultConfirm = await stepConfirm(conversation, ctx);
+    const resultConfirm = await confirmStep(conversation, ctx);
 
     if (!resultConfirm) {
       await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
@@ -140,12 +90,12 @@ export async function finishSurveyScene(
     if (resultConfirm === BUTTONS_KEYBOARD.ConfirmButton) {
       await userCompletedSurvey(
         {
-          surveyActiveId: surveyActive.survey_active_id,
+          delete_id: surveyActive.survey_active_id,
           user_id: surveyActive.user_id,
           survey_id: surveyActive.survey_id,
           operator_id: operator_id,
+          video_id: videoId,
           survey_interval: surveyData.survey_interval,
-          videoId: videoId,
         },
         result,
       );
@@ -163,152 +113,6 @@ export async function finishSurveyScene(
     return ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.SOME_ERROR, {
       reply_markup: FinishSurveyInlineKeyboard(surveyActiveId),
     });
-  }
-}
-
-async function completedOrNotStep(
-  conversation: MyConversation,
-  ctx: MyConversationContext,
-  survey_task: SurveyTasksType,
-) {
-  try {
-    await ctx.reply(
-      FINISH_SURVEY_OPERATOR_SCENE.ENTER_COMPLETED_OR_NOT +
-        `\n\n${survey_task.description.replaceAll("/n", "\n")}`,
-      {
-        parse_mode: "HTML",
-        reply_markup: YesNoKeyboard(),
-      },
-    );
-
-    let result: string | null = null;
-    //Два выхода из цикла — контакт юзера получен либо произошла ошибка(скорее всего на стороне тг)
-    while (true) {
-      const response = await conversation.waitForHears(
-        [BUTTONS_KEYBOARD.YesButton, BUTTONS_KEYBOARD.NoButton],
-        {
-          otherwise: (ctx) =>
-            ctx.reply(
-              FINISH_SURVEY_OPERATOR_SCENE.ENTER_COMPLETED_OR_NOT_OTHERWISE,
-              {
-                parse_mode: "HTML",
-                reply_markup: YesNoKeyboard(),
-              },
-            ),
-        },
-      );
-
-      if (!response.message?.text) break;
-
-      result = response.message?.text;
-      break;
-    }
-
-    if (!result) return null;
-    return result;
-  } catch (error) {
-    return null;
-  }
-}
-
-async function countResultStep(
-  conversation: MyConversation,
-  ctx: MyConversationContext,
-): Promise<string | null> {
-  try {
-    await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT);
-
-    let result_position: any = null;
-    //Два выхода из цикла — контакт юзера получен либо произошла ошибка(скорее всего на стороне тг)
-    while (true) {
-      const response = await conversation.waitFor("message:text", {
-        otherwise: (ctx) =>
-          ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT_OTHERWISE),
-      });
-      const userInput = response.message?.text.trim() ?? "";
-      const number = Number(userInput); // Преобразуем в целое число
-
-      if (isNaN(number) || number <= 0) {
-        await ctx.reply(
-          FINISH_SURVEY_OPERATOR_SCENE.ENTERED_NOT_CORRECT_RESULT,
-        );
-        continue;
-      }
-      result_position = number.toString();
-      break;
-    }
-    return result_position;
-  } catch (error) {
-    return null;
-  }
-}
-
-async function countResultPositionVarStep(
-  conversation: MyConversation,
-  ctx: MyConversationContext,
-  data: any,
-) {
-  try {
-    const { positions_var } = data;
-
-    await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT_POS_VAR_1, {
-      reply_markup: CreateFromWordsKeyboard(positions_var),
-    });
-
-    let result_1: string | null = null;
-    //Два выхода из цикла — контакт юзера получен либо произошла ошибка(скорее всего на стороне тг)
-    while (true) {
-      const response = await conversation.waitFor("message:text", {
-        otherwise: (ctx) =>
-          ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RES_POS_OTHERWISE, {
-            reply_markup: CreateFromWordsKeyboard(positions_var),
-          }),
-      });
-      const userInput = response.message?.text.trim() ?? "";
-
-      result_1 = userInput;
-      break;
-    }
-    await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT_POS_VAR_2, {
-      reply_markup: CreateFromWordsKeyboard(positions_var),
-    });
-
-    let result_2: string | null = null;
-    //Два выхода из цикла — контакт юзера получен либо произошла ошибка(скорее всего на стороне тг)
-    while (true) {
-      const response = await conversation.waitFor("message:text", {
-        otherwise: (ctx) =>
-          ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RES_POS_OTHERWISE, {
-            reply_markup: CreateFromWordsKeyboard(positions_var),
-          }),
-      });
-      const userInput = response.message?.text.trim() ?? "";
-
-      result_2 = userInput;
-      break;
-    }
-    await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RESULT_POS_VAR_3, {
-      reply_markup: CreateFromWordsKeyboard(positions_var),
-    });
-
-    let result_3: string | null = null;
-    //Два выхода из цикла — контакт юзера получен либо произошла ошибка(скорее всего на стороне тг)
-    while (true) {
-      const response = await conversation.waitFor("message:text", {
-        otherwise: (ctx) =>
-          ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.ENTER_RES_POS_OTHERWISE, {
-            reply_markup: CreateFromWordsKeyboard(positions_var),
-          }),
-      });
-      const userInput = response.message?.text.trim() ?? "";
-
-      result_3 = userInput;
-      break;
-    }
-
-    return [result_1, result_2, result_3];
-  } catch (error) {
-    return null;
   }
 }
 
@@ -371,6 +175,42 @@ async function uploadVideoStep(
       const arrayBuffer = await response2.arrayBuffer();
       videoData = Buffer.from(arrayBuffer);
 
+      // Сжатие видео
+      const tempInputPath = join(tmpdir(), `input_${fileId}.mp4`);
+      const tempOutputPath = join(tmpdir(), `output_${fileId}.mp4`);
+      await new Promise((resolve, reject) => {
+        createWriteStream(tempInputPath)
+          .on("finish", resolve)
+          .on("error", reject)
+          .end(videoData);
+      });
+      await new Promise((resolve, reject) => {
+        ffmpeg(tempInputPath)
+          .outputOptions([
+            "-vcodec libx264", // Кодек H.264
+            "-crf 28", // Контроль качества (28 — баланс между качеством и размером)
+            "-preset fast", // Скорость сжатия
+            "-vf scale=1280:720", // Уменьшение разрешения до 720p
+            "-acodec aac", // Аудиокодек
+            "-b:a 128k", // Битрейт аудио
+          ])
+          .output(tempOutputPath)
+          .on("end", resolve)
+          .on("error", reject)
+          .run();
+      });
+
+      // Чтение сжатого видео
+      videoData = await new Promise((resolve, reject) => {
+        const chunks: Buffer[] = [];
+        createReadStream(tempOutputPath)
+          .on("data", (chunk) => chunks.push(Buffer.from(chunk)))
+          .on("end", () => resolve(Buffer.concat(chunks)))
+          .on("error", reject);
+      });
+
+      // Удаление временных файлов
+      await Promise.all([unlink(tempInputPath), unlink(tempOutputPath)]);
       // Сохранение в базу данных onversation.external
       video_id = await conversation.external(() =>
         addVideo(fileId, videoData, fileName, mimeType),
@@ -382,44 +222,8 @@ async function uploadVideoStep(
 
     return video_id;
   } catch (error) {
+    await ctx.reply("Видео не сохранилось");
     logger.error("Ошибка при загрузке видео: " + error);
-    return null;
-  }
-}
-
-async function stepConfirm(
-  conversation: Conversation<MyContext, MyConversationContext>,
-  ctx: MyConversationContext,
-) {
-  try {
-    await ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.CONFIRMATION, {
-      parse_mode: "HTML",
-      reply_markup: ConfirmCancelKeyboard(),
-    });
-
-    let result: string | null = null;
-    //Два выхода из цикла — контакт юзера получен либо произошла ошибка(скорее всего на стороне тг)
-    while (true) {
-      const response = await conversation.waitForHears(
-        [BUTTONS_KEYBOARD.ConfirmButton, BUTTONS_KEYBOARD.CancelButton],
-        {
-          otherwise: (ctx) =>
-            ctx.reply(FINISH_SURVEY_OPERATOR_SCENE.CONFIRMATION_OTHERWISE, {
-              parse_mode: "HTML",
-              reply_markup: ConfirmCancelKeyboard(),
-            }),
-        },
-      );
-
-      if (!response.message?.text) break;
-
-      result = response.message?.text;
-      break;
-    }
-
-    if (!result) return null;
-    return result;
-  } catch (error) {
     return null;
   }
 }

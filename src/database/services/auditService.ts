@@ -4,88 +4,106 @@ import {
   setAuditActiveSurveyAuditorIdIfNull,
 } from "../queries_kysely/audit_survey_active";
 import { addAuditSurveyTaskCompletions } from "../queries_kysely/audit_survey_task_completions";
-import { updateAuditorByAuditorId } from "../queries_kysely/auditors";
 import { AuditorSurveyActiveType } from "../db-types";
 import { updateSurveyCompletion } from "../queries_kysely/survey_task_completions";
 import { updateUserByUserId } from "../queries_kysely/users";
 import { updateOperatorByOperatorId } from "../queries_kysely/operators";
+import { addRecheckSurvey } from "../queries_kysely/recheck_survey";
+import { TaskResult } from "../../bot-auditor/scenes/common_step/tasks_result";
 
 export async function auditorCompletedAuditSurvey(
   params: {
-    audit_survey_active_id: number;
-    auditor_id: number;
+    delete_id: number;
     user_id: number;
+    survey_id: number;
     operator_id: number;
+    video_id: number;
+    auditor_id: number;
   },
-  result: {
-    isCompleted: boolean;
-    reward_auditor: number;
-    reward_user: number;
-    reward_operator: number;
-    result: string | null;
-    result_positions: string | null;
-    description: string | null;
-    completed_id: number | null;
-  }[],
+  result: Array<
+    TaskResult & {
+      completion_id: number | null;
+      isSameAnswers: boolean;
+    }
+  >,
 ): Promise<any> {
   try {
-    const { audit_survey_active_id, auditor_id, user_id, operator_id } = params;
+    const { delete_id, user_id, survey_id, operator_id, video_id, auditor_id } =
+      params;
 
     return await pool.transaction().execute(async (trx) => {
+      // сошлись ответы или нет
+      const isAllSameAnswer =
+        result.filter((el) => !el.isSameAnswers).length === 0;
+
+      // удаление активной записи для аудитора
       const isDeleteAuditActiveSurveyId = await deleteAuditActiveSurvey(
-        audit_survey_active_id,
+        delete_id,
         trx,
       );
       if (!isDeleteAuditActiveSurveyId) {
-        throw new Error("AUDIT Survey active delete failed");
+        throw new Error("deleteAuditActiveSurvey failed");
       }
 
-      let reward_auditor = 0;
       let reward_user = 0;
       let reward_operator = 0;
+      let audit_task_ids = [];
+      // Добавление ответов на задания опросов
       for (const item of result) {
         const auditCompletedTaskId = await addAuditSurveyTaskCompletions(
           {
-            completion_id: item.completed_id,
+            completion_id: item.completion_id,
             auditor_id: auditor_id,
             result: item.result,
             result_positions_var: item.result_positions,
-            reward_auditor: item.reward_auditor,
-            description: item.description,
+            survey_task_id: item.survey_task_id,
+            survey_id: survey_id,
+            reward_auditor: 0,
+            description: "",
           },
           trx,
         );
         if (!auditCompletedTaskId) {
-          throw new Error("Survey Completion add failed");
+          throw new Error("addAuditSurveyTaskCompletions failed");
         }
-        reward_auditor += Number(item.reward_auditor);
-        if (item.completed_id) {
+
+        // если все ок, то считаем ответы оператора валидными, обновляем награду за задание.
+        if (item.completion_id && isAllSameAnswer) {
           const updateCompletedTaskId = await updateSurveyCompletion(
-            item.completed_id,
+            item.completion_id,
             {
               reward_user: item.reward_user,
               reward_operator: item.reward_operator,
+              is_valid: true,
             },
+            trx,
           );
           if (!updateCompletedTaskId) {
-            throw new Error("Survey updateCompletedTaskId");
+            throw new Error("updateSurveyCompletion failed");
           }
           reward_user += Number(item.reward_user);
           reward_operator += Number(item.reward_operator);
         }
+        audit_task_ids.push(auditCompletedTaskId);
       }
 
-      const isBalanceUpdate = await updateAuditorByAuditorId(
-        auditor_id,
-        {
-          add_balance: reward_auditor,
-        },
-        trx,
-      );
-
-      if (!isBalanceUpdate) {
-        throw new Error("UpdateBalance filed");
+      // Если нужна перепроверка, то добавляем соответствующую запись.
+      if (!isAllSameAnswer) {
+        const isAddRecheckSurveyId = await addRecheckSurvey(
+          {
+            user_id: user_id,
+            survey_id: survey_id,
+            operator_id: operator_id,
+            video_id: video_id,
+            audit_task_ids: audit_task_ids,
+          },
+          trx,
+        );
+        if (!isAddRecheckSurveyId) {
+          throw new Error("addRecheckSurvey failed");
+        }
       }
+
       const isUserBalanceUpdate = await updateUserByUserId(
         user_id,
         {
@@ -95,7 +113,7 @@ export async function auditorCompletedAuditSurvey(
       );
 
       if (!isUserBalanceUpdate) {
-        throw new Error("isUserBalanceUpdate filed");
+        throw new Error("updateUserByUserId filed");
       }
       const isOperatorBalanceUpdate = await updateOperatorByOperatorId(
         operator_id,
@@ -106,7 +124,7 @@ export async function auditorCompletedAuditSurvey(
       );
 
       if (!isOperatorBalanceUpdate) {
-        throw new Error("isOperatorBalanceUpdate filed");
+        throw new Error("updateOperatorByOperatorId filed");
       }
     });
   } catch (error) {

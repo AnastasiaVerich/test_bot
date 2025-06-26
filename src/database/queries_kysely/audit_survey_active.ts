@@ -6,9 +6,9 @@ export async function addAuditSurveyActive(
     survey_id: AuditorSurveyActiveType["survey_id"];
     operator_id: AuditorSurveyActiveType["operator_id"];
     user_id: AuditorSurveyActiveType["user_id"];
-    auditor_id: AuditorSurveyActiveType["auditor_id"];
     video_id: AuditorSurveyActiveType["video_id"];
     task_completions_ids: AuditorSurveyActiveType["task_completions_ids"];
+    auditor_id?: AuditorSurveyActiveType["auditor_id"];
   },
   trx: poolType = pool,
 ): Promise<AuditorSurveyActiveType["audit_survey_active_id"] | null> {
@@ -16,7 +16,7 @@ export async function addAuditSurveyActive(
     const {
       task_completions_ids,
       survey_id,
-      auditor_id,
+      auditor_id = null,
       operator_id,
       user_id,
       video_id,

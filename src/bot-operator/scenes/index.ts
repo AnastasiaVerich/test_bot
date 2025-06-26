@@ -7,11 +7,13 @@ import { withdrawalScene } from "../../bot-common/scenes/withdrawal";
 import { AuthOperatorKeyboard } from "../../bot-common/keyboards/keyboard";
 import { simpleRegistrationScene } from "../../bot-common/scenes/simpleRegistration";
 import { linkWelcomeOperator } from "../../config/env";
+import { recheckSurveyScene } from "./recheck_survey";
 
 export enum ScenesOperator {
   RegisterScene = "RegisterScene", // eslint-disable-line no-unused-vars
   FinishSurveyScene = "FinishSurveyScene", // eslint-disable-line no-unused-vars
   WithdrawalScene = "WithdrawalScene", // eslint-disable-line no-unused-vars
+  RecheckSurvey = "RecheckSurvey", // eslint-disable-line no-unused-vars
 }
 
 export function registerScenes(bot: Bot<MyContext>): void {
@@ -34,6 +36,11 @@ export function registerScenes(bot: Bot<MyContext>): void {
   bot.use(
     createConversation(finishSurveyScene, {
       id: ScenesOperator.FinishSurveyScene,
+    }),
+  );
+  bot.use(
+    createConversation(recheckSurveyScene, {
+      id: ScenesOperator.RecheckSurvey,
     }),
   );
   bot.use(

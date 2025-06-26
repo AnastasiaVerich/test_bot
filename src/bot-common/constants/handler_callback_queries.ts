@@ -2,6 +2,7 @@ export const HANDLER_BALANCE = {
   USER_ID_UNDEFINED: "Произошла ошибка. Начните заново с команды /start.",
   NO_PENDING_PAYMENT: "Нет ожидающих платежей",
   RUB: "РУБ",
+  TON: "TON",
   OR: "или",
   BALANCE: "На Вашем балансе",
   BALANCE_PENDING: "Ожидающие платежи",
@@ -52,6 +53,13 @@ export const HANDLER_USER_WROTE = {
 };
 
 export const HANDLER_GET_USER_SURVEY_INFO = {
+  ERROR_DATA_UNDEFINED: "Данные не получены.",
+  ERROR_DATA_INVALID: "Неверный формат данных.",
+  IF_NEED_FINISH_SURVEY: "После окончания опроса нажмите на кнопку завершения.",
+  SOME_ERROR: "Бот временно недоступен",
+};
+
+export const HANDLER_RECHECK_THIS_SURVEY = {
   ERROR_DATA_UNDEFINED: "Данные не получены.",
   ERROR_DATA_INVALID: "Неверный формат данных.",
   IF_NEED_FINISH_SURVEY: "После окончания опроса нажмите на кнопку завершения.",

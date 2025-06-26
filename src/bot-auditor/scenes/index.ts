@@ -1,7 +1,7 @@
 import { Bot } from "grammy";
 import { createConversation } from "@grammyjs/conversations";
 import { MyContext } from "../../bot-common/types/type";
-import { checkSurveyScene } from "./check_survey_scene";
+import { checkSurveyScene } from "./audit_survey_scene";
 import { withdrawalScene } from "../../bot-common/scenes/withdrawal";
 
 import { AuthAuditorKeyboard } from "../../bot-common/keyboards/keyboard";
@@ -32,7 +32,7 @@ export function registerScenes(bot: Bot<MyContext>): void {
   );
 
   bot.use(
-    createConversation(checkSurveyScene, {
+    createConversation((a, b) => checkSurveyScene(a, b), {
       id: ScenesAuditor.CheckSurveyScene,
     }),
   );

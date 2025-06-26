@@ -61,6 +61,8 @@ export const AuthOperatorKeyboard = (): Keyboard =>
     .row()
     .text(BUTTONS_KEYBOARD.CurrentSurveys)
     .row()
+    .text(BUTTONS_KEYBOARD.RecheckSurveys)
+    .row()
     .text(BUTTONS_KEYBOARD.BalanceButton)
     .resized();
 

@@ -103,13 +103,22 @@ export async function addSurveyCompletion(
 export async function updateSurveyCompletion(
   completion_id: SurveyCompletionsType["completion_id"],
   params: {
+    result_main?: SurveyCompletionsType["result"];
+    result_positions?: SurveyCompletionsType["result_positions_var"];
     reward_user?: SurveyCompletionsType["reward_user"];
     reward_operator?: SurveyCompletionsType["reward_operator"];
+    is_valid?: SurveyCompletionsType["is_valid"];
   },
   trx: poolType = pool,
 ): Promise<SurveyCompletionsType["completion_id"] | null> {
   try {
-    const { reward_user, reward_operator } = params;
+    const {
+      reward_user,
+      result_main,
+      result_positions,
+      reward_operator,
+      is_valid,
+    } = params;
 
     const set: Partial<SurveyCompletionsType> = {};
 
@@ -118,6 +127,15 @@ export async function updateSurveyCompletion(
     }
     if (reward_operator !== undefined) {
       set.reward_operator = reward_operator;
+    }
+    if (is_valid !== undefined) {
+      set.is_valid = is_valid;
+    }
+    if (result_main !== undefined) {
+      set.result = result_main;
+    }
+    if (result_positions !== undefined) {
+      set.result_positions_var = result_positions;
     }
 
     const result = await trx
@@ -131,5 +149,22 @@ export async function updateSurveyCompletion(
     return result?.completion_id ?? null;
   } catch (error) {
     throw new Error("Error updateSurveyCompletion: " + error);
+  }
+}
+
+export async function deleteSurveyCompletion(
+  completion_id: SurveyCompletionsType["completion_id"],
+  trx: poolType = pool,
+): Promise<SurveyCompletionsType["completion_id"] | null> {
+  try {
+    const result = await trx
+      .deleteFrom("survey_task_completions")
+      .where("completion_id", "=", completion_id)
+      .returning("completion_id")
+      .executeTakeFirst();
+
+    return result?.completion_id ?? null;
+  } catch (error) {
+    throw new Error("Error deleteSurveyCompletion: " + error);
   }
 }

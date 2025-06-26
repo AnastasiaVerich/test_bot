@@ -32,6 +32,7 @@ export const BUTTONS_CALLBACK_QUERIES = {
   ThisUserWrote: "ThisUserWrote",
   ThisUserGetSurveyInfo: "ThisUserGetSurveyInfo",
   ThisPendingPaymentInfo: "GetPendingPaymentInfo",
+  ThisSurveyNeedRecheck: "ThisSurveyNeedRecheck",
 };
 export const BUTTONS_KEYBOARD = {
   SendNumberButton: "Отправить номер",
@@ -53,6 +54,7 @@ export const BUTTONS_KEYBOARD = {
 
   NewSurveys: "Новые опросы",
   CurrentSurveys: "Текущее опросы",
+  RecheckSurveys: "Перепроверка опросов",
 
   AddAdvertisingCampaign: "Добавить рекламную компанию",
   GetUsersLogs: "Логи пользователей",

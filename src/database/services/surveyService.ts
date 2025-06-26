@@ -20,7 +20,11 @@ import {
 import { addSurveyTask } from "../queries_kysely/survey_tasks";
 import logger from "../../lib/logger";
 import { getRegionById } from "../queries_kysely/region_settings";
-import { addSurveyCompletion } from "../queries_kysely/survey_task_completions";
+import {
+  addSurveyCompletion,
+  deleteSurveyCompletion,
+  updateSurveyCompletion,
+} from "../queries_kysely/survey_task_completions";
 import { updateUserByUserId } from "../queries_kysely/users";
 import {
   getReferralByReferredUserIdAndStatus,
@@ -28,6 +32,8 @@ import {
 } from "../queries_kysely/referral_bonuses";
 import { updateOperatorByOperatorId } from "../queries_kysely/operators";
 import { addAuditSurveyActive } from "../queries_kysely/audit_survey_active";
+import { deleteRecheckSurvey } from "../queries_kysely/recheck_survey";
+import { TaskResult } from "../../bot-auditor/scenes/common_step/tasks_result";
 
 export async function reservationSurveyActiveByOperator(params: {
   operatorId: SurveyActiveType["operator_id"];
@@ -248,50 +254,40 @@ export async function getInfoAboutSurvey(
 
 export async function userCompletedSurvey(
   params: {
-    surveyActiveId: number;
+    delete_id: number;
     user_id: number;
     survey_id: number;
     operator_id: number;
+    video_id: number | null;
     survey_interval: string;
-    videoId: number | null;
   },
-  result: {
-    survey_task_id: number;
-    isCompleted: boolean;
-    result?: string;
-    result_positions?: string;
-    reward_user?: number;
-    reward_operator?: number;
-  }[],
+  result: TaskResult[],
 ): Promise<any> {
   try {
     const {
-      surveyActiveId,
+      delete_id,
       user_id,
       survey_id,
       operator_id,
       survey_interval,
-      videoId,
+      video_id,
     } = params;
 
     return await pool.transaction().execute(async (trx) => {
-      const isDeleteActiveSurveyId = await deleteActiveSurvey(
-        surveyActiveId,
-        trx,
-      );
+      //удаление активного опроса
+      const isDeleteActiveSurveyId = await deleteActiveSurvey(delete_id, trx);
       if (!isDeleteActiveSurveyId) {
-        throw new Error("Survey active delete failed");
+        throw new Error("deleteActiveSurvey failed");
       }
       let reward_user = 0;
       let reward_operator = 0;
-      const task_completions_id: number[] = [];
+      const task_completions_ids: number[] = [];
+      //добавление ответов на задания опроса
       for (const item of result) {
         if (
           item.isCompleted &&
-          item.result !== undefined &&
-          item.result_positions !== undefined &&
-          item.reward_user !== undefined &&
-          item.reward_operator !== undefined
+          item.result !== null &&
+          item.result_positions !== null
         ) {
           const completedTaskId = await addSurveyCompletion(
             {
@@ -301,56 +297,61 @@ export async function userCompletedSurvey(
               operator_id: operator_id,
               result_main: item.result,
               result_positions: item.result_positions,
-              reward_user: !videoId ? item.reward_user : 0,
-              reward_operator: !videoId ? item.reward_operator : 0,
-              video_id: videoId,
+              reward_user: !video_id ? item.reward_user : 0,
+              reward_operator: !video_id ? item.reward_operator : 0,
+              video_id: video_id,
             },
             trx,
           );
           if (!completedTaskId) {
-            throw new Error("Survey Completion add failed");
+            throw new Error("addSurveyCompletion failed");
           }
-          task_completions_id.push(completedTaskId);
+          task_completions_ids.push(completedTaskId);
           reward_user += Number(item.reward_user);
           reward_operator += Number(item.reward_operator);
         }
       }
 
-      if (videoId) {
+      //добавление записи на проверку аудитору
+      if (video_id) {
         const addAuditSurveyActiveId = await addAuditSurveyActive(
           {
-            survey_id: survey_id,
-            auditor_id: null,
-            video_id: videoId,
-            task_completions_ids: task_completions_id,
             user_id: user_id,
+            survey_id: survey_id,
             operator_id: operator_id,
+            video_id: video_id,
+            task_completions_ids: task_completions_ids,
           },
           trx,
         );
         if (!addAuditSurveyActiveId) {
-          throw new Error("Audit survey active delete failed");
+          throw new Error("addAuditSurveyActive failed");
         }
       }
 
-      const isBalanceUpdate = await updateUserByUserId(
+      // Обновляем пользователю баланс, блокируем прохождение опросов на определенное время и ставим
+      // уведомление для того, что бы ему пришло сообщение, информирующее об окончании опроса
+      const isUserInfoUpdate = await updateUserByUserId(
         user_id,
         {
-          add_balance: !videoId ? reward_user : 0,
+          add_balance: !video_id ? reward_user : 0,
           notifyReason: "finish_survey",
           interval_survey_lock_until: survey_interval,
         },
         trx,
       );
+      if (!isUserInfoUpdate) {
+        throw new Error("updateUserByUserId filed");
+      }
       const isBalanceOperatorUpdate = await updateOperatorByOperatorId(
         operator_id,
         {
-          add_balance: !videoId ? reward_operator : 0,
+          add_balance: !video_id ? reward_operator : 0,
         },
         trx,
       );
-      if (!isBalanceUpdate || !isBalanceOperatorUpdate) {
-        throw new Error("UpdateBalance filed");
+      if (!isBalanceOperatorUpdate) {
+        throw new Error("updateOperatorByOperatorId filed");
       }
 
       const referral_data = await getReferralByReferredUserIdAndStatus(
@@ -361,7 +362,7 @@ export async function userCompletedSurvey(
 
       if (referral_data) {
         const sum_regard = 100;
-        const isUpdateRes = await updateReferralByReferredUserId(
+        const isUpdateReferral = await updateReferralByReferredUserId(
           user_id,
           {
             status: "completed",
@@ -369,7 +370,7 @@ export async function userCompletedSurvey(
           },
           trx,
         );
-        if (!isUpdateRes) {
+        if (!isUpdateReferral) {
           throw new Error("updateReferralByReferredUserId filed");
         }
         const isBalanceUpdate = await updateUserByUserId(
@@ -386,5 +387,137 @@ export async function userCompletedSurvey(
     });
   } catch (error) {
     throw new Error("Error userCompletedSurvey: " + error);
+  }
+}
+
+export async function userRecheckSurvey(
+  params: {
+    delete_id: number;
+    user_id: number;
+    survey_id: number;
+    operator_id: number;
+    video_id: number;
+  },
+  result: Array<
+    TaskResult & {
+      completion_id: number | null;
+      isSameAnswers: boolean;
+    }
+  >,
+): Promise<any> {
+  try {
+    const { delete_id, user_id, survey_id, operator_id, video_id } = params;
+
+    return await pool.transaction().execute(async (trx) => {
+      // сошлись ответы или нет
+      const isAllSameAnswer =
+        result.filter((el) => !el.isSameAnswers).length === 0;
+
+      // удаление активной записи на перепроверку
+      const isDeleteRecheckSurveyId = await deleteRecheckSurvey(delete_id, trx);
+
+      if (!isDeleteRecheckSurveyId) {
+        throw new Error("deleteRecheckSurvey failed");
+      }
+      let reward_user = 0;
+      let reward_operator = 0;
+      const task_completions_ids: number[] = [];
+
+      // Обновление ответов на задания опроса, либо добавление, если раньше не было такого ответа,
+      // либо удаление, если случайно раньше написали, что задание выполнено было.
+      for (const item of result) {
+        if (
+          item.isCompleted &&
+          item.result !== null &&
+          item.result_positions !== null
+        ) {
+          if (item.completion_id) {
+            const updateTaskId = await updateSurveyCompletion(
+              item.completion_id,
+              {
+                result_main: item.result,
+                result_positions: item.result_positions,
+                reward_user: isAllSameAnswer ? item.reward_user : 0,
+                reward_operator: isAllSameAnswer ? item.reward_operator : 0,
+                is_valid: isAllSameAnswer,
+              },
+              trx,
+            );
+            if (!updateTaskId) {
+              throw new Error("updateSurveyCompletion failed");
+            }
+            task_completions_ids.push(updateTaskId);
+          } else {
+            const completedTaskId = await addSurveyCompletion(
+              {
+                survey_id: survey_id,
+                survey_task_id: item.survey_task_id,
+                user_id: user_id,
+                operator_id: operator_id,
+                result_main: item.result,
+                result_positions: item.result_positions,
+                reward_user: isAllSameAnswer ? item.reward_user : 0,
+                reward_operator: isAllSameAnswer ? item.reward_operator : 0,
+                video_id: video_id,
+              },
+              trx,
+            );
+            if (!completedTaskId) {
+              throw new Error("Survey Completion add failed");
+            }
+            task_completions_ids.push(completedTaskId);
+          }
+          reward_user += Number(item.reward_user);
+          reward_operator += Number(item.reward_operator);
+        } else if (!item.isCompleted && item.completion_id) {
+          const isDeleteSurveyTaskComplId = await deleteSurveyCompletion(
+            item.completion_id,
+            trx,
+          );
+          if (!isDeleteSurveyTaskComplId) {
+            throw new Error("deleteSurveyCompletion failed");
+          }
+        }
+      }
+
+      //добавление записи на проверку аудитору
+      if (!isAllSameAnswer) {
+        const addAuditSurveyActiveId = await addAuditSurveyActive(
+          {
+            user_id: user_id,
+            survey_id: survey_id,
+            operator_id: operator_id,
+            video_id: video_id,
+            task_completions_ids: task_completions_ids,
+          },
+          trx,
+        );
+        if (!addAuditSurveyActiveId) {
+          throw new Error("addAuditSurveyActive failed");
+        }
+      }
+      const isBalanceUpdate = await updateUserByUserId(
+        user_id,
+        {
+          add_balance: isAllSameAnswer ? reward_user : 0,
+        },
+        trx,
+      );
+      if (!isBalanceUpdate) {
+        throw new Error("updateUserByUserId filed");
+      }
+      const isBalanceOperatorUpdate = await updateOperatorByOperatorId(
+        operator_id,
+        {
+          add_balance: isAllSameAnswer ? reward_operator : 0,
+        },
+        trx,
+      );
+      if (!isBalanceOperatorUpdate) {
+        throw new Error("updateOperatorByOperatorId filed");
+      }
+    });
+  } catch (error) {
+    throw new Error("Error userRecheckSurvey: " + error);
   }
 }

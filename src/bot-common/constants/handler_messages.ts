@@ -9,6 +9,13 @@ export const HANDLER_NEW_SURVEYS = {
 
   SOME_ERROR: "Бот временно недоступен",
 };
+export const HANDLER_RECHECK_SURVEYS = {
+  NO_RECHECK_SURVEYS: "У вас нет опросов на перепроверку.",
+  RECHECK_NUMBER_ID: "Перепроверить запись №",
+  HEADER: "Вот записи, которые нужно перепроверить.",
+
+  SOME_ERROR: "Бот временно недоступен",
+};
 export const HANDLER_RESTART_FAILED_PAYMENT = {
   NO_FAILED_PENDING_PAYMENTS:
     "Нет неуспешных платежей, которые можно перезапустить.",

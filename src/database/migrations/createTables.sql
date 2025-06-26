@@ -242,6 +242,7 @@ CREATE TABLE survey_task_completions (
     reward_user DECIMAL(10, 2) NOT NULL,
     reward_operator DECIMAL(10, 2) NOT NULL,
     video_id BIGINT,
+    is_valid BOOLEAN DEFAULT FALSE NOT NULL,
 
     completed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
@@ -252,6 +253,30 @@ CREATE TABLE survey_task_completions (
 );
 GRANT ALL PRIVILEGES ON TABLE survey_task_completions TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE survey_task_completions_completion_id_seq TO admin_vadim;
+
+
+-- Таблица для перепроверки опросов оператором результатов опроса
+CREATE TABLE recheck_survey (
+    recheck_survey_id SERIAL PRIMARY KEY,
+    task_completions_ids INTEGER[] NOT NULL DEFAULT '{}',
+    audit_task_ids INTEGER[] NOT NULL DEFAULT '{}',
+    survey_id INT NOT NULL,
+    user_id BIGINT,
+    operator_id BIGINT,
+    video_id BIGINT,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL,
+    FOREIGN KEY (operator_id) REFERENCES operators(operator_id) ON DELETE SET NULL,
+    FOREIGN KEY (survey_id) REFERENCES surveys(survey_id) ON DELETE CASCADE,
+    FOREIGN KEY (video_id) REFERENCES videos(video_id) ON DELETE SET NULL
+);
+
+GRANT ALL PRIVILEGES ON TABLE recheck_survey TO admin_vadim;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE recheck_survey_recheck_survey_id_seq TO admin_vadim;
+
+
 
 -- Таблица для аудитов, которые либо сейчас проверяются либо ждут проверки
 CREATE TABLE audit_survey_active (
@@ -280,6 +305,8 @@ GRANT USAGE, SELECT, UPDATE ON SEQUENCE audit_survey_active_audit_survey_active_
 CREATE TABLE audit_survey_task_completions (
     id SERIAL PRIMARY KEY,
     completion_id INT,
+    survey_id BIGINT NOT NULL,
+    survey_task_id INT NOT NULL,
     auditor_id BIGINT NOT NULL,
     reward_auditor DECIMAL(10, 2) NOT NULL,
     result VARCHAR(255),
@@ -289,6 +316,7 @@ CREATE TABLE audit_survey_task_completions (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (completion_id) REFERENCES survey_task_completions(completion_id) ON DELETE CASCADE,
+    FOREIGN KEY (survey_task_id) REFERENCES survey_tasks(survey_task_id) ON DELETE SET NULL,
     FOREIGN KEY (auditor_id) REFERENCES auditors(auditor_id) ON DELETE SET NULL
 );
 GRANT ALL PRIVILEGES ON TABLE audit_survey_task_completions TO admin_vadim;

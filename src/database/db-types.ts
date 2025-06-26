@@ -11,6 +11,7 @@ import {
   OperatorsEntity,
   PendingPaymentsEntity,
   PhotosEntity,
+  RecheckSurveyEntity,
   ReferralBonusesEntity,
   RegionSettingsEntity,
   SupervisorEntity,
@@ -45,6 +46,7 @@ export type ReferralBonusesType = UnwrapGeneratedEntity<ReferralBonusesEntity>;
 export type UsersType = UnwrapGeneratedEntity<UsersEntity>;
 export type SurveysType = UnwrapGeneratedEntity<SurveysEntity>;
 export type SurveyActiveType = UnwrapGeneratedEntity<SurveyActiveEntity>;
+export type RecheckSurveyType = UnwrapGeneratedEntity<RecheckSurveyEntity>;
 export type SurveyCompletionsType =
   UnwrapGeneratedEntity<SurveyCompletionsEntity>;
 export type SurveyTasksType = UnwrapGeneratedEntity<SurveyTasksEntity>;

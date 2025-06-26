@@ -11,15 +11,17 @@ import { MyContext } from "../../bot-common/types/type";
 import { newSurveysHandler } from "./callback/mess_new_surveys";
 import { currentSurveysHandler } from "./callback/mess_current_surveys";
 import { createCallbackRegex } from "../../utils/callBackRegex";
-import { handleFinishSurvey } from "./callback/callback_queries_finish_survey";
-import { handleCancelSurvey } from "./callback/callback_queries_cancel_survey";
-import { handleUserWrote } from "./callback/callback_queries_user_wrote";
-import { handleGetUserSurveyInfo } from "./callback/callback_queries_get_user_survey_info";
-import { handleBalance } from "./callback/callback_queries_balance";
-import { handler_history_accrual } from "./callback/callback_queries_history_accrual";
-import { handler_history_withdrawal } from "./callback/callback_queries_history_withdrawal";
+import { handleFinishSurvey } from "./callback/cq_finish_survey";
+import { handleCancelSurvey } from "./callback/cq_cancel_survey";
+import { handleUserWrote } from "./callback/cq_user_wrote";
+import { handleGetUserSurveyInfo } from "./callback/cq_get_user_survey_info";
+import { handleBalance } from "./callback/cq_balance";
+import { handler_history_accrual } from "./callback/cq_history_accrual";
+import { handler_history_withdrawal } from "./callback/cq_history_withdrawal";
 import { cancelConversations } from "../../bot-common/utils/cancelConversation";
 import { AuthOperatorKeyboard } from "../../bot-common/keyboards/keyboard";
+import { recheckSurveysHandler } from "./callback/mess_recheck_surveys";
+import { handleRecheckThisSurvey } from "./callback/cq_get_recheck_this_survey";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.chatType("private").command("start", async (ctx) => {
@@ -82,6 +84,13 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     );
 
   bot
+    .chatType("private")
+    .callbackQuery(
+      createCallbackRegex(BUTTONS_CALLBACK_QUERIES.ThisSurveyNeedRecheck),
+      handleRecheckThisSurvey,
+    );
+
+  bot
     .chatType("channel")
     .callbackQuery(
       BUTTONS_CALLBACK_QUERIES.TookButton,
@@ -126,6 +135,8 @@ export function registerMessage(bot: Bot<MyContext>): void {
       await currentSurveysHandler(ctx);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.BalanceButton) {
       await handleBalance(ctx);
+    } else if (ctx.message.text === BUTTONS_KEYBOARD.RecheckSurveys) {
+      await recheckSurveysHandler(ctx);
     }
   });
 }

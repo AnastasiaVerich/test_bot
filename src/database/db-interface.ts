@@ -172,8 +172,21 @@ export interface SurveyCompletionsEntity {
   reward_user: number; // награда для пользователя
   reward_operator: number; // награда для оператора
   video_id: Generated<number | null>; // ID видео прохождения опроса
+  is_valid: Generated<boolean>; // Проверен ли аудитором
 
   completed_at: Generated<string>; // Дата создания
+}
+
+// Таблица для перепроверки опросов оператором результатов опроса
+export interface RecheckSurveyEntity {
+  recheck_survey_id: Generated<number>;
+  audit_task_ids: number[]; // массив айди выполненных заданий, которые оператор отметил
+  survey_id: number; // id опроса
+  user_id: number | null; // ID аудитора, который будет проверять выполнение
+  operator_id: number | null; // ID аудитора, который будет проверять выполнение
+  video_id: number | null; // ID видео прохождения опроса
+
+  created_at: Generated<string>; // Дата создания
 }
 
 // Таблица для аудитов, которые либо сейчас проверяются, либо ждут проверки
@@ -194,6 +207,8 @@ export interface AuditorSurveyActiveEntity {
 export interface AuditorSurveyTaskCompletionsEntity {
   id: Generated<number>;
   completion_id: number | null; // id ответов оператора
+  survey_id: number; // ID аудитора, который проверял
+  survey_task_id: number; // ID аудитора, который проверял
   auditor_id: number; // ID аудитора, который проверял
   reward_auditor: number; // награда для аудитора
   result: string | null; // На каком месте находится поисковой сайт
@@ -271,6 +286,7 @@ export interface Database {
   survey_tasks: SurveyTasksEntity;
   survey_active: SurveyActiveEntity;
   survey_task_completions: SurveyCompletionsEntity;
+  recheck_survey: RecheckSurveyEntity;
   audit_survey_active: AuditorSurveyActiveEntity;
   audit_survey_task_completions: AuditorSurveyTaskCompletionsEntity;
   withdrawal_logs: WithdrawalLogsEntity;

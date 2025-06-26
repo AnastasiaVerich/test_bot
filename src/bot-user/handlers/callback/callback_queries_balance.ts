@@ -37,7 +37,7 @@ export async function handleBalance(ctx: MyContext): Promise<any | void> {
                 e.wallet.length > 12
                   ? `${e.wallet.slice(0, 6)}...${e.wallet.slice(-6)}`
                   : e.wallet;
-              return `⏳ *${amount} ${HANDLER_BALANCE.RUB}* — ${wallet}`;
+              return `⏳ *${amount} ${HANDLER_BALANCE.TON}* — ${wallet}`;
             })
             .join("\n")
         : HANDLER_BALANCE.NO_PENDING_PAYMENT;

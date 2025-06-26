@@ -3,6 +3,75 @@ import { BUTTONS_CALLBACK_QUERIES, BUTTONS_KEYBOARD } from "./buttons";
 export const FINISH_SURVEY_OPERATOR_SCENE = {
   SURVEY_ACTIVE_NOT_FOUND: "Активный опрос отсутствует",
 
+  SURVEY_DATA_NOT_FOUND: "Данные по опросу не найдены",
+
+  ENTER_COMPLETED_OR_NOT: "Пользователь выполнил это задание?",
+
+  ENTER_COMPLETED_OR_NOT_OTHERWISE: `Нажмите на соответствующую кнопку`,
+
+  ENTERED_NOT_CORRECT_COUNT: "Пожалуйста, введите число!",
+
+  ENTER_RESULT: "Введите позицию сайта во время опроса",
+
+  ENTER_RESULT_OTHERWISE: `Пожалуйста, введите число, обозначающее позицию сайта при поиске.`,
+
+  ENTER_VIDEO: "Пожалуйста, отправьте видео, подтверждающее выполнение опроса.",
+
+  ENTER_VIDEO_OTHERWISE: `Ожидается видео. Пожалуйста, отправьте видео, или пропустите этот шаг, нажав кнопку "${BUTTONS_KEYBOARD.SkipButton}"`,
+
+  ENTER_VIDEO_SUCCESS: `Видео успешно сохранено.`,
+
+  ENTERED_NOT_CORRECT_RESULT:
+    "Пожалуйста, введите число, которое будет больше 0!",
+
+  ENTER_RESULT_POS_VAR_1: "Выберите сайт, который был на 1ой позиции",
+
+  ENTER_RESULT_POS_VAR_2: "Выберите сайт, который был на 2ой позиции",
+
+  ENTER_RESULT_POS_VAR_3: "Выберите сайт, который был на 3ей позиции",
+
+  ENTER_RES_POS_OTHERWISE: `Пожалуйста, выберете сайт.`,
+
+  CONFIRMATION:
+    "Подтвердите, что вы ввели корректные данные по окончанию прохождения опроса.",
+
+  CONFIRMATION_OTHERWISE:
+    "Нажмите на соответсвующую кнопку для подтверждения или отклонения результата прохождения опроса.",
+
+  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.FinishSurveyButtonText}'.`,
+
+  CANCELLED: `Отменено. Начните заново.`,
+
+  SUCCESS: "Прохождение опроса подтверждено!",
+};
+
+export const COMMON_STEPS = {
+  ENTER_COMPLETED_OR_NOT: "Пользователь выполнил это задание?",
+
+  ENTER_COMPLETED_OR_NOT_OTHERWISE: `Нажмите на соответствующую кнопку`,
+
+  ENTER_RESULT: "Введите позицию сайта во время опроса",
+
+  ENTER_RESULT_OTHERWISE: `Пожалуйста, введите число, обозначающее позицию сайта при поиске.`,
+
+  ENTERED_NOT_CORRECT_RESULT:
+    "Пожалуйста, введите число, которое будет больше 0!",
+
+  ENTER_RESULT_POS_VAR_1: "Выберите сайт, который был на 1ой позиции",
+
+  ENTER_RESULT_POS_VAR_2: "Выберите сайт, который был на 2ой позиции",
+
+  ENTER_RESULT_POS_VAR_3: "Выберите сайт, который был на 3ей позиции",
+
+  ENTER_RES_POS_OTHERWISE: `Пожалуйста, выберете сайт.`,
+
+  CONFIRMATION: "Подтвердите, что вы ввели корректные данные.",
+
+  CONFIRMATION_OTHERWISE:
+    "Нажмите на соответсвующую кнопку для подтверждения или отклонения.",
+};
+
+export const RECHECK_SURVEY_OPERATOR_SCENE = {
   ENTER_COMPLETED_OR_NOT: "Пользователь выполнил это задание?",
 
   ENTER_COMPLETED_OR_NOT_OTHERWISE: `Нажмите на соответствующую кнопку`,

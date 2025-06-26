@@ -9,6 +9,8 @@ export async function addAuditSurveyTaskCompletions(
     result_positions_var: AuditorSurveyTaskCompletionsType["result_positions_var"];
     reward_auditor: AuditorSurveyTaskCompletionsType["reward_auditor"];
     description: AuditorSurveyTaskCompletionsType["description"];
+    survey_task_id: AuditorSurveyTaskCompletionsType["survey_task_id"];
+    survey_id: AuditorSurveyTaskCompletionsType["survey_id"];
   },
   trx: poolType = pool,
 ): Promise<AuditorSurveyTaskCompletionsType["id"] | null> {
@@ -20,6 +22,8 @@ export async function addAuditSurveyTaskCompletions(
       result_positions_var,
       reward_auditor,
       description,
+      survey_task_id,
+      survey_id,
     } = params;
 
     const res = await trx
@@ -31,6 +35,8 @@ export async function addAuditSurveyTaskCompletions(
         result_positions_var: result_positions_var,
         reward_auditor: reward_auditor,
         description: description,
+        survey_task_id: survey_task_id,
+        survey_id: survey_id,
       })
       .returning("id")
       .executeTakeFirst();
@@ -54,5 +60,22 @@ export async function getAuditSurveyCompletionsByAuditorId(
       .execute();
   } catch (error) {
     throw new Error("Error getAuditSurveyCompletionsByAuditorId: " + error);
+  }
+}
+
+export async function getAuditSurveyCompletionsById(
+  id: AuditorSurveyTaskCompletionsType["id"],
+  trx: poolType = pool,
+): Promise<AuditorSurveyTaskCompletionsType | null> {
+  try {
+    const result = await trx
+      .selectFrom("audit_survey_task_completions")
+      .selectAll()
+      .where("id", "=", id)
+      .orderBy("created_at", "desc")
+      .executeTakeFirst();
+    return result ?? null;
+  } catch (error) {
+    throw new Error("Error getAuditSurveyCompletionsById: " + error);
   }
 }
