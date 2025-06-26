@@ -15,6 +15,7 @@ import { handleRestartFailedPayments } from "../../bot-operator/handlers/callbac
 import { cancelConversations } from "../../bot-common/utils/cancelConversation";
 import { AuthSupervisorKeyboard } from "../../bot-common/keyboards/keyboard";
 import { handleGroupVideo } from "./callback/mess__group_video";
+import { handleGetMoneyLogs } from "./callback/mess_get_money_logs";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.command("start", async (ctx) => {
@@ -58,6 +59,8 @@ export function registerMessage(bot: Bot<MyContext>): void {
       await ctx.conversation.enter(ScenesSupervisor.AddNewSurveys);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.GetUsersLogs) {
       await handleGetUserLogs(ctx);
+    } else if (ctx.message.text === BUTTONS_KEYBOARD.GetMoneyLogs) {
+      await handleGetMoneyLogs(ctx);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.AddNewOperators) {
       await ctx.conversation.enter(ScenesSupervisor.AddNewOperators);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.SwitchPaymentType) {

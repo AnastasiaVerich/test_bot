@@ -77,6 +77,8 @@ export const AuthSupervisorKeyboard = (): Keyboard =>
   new Keyboard()
     .text(BUTTONS_KEYBOARD.GetUsersLogs)
     .row()
+    .text(BUTTONS_KEYBOARD.GetMoneyLogs)
+    .row()
     .text(BUTTONS_KEYBOARD.AddAdvertisingCampaign)
     .row()
     .text(BUTTONS_KEYBOARD.AddNewSurveys)

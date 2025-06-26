@@ -15,6 +15,17 @@ export interface UserMetrics {
   registration_date: string | null;
 }
 
+export interface MoneyMetrics {
+  user_id: number;
+  current_balance: number;
+  total_withdrawn_rub: number;
+  total_survey_earnings: number;
+  total_referral_earnings: number;
+  total_earned: number;
+  potential_balance: number;
+  balance_difference: number;
+}
+
 export async function getUserRegistrationMetrics(): Promise<
   UserMetrics[] | undefined
 > {
@@ -107,6 +118,62 @@ export async function getUserRegistrationMetrics(): Promise<
     return result.rows;
   } catch (error) {
     logger.error("Error in getUserRegistrationMetrics: " + error);
+    return undefined;
+  }
+}
+
+export async function getUserMoneyLogs(): Promise<MoneyMetrics[] | undefined> {
+  try {
+    const queryText = `WITH 
+    -- Сумма выводов (в рублях, с учетом курса 230)
+    withdrawal_totals AS (
+        SELECT 
+            user_id,
+            COALESCE(SUM(amount * 230), 0) AS total_withdrawn_rub
+        FROM withdrawal_logs
+        WHERE user_id IS NOT NULL
+        GROUP BY user_id
+    ),
+    -- Сумма заработка от опросов
+    survey_earnings AS (
+        SELECT 
+            user_id,
+            COALESCE(SUM(reward_user), 0) AS total_survey_earnings
+        FROM survey_task_completions
+        WHERE user_id IS NOT NULL
+        GROUP BY user_id
+    ),
+    -- Сумма реферальных бонусов
+    referral_earnings AS (
+        SELECT 
+            referrer_id AS user_id,
+            COALESCE(SUM(amount), 0) AS total_referral_earnings
+        FROM referral_bonuses
+        GROUP BY referrer_id
+    )
+SELECT 
+    u.user_id,
+    u.balance AS current_balance,
+    COALESCE(w.total_withdrawn_rub, 0) AS total_withdrawn_rub,
+    COALESCE(s.total_survey_earnings, 0) AS total_survey_earnings,
+    COALESCE(r.total_referral_earnings, 0) AS total_referral_earnings,
+    -- Общий заработок (опросы + рефералы)
+    (COALESCE(s.total_survey_earnings, 0) + COALESCE(r.total_referral_earnings, 0)) AS total_earned,
+    -- Потенциальный баланс без выводов
+    (u.balance + COALESCE(w.total_withdrawn_rub, 0) ) AS potential_balance,
+    -- Разница между общим заработком и потенциальным балансом
+       ((COALESCE(s.total_survey_earnings, 0) + COALESCE(r.total_referral_earnings, 0)) - (u.balance + COALESCE(w.total_withdrawn_rub, 0))) AS balance_difference
+FROM users u
+LEFT JOIN withdrawal_totals w ON u.user_id = w.user_id
+LEFT JOIN survey_earnings s ON u.user_id = s.user_id
+LEFT JOIN referral_earnings r ON u.user_id = r.user_id
+ORDER BY u.user_id;`;
+
+    const result = await client.query<MoneyMetrics>(queryText);
+
+    return result.rows;
+  } catch (error) {
+    logger.error("Error in getUserMoneyLogs: " + error);
     return undefined;
   }
 }

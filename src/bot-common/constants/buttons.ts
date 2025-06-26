@@ -58,6 +58,7 @@ export const BUTTONS_KEYBOARD = {
 
   AddAdvertisingCampaign: "Добавить рекламную компанию",
   GetUsersLogs: "Логи пользователей",
+  GetMoneyLogs: "Логи движения денег",
   AddNewSurveys: "Добавить опросы",
   AddNewOperators: "Добавить оператора",
   SwitchPaymentType: "Переключатель автоматического проведения платежей",
