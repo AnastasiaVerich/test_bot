@@ -10,6 +10,7 @@ import {
   getAllRecheckWhereOperatorNotNotify,
   updateRecheckSurvey,
 } from "../../database/queries_kysely/recheck_survey";
+import { RESPONSES } from "../../bot-common/constants/responses";
 
 async function processRecord(
   bot: Bot<MyContext>,
@@ -18,10 +19,12 @@ async function processRecord(
   const { operator_id, recheck_survey_id } = record;
   if (!operator_id) return;
 
-  let message = `Вам необходимо перезаполнить ответы на опрос, так как ваши ответы разняться с ответами аудитора.`;
-
   try {
-    const messageId = await sendMessageWithRetry(bot, message, operator_id);
+    const messageId = await sendMessageWithRetry(
+      bot,
+      RESPONSES.NOT_SAME_WITH_AUDITOR,
+      operator_id,
+    );
 
     if (messageId !== null) {
       const resUpdate = await updateRecheckSurvey(recheck_survey_id, {

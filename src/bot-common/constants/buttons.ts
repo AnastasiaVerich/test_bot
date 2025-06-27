@@ -9,7 +9,7 @@ export const BUTTONS_CALLBACK_QUERIES = {
   WithdrawalOfMoneyButtonText: "Вывод средств",
 
   HistoryMoneyInputButton: "HISTORY_MONEY_INPUT",
-  HistoryMoneyInputButtonText: "История зачисления",
+  HistoryMoneyInputButtonText: "История зачислений",
 
   HistoryWithdrawalOfMoneyButton: "HISTORY_WITHDRAWAL_OF_MONEY",
   HistoryWithdrawalOfMoneyButtonText: "История снятий",
