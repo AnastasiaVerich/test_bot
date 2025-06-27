@@ -1,7 +1,7 @@
 import { entitiesType, MyContext } from "../types/type";
 import { getUserId } from "../utils/getUserId";
 import {
-  getAllPendingPayment,
+  allPendingPayment,
   getBalance,
   getCurse,
 } from "../../database/services/paymentService";
@@ -30,7 +30,7 @@ export async function handleMessageBalance(
       return ctx.reply(HANDLER_BALANCE.USER_ID_UNDEFINED);
     }
     const balance_ton = Number((balance_rub / curseTon).toFixed(2));
-    const pending_payment = await getAllPendingPayment(user_id, role);
+    const pending_payment = await allPendingPayment(user_id, role);
 
     // Форматируем ожидающие платежи
     const pendingPayment_show =

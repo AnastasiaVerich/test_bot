@@ -1,11 +1,8 @@
-import {
-  MyConversation,
-  MyConversationContext,
-} from "../../../bot-common/types/type";
+import { MyConversation, MyConversationContext } from "../../types/type";
 import { SurveyTasksType } from "../../../database/db-types";
-import { COMMON_STEPS } from "../../../bot-common/constants/scenes";
-import { YesNoKeyboard } from "../../../bot-common/keyboards/keyboard";
-import { BUTTONS_KEYBOARD } from "../../../bot-common/constants/buttons";
+import { COMMON_STEPS } from "../../constants/scenes";
+import { YesNoKeyboard } from "../../keyboards/keyboard";
+import { BUTTONS_KEYBOARD } from "../../constants/buttons";
 import logger from "../../../lib/logger";
 
 export async function taskCompletedOrNotStep(

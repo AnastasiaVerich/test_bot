@@ -33,7 +33,7 @@ import {
 import { updateOperatorByOperatorId } from "../queries_kysely/operators";
 import { addAuditSurveyActive } from "../queries_kysely/audit_survey_active";
 import { deleteRecheckSurvey } from "../queries_kysely/recheck_survey";
-import { TaskResult } from "../../bot-auditor/scenes/common_step/tasks_result";
+import { TaskResult } from "../../bot-common/scenes/common_step/tasks_result";
 
 export async function reservationSurveyActiveByOperator(params: {
   operatorId: SurveyActiveType["operator_id"];

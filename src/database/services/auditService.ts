@@ -9,7 +9,7 @@ import { updateSurveyCompletion } from "../queries_kysely/survey_task_completion
 import { updateUserByUserId } from "../queries_kysely/users";
 import { updateOperatorByOperatorId } from "../queries_kysely/operators";
 import { addRecheckSurvey } from "../queries_kysely/recheck_survey";
-import { TaskResult } from "../../bot-auditor/scenes/common_step/tasks_result";
+import { TaskResult } from "../../bot-common/scenes/common_step/tasks_result";
 
 export async function auditorCompletedAuditSurvey(
   params: {

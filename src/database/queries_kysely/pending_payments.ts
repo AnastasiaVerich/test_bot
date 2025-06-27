@@ -59,17 +59,17 @@ export async function addPendingPayment(
 export async function deletePendingPayment(
   params: {
     auditor_id?: PendingPaymentsType["auditor_id"];
-    userId?: PendingPaymentsType["user_id"];
-    operatorId?: PendingPaymentsType["operator_id"];
+    user_id?: PendingPaymentsType["user_id"];
+    operator_id?: PendingPaymentsType["operator_id"];
   },
   trx: poolType = pool,
 ): Promise<PendingPaymentsType["user_id"] | null> {
   try {
-    const { userId, operatorId, auditor_id } = params;
+    const { user_id, operator_id, auditor_id } = params;
 
     if (
-      userId === undefined &&
-      operatorId === undefined &&
+      user_id === undefined &&
+      operator_id === undefined &&
       auditor_id === undefined
     ) {
       throw new Error(
@@ -81,11 +81,11 @@ export async function deletePendingPayment(
       .deleteFrom("pending_payments")
       .where((eb) => {
         const conditions = [];
-        if (userId !== undefined) {
-          conditions.push(eb("user_id", "=", userId));
+        if (user_id !== undefined) {
+          conditions.push(eb("user_id", "=", user_id));
         }
-        if (operatorId !== undefined) {
-          conditions.push(eb("operator_id", "=", operatorId));
+        if (operator_id !== undefined) {
+          conditions.push(eb("operator_id", "=", operator_id));
         }
         if (auditor_id !== undefined) {
           conditions.push(eb("auditor_id", "=", auditor_id));
@@ -134,55 +134,6 @@ export async function getAllPendingPaymentById(
     throw new Error("Error getAllPendingPaymentById: " + error);
   }
 }
-export async function getAllPendingPaymentByUserId(
-  userId: PendingPaymentsType["user_id"],
-  trx: poolType = pool,
-): Promise<PendingPaymentsType[]> {
-  try {
-    const result = await trx
-      .selectFrom("pending_payments")
-      .selectAll()
-      .where("user_id", "=", Number(userId))
-      .execute();
-
-    return result;
-  } catch (error) {
-    throw new Error("Error getAllPendingPaymentByUserId: " + error);
-  }
-}
-export async function getAllPendingPaymentByOperatorId(
-  operatorId: PendingPaymentsType["operator_id"],
-  trx: poolType = pool,
-): Promise<PendingPaymentsType[]> {
-  try {
-    const result = await trx
-      .selectFrom("pending_payments")
-      .selectAll()
-      .where("operator_id", "=", Number(operatorId))
-      .execute();
-
-    return result;
-  } catch (error) {
-    throw new Error("Error getAllPendingPaymentByOperatorId: " + error);
-  }
-}
-
-export async function getAllPendingPaymentByAuditorId(
-  auditor_id: PendingPaymentsType["auditor_id"],
-  trx: poolType = pool,
-): Promise<PendingPaymentsType[]> {
-  try {
-    const result = await trx
-      .selectFrom("pending_payments")
-      .selectAll()
-      .where("auditor_id", "=", Number(auditor_id))
-      .execute();
-
-    return result;
-  } catch (error) {
-    throw new Error("Error getAllPendingPaymentByAuditorId: " + error);
-  }
-}
 
 export async function getPendingPaymentByUserId(
   userId: PendingPaymentsType["user_id"],
@@ -198,23 +149,6 @@ export async function getPendingPaymentByUserId(
     return result ?? null;
   } catch (error) {
     throw new Error("Error getPendingPaymentByUserId: " + error);
-  }
-}
-
-export async function getPendingPaymentByOperatorId(
-  operatorId: PendingPaymentsType["operator_id"],
-  trx: poolType = pool,
-): Promise<PendingPaymentsType | null> {
-  try {
-    const result = await trx
-      .selectFrom("pending_payments")
-      .selectAll()
-      .where("operator_id", "=", Number(operatorId))
-      .executeTakeFirst();
-
-    return result ?? null;
-  } catch (error) {
-    throw new Error("Error getPendingPaymentByOperatorId: " + error);
   }
 }
 

@@ -1,12 +1,9 @@
 import { taskCompletedOrNotStep } from "./task_is_completed_or_not";
-import { BUTTONS_KEYBOARD } from "../../../bot-common/constants/buttons";
+import { BUTTONS_KEYBOARD } from "../../constants/buttons";
 import { taskResultStep } from "./task_result_step";
 import { taskResultPositionsStep } from "./task_result_positions";
 import { SurveyTasksType } from "../../../database/db-types";
-import {
-  MyConversation,
-  MyConversationContext,
-} from "../../../bot-common/types/type";
+import { MyConversation, MyConversationContext } from "../../types/type";
 
 export interface TaskResult {
   survey_task_id: number; // ID задачи опроса

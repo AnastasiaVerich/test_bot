@@ -75,22 +75,15 @@ export const AuthAuditorKeyboard = (): Keyboard =>
 
 export const AuthSupervisorKeyboard = (): Keyboard =>
   new Keyboard()
-    .text(BUTTONS_KEYBOARD.GetUsersLogs)
+    .text(BUTTONS_KEYBOARD.GetLogsMenu)
     .row()
-    .text(BUTTONS_KEYBOARD.GetMoneyLogs)
+    .text(BUTTONS_KEYBOARD.PaymentsMenu)
     .row()
     .text(BUTTONS_KEYBOARD.AddAdvertisingCampaign)
     .row()
     .text(BUTTONS_KEYBOARD.AddNewSurveys)
     .row()
     .text(BUTTONS_KEYBOARD.AddNewOperators)
-    .row()
-    .text(BUTTONS_KEYBOARD.SwitchPaymentType)
-    .row()
-    .text(BUTTONS_KEYBOARD.ManualPayment)
-    .row()
-    .text(BUTTONS_KEYBOARD.RestartFailedPayments)
-    .row()
     .resized();
 
 export const CreateFromWordsKeyboard = (words: string[]): Keyboard => {

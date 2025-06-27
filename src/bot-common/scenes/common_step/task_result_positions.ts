@@ -1,9 +1,6 @@
-import {
-  MyConversation,
-  MyConversationContext,
-} from "../../../bot-common/types/type";
-import { COMMON_STEPS } from "../../../bot-common/constants/scenes";
-import { CreateFromWordsKeyboard } from "../../../bot-common/keyboards/keyboard";
+import { MyConversation, MyConversationContext } from "../../types/type";
+import { COMMON_STEPS } from "../../constants/scenes";
+import { CreateFromWordsKeyboard } from "../../keyboards/keyboard";
 import logger from "../../../lib/logger";
 
 export async function taskResultPositionsStep(

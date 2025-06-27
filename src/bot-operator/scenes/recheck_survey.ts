@@ -16,11 +16,11 @@ import {
 import { AuditorSurveyTaskCompletionsType } from "../../database/db-types";
 import { getRecheckSurveyByRecheckId } from "../../database/queries_kysely/recheck_survey";
 import { getAuditSurveyCompletionsById } from "../../database/queries_kysely/audit_survey_task_completions";
-import { confirmStep } from "../../bot-auditor/scenes/common_step/conform_or_not";
+import { confirmStep } from "../../bot-common/scenes/common_step/conform_or_not";
 import {
   TaskResult,
   tasks_result,
-} from "../../bot-auditor/scenes/common_step/tasks_result";
+} from "../../bot-common/scenes/common_step/tasks_result";
 import { getVideoByVideoId } from "../../database/queries_kysely/videos";
 
 export async function recheckSurveyScene(

@@ -29,6 +29,24 @@ export const BUTTONS_CALLBACK_QUERIES = {
   TookAuditButton: "TookAuditButton",
   TookAuditButtonText: "Провести аудит",
 
+  GetUsersLogsButton: "GetUsersLogsButton",
+  GetUsersLogsButtonText: "Логи пользователей",
+
+  GetMoneyLogsButton: "GetMoneyLogsButton",
+  GetMoneyLogsButtonText: "Логи движения денег",
+
+  SwitchPaymentButton: "SwitchPaymentButton",
+  SwitchPaymentButtonText: "Переключатель автоматического проведения платежей",
+
+  ManualPaymentButton: "ManualPaymentButton",
+  ManualPaymentButtonText: "Провести платежи вручную",
+
+  RestartFailedPaymentsButton: "RestartFailedPaymentsButton",
+  RestartFailedPaymentsButtonText: "Повторить неуспешные платежи",
+
+  CancelFailedPaymentsButton: "CancelFailedPaymentsButton",
+  CancelFailedPaymentsButtonText: "Отменить неуспешные платежи",
+
   ThisUserWrote: "ThisUserWrote",
   ThisUserGetSurveyInfo: "ThisUserGetSurveyInfo",
   ThisPendingPaymentInfo: "GetPendingPaymentInfo",
@@ -56,14 +74,11 @@ export const BUTTONS_KEYBOARD = {
   CurrentSurveys: "Текущее опросы",
   RecheckSurveys: "Перезаполнение опросов",
 
+  GetLogsMenu: "Логи",
+  PaymentsMenu: "Платежи",
   AddAdvertisingCampaign: "Добавить рекламную компанию",
-  GetUsersLogs: "Логи пользователей",
-  GetMoneyLogs: "Логи движения денег",
   AddNewSurveys: "Добавить опросы",
   AddNewOperators: "Добавить оператора",
-  SwitchPaymentType: "Переключатель автоматического проведения платежей",
-  ManualPayment: "Провести платежи вручную",
-  RestartFailedPayments: "Повторить неуспешные платежи",
 
   CheckSurveyByAuditor: "Провести аудит",
 };

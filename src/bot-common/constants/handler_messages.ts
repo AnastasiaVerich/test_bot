@@ -1,4 +1,4 @@
-import { BUTTONS_KEYBOARD } from "./buttons";
+import { BUTTONS_CALLBACK_QUERIES } from "./buttons";
 
 export const HANDLER_NEW_SURVEYS = {
   NO_NEW_SURVEYS: "У вас нет новый опросов.",
@@ -23,6 +23,15 @@ export const HANDLER_RESTART_FAILED_PAYMENT = {
 
   SOME_ERROR: "Бот временно недоступен",
 };
+export const HANDLER_CANCEL_FAILED_PAYMENT = {
+  NO_FAILED_PENDING_PAYMENTS:
+    "Нет неуспешных платежей, которые можно отменить.",
+  SUCCESS: "Выполнено.",
+  SUMMA: "Сумма",
+  WALLET: "кошелек",
+
+  SOME_ERROR: "Бот временно недоступен",
+};
 export const HANDLER_CURRENT_SURVEYS = {
   NO_CURRENT_SURVEYS: "У вас нет текущих опросов.",
   TG_ACC: "Юзернейм:",
@@ -36,8 +45,8 @@ export const HANDLER_MANUAL_PAYMENT = {
   AUTO_PAYMENT_ON: `Включено автоматическое проведение платежей. Вручную можно провести только платежи, которые по какой-то причине не смогли пройти автоматически.`,
   AVAILABLE_PAYMENTS: `Платежи, доступные для проведения вручную.`,
   NO_AVAILABLE_PAYMENTS: `В данным момент нет платежей, доступных для проведения вручную.`,
-  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.ManualPayment}'.`,
+  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.ManualPaymentButtonText}'.`,
 };
 export const HANDLER_GET_USER_LOGS = {
-  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.GetUsersLogs}'.`,
+  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.GetUsersLogsButtonText}'.`,
 };

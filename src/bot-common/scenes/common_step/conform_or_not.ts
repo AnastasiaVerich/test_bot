@@ -1,11 +1,8 @@
 import { Conversation } from "@grammyjs/conversations";
-import {
-  MyContext,
-  MyConversationContext,
-} from "../../../bot-common/types/type";
-import { COMMON_STEPS } from "../../../bot-common/constants/scenes";
-import { ConfirmCancelKeyboard } from "../../../bot-common/keyboards/keyboard";
-import { BUTTONS_KEYBOARD } from "../../../bot-common/constants/buttons";
+import { MyContext, MyConversationContext } from "../../types/type";
+import { COMMON_STEPS } from "../../constants/scenes";
+import { ConfirmCancelKeyboard } from "../../keyboards/keyboard";
+import { BUTTONS_KEYBOARD } from "../../constants/buttons";
 import logger from "../../../lib/logger";
 
 export async function confirmStep(

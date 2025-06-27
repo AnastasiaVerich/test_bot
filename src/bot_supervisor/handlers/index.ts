@@ -7,15 +7,20 @@ import {
 } from "../../bot-common/constants/buttons";
 import { ScenesSupervisor } from "../scenes";
 import { authSupervisorMiddleware } from "../middleware/authMiddleware";
-import { handleMessageManualPayment } from "./callback/message_manual_payment";
+import { handleCQManualPayment } from "./callback/cq_manual_payment";
 import { createCallbackRegex } from "../../utils/callBackRegex";
 import { handleCQPendingPaymentInfo } from "./callback/cq_pending_payment_info";
-import { handleMessageGetUserLogs } from "./callback/message_get_user_logs";
-import { handleMessageRestartFailedPayments } from "../../bot-operator/handlers/callback/message_restart_failed_payments";
+import { handleCQGetUserLogs } from "./callback/cq_get_user_logs";
+import { handleCQRestartFailedPayments } from "./callback/cq_restart_failed_payments";
 import { cancelConversations } from "../../bot-common/utils/cancelConversation";
 import { AuthSupervisorKeyboard } from "../../bot-common/keyboards/keyboard";
 import { handleChannelPostVideo } from "./callback/channel_post__video";
-import { handleMessageGetMoneyLogs } from "./callback/message_get_money_logs";
+import { handleCQGetMoneyLogs } from "./callback/cq_get_money_logs";
+import { handleCQCancelFailedPayments } from "./callback/cq_cancel_failed_payments";
+import {
+  LogsInlineKeyboard,
+  PaymentsInlineKeyboard,
+} from "../../bot-common/keyboards/inlineKeyboard";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.command("start", async (ctx) => {
@@ -44,6 +49,54 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
   bot
     .chatType("private")
     .callbackQuery(
+      BUTTONS_CALLBACK_QUERIES.GetUsersLogsButton,
+      async (ctx: MyContext) => {
+        await handleCQGetUserLogs(ctx);
+      },
+    );
+  bot
+    .chatType("private")
+    .callbackQuery(
+      BUTTONS_CALLBACK_QUERIES.SwitchPaymentButton,
+      async (ctx: MyContext) => {
+        await ctx.conversation.enter(ScenesSupervisor.SwitchPaymentType);
+      },
+    );
+  bot
+    .chatType("private")
+    .callbackQuery(
+      BUTTONS_CALLBACK_QUERIES.ManualPaymentButton,
+      async (ctx: MyContext) => {
+        await handleCQManualPayment(ctx);
+      },
+    );
+  bot
+    .chatType("private")
+    .callbackQuery(
+      BUTTONS_CALLBACK_QUERIES.RestartFailedPaymentsButton,
+      async (ctx: MyContext) => {
+        await handleCQRestartFailedPayments(ctx);
+      },
+    );
+  bot
+    .chatType("private")
+    .callbackQuery(
+      BUTTONS_CALLBACK_QUERIES.CancelFailedPaymentsButton,
+      async (ctx: MyContext) => {
+        await handleCQCancelFailedPayments(ctx);
+      },
+    );
+  bot
+    .chatType("private")
+    .callbackQuery(
+      BUTTONS_CALLBACK_QUERIES.GetMoneyLogsButton,
+      async (ctx: MyContext) => {
+        await handleCQGetMoneyLogs(ctx);
+      },
+    );
+  bot
+    .chatType("private")
+    .callbackQuery(
       createCallbackRegex(BUTTONS_CALLBACK_QUERIES.ThisPendingPaymentInfo),
       handleCQPendingPaymentInfo,
     );
@@ -57,18 +110,16 @@ export function registerMessage(bot: Bot<MyContext>): void {
       );
     } else if (ctx.message.text === BUTTONS_KEYBOARD.AddNewSurveys) {
       await ctx.conversation.enter(ScenesSupervisor.AddNewSurveys);
-    } else if (ctx.message.text === BUTTONS_KEYBOARD.GetUsersLogs) {
-      await handleMessageGetUserLogs(ctx);
-    } else if (ctx.message.text === BUTTONS_KEYBOARD.GetMoneyLogs) {
-      await handleMessageGetMoneyLogs(ctx);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.AddNewOperators) {
       await ctx.conversation.enter(ScenesSupervisor.AddNewOperators);
-    } else if (ctx.message.text === BUTTONS_KEYBOARD.SwitchPaymentType) {
-      await ctx.conversation.enter(ScenesSupervisor.SwitchPaymentType);
-    } else if (ctx.message.text === BUTTONS_KEYBOARD.ManualPayment) {
-      await handleMessageManualPayment(ctx);
-    } else if (ctx.message.text === BUTTONS_KEYBOARD.RestartFailedPayments) {
-      await handleMessageRestartFailedPayments(ctx);
+    } else if (ctx.message.text === BUTTONS_KEYBOARD.GetLogsMenu) {
+      await ctx.reply("Выберите логи, которые вам нужны", {
+        reply_markup: LogsInlineKeyboard(),
+      });
+    } else if (ctx.message.text === BUTTONS_KEYBOARD.PaymentsMenu) {
+      await ctx.reply("Выберите платежи", {
+        reply_markup: PaymentsInlineKeyboard(),
+      });
     }
   });
   bot.on("channel_post:video", async (ctx: MyContext) => {

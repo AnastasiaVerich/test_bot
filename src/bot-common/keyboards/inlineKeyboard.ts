@@ -121,3 +121,39 @@ export const TookAuditSurveyInlineKeyboard = (): InlineKeyboard => {
     BUTTONS_CALLBACK_QUERIES.TookAuditButton,
   );
 };
+export const LogsInlineKeyboard = (): InlineKeyboard => {
+  return new InlineKeyboard()
+    .text(
+      BUTTONS_CALLBACK_QUERIES.GetUsersLogsButtonText,
+      BUTTONS_CALLBACK_QUERIES.GetUsersLogsButton,
+    )
+    .row()
+    .text(
+      BUTTONS_CALLBACK_QUERIES.GetMoneyLogsButtonText,
+      BUTTONS_CALLBACK_QUERIES.GetMoneyLogsButton,
+    )
+    .row();
+};
+export const PaymentsInlineKeyboard = (): InlineKeyboard => {
+  return new InlineKeyboard()
+    .text(
+      BUTTONS_CALLBACK_QUERIES.SwitchPaymentButtonText,
+      BUTTONS_CALLBACK_QUERIES.SwitchPaymentButton,
+    )
+    .row()
+    .text(
+      BUTTONS_CALLBACK_QUERIES.ManualPaymentButtonText,
+      BUTTONS_CALLBACK_QUERIES.ManualPaymentButton,
+    )
+    .row()
+    .text(
+      BUTTONS_CALLBACK_QUERIES.RestartFailedPaymentsButtonText,
+      BUTTONS_CALLBACK_QUERIES.RestartFailedPaymentsButton,
+    )
+    .row()
+    .text(
+      BUTTONS_CALLBACK_QUERIES.CancelFailedPaymentsButtonText,
+      BUTTONS_CALLBACK_QUERIES.CancelFailedPaymentsButton,
+    )
+    .row();
+};

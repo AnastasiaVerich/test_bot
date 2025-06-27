@@ -14,8 +14,11 @@ import { getInfoAboutSurvey } from "../../database/services/surveyService";
 import { getAllSurveyTasks } from "../../database/queries_kysely/survey_tasks";
 import { auditorCompletedAuditSurvey } from "../../database/services/auditService";
 import { getSurveyTaskCompletionByCompletionId } from "../../database/queries_kysely/survey_task_completions";
-import { confirmStep } from "./common_step/conform_or_not";
-import { TaskResult, tasks_result } from "./common_step/tasks_result";
+import { confirmStep } from "../../bot-common/scenes/common_step/conform_or_not";
+import {
+  TaskResult,
+  tasks_result,
+} from "../../bot-common/scenes/common_step/tasks_result";
 
 export async function checkSurveyScene(
   conversation: MyConversation,

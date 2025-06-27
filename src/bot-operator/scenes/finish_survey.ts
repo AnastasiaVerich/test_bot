@@ -21,11 +21,11 @@ import {
   userCompletedSurvey,
 } from "../../database/services/surveyService";
 import { addVideo } from "../../database/queries_kysely/videos";
-import { confirmStep } from "../../bot-auditor/scenes/common_step/conform_or_not";
+import { confirmStep } from "../../bot-common/scenes/common_step/conform_or_not";
 import {
   TaskResult,
   tasks_result,
-} from "../../bot-auditor/scenes/common_step/tasks_result";
+} from "../../bot-common/scenes/common_step/tasks_result";
 import { channelIdVideoSharing } from "../../config/env";
 
 export async function finishSurveyScene(

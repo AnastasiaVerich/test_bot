@@ -350,7 +350,7 @@ export const SWITCH_PAYMENT_TYPE_SCENES = {
   SUCCESS_OFF: "Автоматическое проведение платежей отключено.",
   CANCELLED: "Ничего не изменили.",
 
-  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.SwitchPaymentType}'.`,
+  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.SwitchPaymentButtonText}'.`,
 };
 
 export const MAKE_A_PAYMENT_SCENES = {
@@ -365,5 +365,5 @@ export const MAKE_A_PAYMENT_SCENES = {
 
   SUCCESS: "Платеж совершен.",
   CANCELLED: "Отменено.",
-  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.ManualPayment}'.`,
+  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.ManualPaymentButtonText}'.`,
 };

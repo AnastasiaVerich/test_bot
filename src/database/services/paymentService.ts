@@ -39,13 +39,13 @@ export async function paymentIsCompleted(
       let isDeleted;
       if (payment.user_id) {
         isDeleted = await deletePendingPayment(
-          { userId: payment.user_id },
+          { user_id: payment.user_id },
           trx,
         );
       } else if (payment.operator_id) {
         isDeleted = await deletePendingPayment(
           {
-            operatorId: payment.operator_id,
+            operator_id: payment.operator_id,
           },
           trx,
         );
@@ -126,7 +126,7 @@ export async function hasPendingPayment(
   return pendingPayments.length > 0;
 }
 
-export async function getAllPendingPayment(
+export async function allPendingPayment(
   id: number,
   type: entitiesType,
 ): Promise<PendingPaymentsType[]> {
@@ -193,6 +193,30 @@ export async function getAllSurveyRewards(
       break;
   }
   return surveys;
+}
+
+export async function deletePendingPaymentByRole(
+  id: number,
+  type: entitiesType,
+  trx: poolType = pool,
+): Promise<number | null> {
+  let delete_id = null;
+  switch (type) {
+    case "auditor":
+      delete_id = await deletePendingPayment({ auditor_id: id });
+
+      break;
+    case "operator":
+      delete_id = await deletePendingPayment({
+        operator_id: id,
+      });
+
+      break;
+    case "user":
+      delete_id = await deletePendingPayment({ user_id: id });
+      break;
+  }
+  return delete_id;
 }
 
 export async function getAllReferralRewards(
@@ -364,5 +388,32 @@ export async function getCurse(): Promise<CommonVariablesType | null> {
     return await getCommonVariableByLabel("ton_rub_price");
   } catch (error) {
     throw new Error("Error in getCurse: " + error);
+  }
+}
+
+export async function cancelThisPendingPayments(
+  id: number,
+  payment: PendingPaymentsType,
+  type: entitiesType,
+) {
+  try {
+    return await pool.transaction().execute(async (trx) => {
+      const delete_id = deletePendingPaymentByRole(id, type, trx);
+
+      if (!delete_id) {
+        throw new Error("deletePendingPaymentByRole failed");
+      }
+      const updateBalanceId = await updateBalanceF(
+        id,
+        type,
+        payment.amount_rub,
+        trx,
+      );
+      if (!updateBalanceId) {
+        throw new Error("updateBalanceId failed");
+      }
+    });
+  } catch (error) {
+    throw new Error("Error in cancelThisPendingPayments: " + error);
   }
 }

@@ -7,7 +7,7 @@ import {
 } from "../../../database/queries_kysely/pending_payments";
 import { AuthSupervisorKeyboard } from "../../../bot-common/keyboards/keyboard";
 
-export const handleMessageRestartFailedPayments = async (ctx: MyContext) => {
+export const handleCQRestartFailedPayments = async (ctx: MyContext) => {
   try {
     const allPendingPayment = await getAllPendingPayment();
     const failedPendingPayment = allPendingPayment.filter(
