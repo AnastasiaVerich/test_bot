@@ -9,7 +9,7 @@ import {
 } from "../../../database/queries_kysely/survey_active";
 import { getUser } from "../../../database/queries_kysely/users";
 
-export async function handleUserWrote(ctx: MyContext): Promise<void> {
+export async function handleCQUserWrote(ctx: MyContext): Promise<void> {
   try {
     const callbackData = ctx.callbackQuery?.data; // Получаем данные callback-запроса
     if (!callbackData) {

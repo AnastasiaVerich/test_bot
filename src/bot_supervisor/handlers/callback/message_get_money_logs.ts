@@ -11,7 +11,7 @@ import {
 } from "../../../database/services/logService";
 import { getUserId } from "../../../bot-common/utils/getUserId";
 
-export const handleGetMoneyLogs = async (ctx: MyContext) => {
+export const handleMessageGetMoneyLogs = async (ctx: MyContext) => {
   try {
     const supervisor_id = await getUserId(ctx);
     if (!supervisor_id) return;

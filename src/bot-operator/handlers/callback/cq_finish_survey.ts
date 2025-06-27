@@ -6,7 +6,7 @@ import { ScenesOperator } from "../../scenes";
 import { createCallbackRegex } from "../../../utils/callBackRegex";
 import { AuthOperatorKeyboard } from "../../../bot-common/keyboards/keyboard";
 
-export async function handleFinishSurvey(ctx: MyContext): Promise<void> {
+export async function handleCQFinishSurvey(ctx: MyContext): Promise<void> {
   try {
     const callbackData = ctx.callbackQuery?.data; // Получаем данные callback-запроса
     if (!callbackData) {

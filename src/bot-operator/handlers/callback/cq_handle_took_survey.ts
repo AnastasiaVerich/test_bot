@@ -13,7 +13,10 @@ import {
   reservationSurveyActiveByOperator,
 } from "../../../database/services/surveyService";
 
-export const handleTookSurvey = async (ctx: MyContext, bot: Bot<MyContext>) => {
+export const handleCQTookSurvey = async (
+  ctx: MyContext,
+  bot: Bot<MyContext>,
+) => {
   try {
     const message_id = ctx.update.callback_query?.message?.message_id;
     const chat_id = ctx.update.callback_query?.message?.chat.id;

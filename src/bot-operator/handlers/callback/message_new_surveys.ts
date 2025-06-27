@@ -7,7 +7,7 @@ import { getAllActiveSurveysReservationByOperator } from "../../../database/quer
 import { BUTTONS_CALLBACK_QUERIES } from "../../../bot-common/constants/buttons";
 import { getUsersByIds } from "../../../database/queries_kysely/users";
 
-export const newSurveysHandler = async (ctx: MyContext) => {
+export const handleMessageNewSurveys = async (ctx: MyContext) => {
   try {
     const operator_id = await getUserId(ctx);
     if (!operator_id) return;

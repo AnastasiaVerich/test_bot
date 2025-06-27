@@ -1,5 +1,5 @@
 import { Bot } from "grammy";
-import { handleStartCommand } from "./callback/command_start";
+import { handleCommandStartAuditor } from "./callback/command_start";
 
 import { MyContext } from "../../bot-common/types/type";
 import {
@@ -7,18 +7,18 @@ import {
   BUTTONS_KEYBOARD,
 } from "../../bot-common/constants/buttons";
 import { ScenesAuditor } from "../scenes";
-import { handleTookAuditSurvey } from "./callback/handle_took_audit_survey";
+import { handleCQTookAuditSurvey } from "./callback/cq_took_audit_survey";
 import { cancelConversations } from "../../bot-common/utils/cancelConversation";
 import { AuthAuditorKeyboard } from "../../bot-common/keyboards/keyboard";
-import { handleGroupVideo } from "./callback/mess__group_video";
+import { handleChannelPostVideo } from "./callback/channel_post__video";
 import { handleMessageBalance } from "../../bot-common/handlers_callback/message__balance";
-import { handler_cq_history_withdrawal } from "../../bot-common/handlers_callback/cq_history_withdrawal";
-import { handler_cq_history_accrual } from "../../bot-common/handlers_callback/cq_history_accrual";
+import { handlerCQHistoryWithdrawal } from "../../bot-common/handlers_callback/cq_history_withdrawal";
+import { handleCQHistoryAccrual } from "../../bot-common/handlers_callback/cq_history_accrual";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.chatType("private").command("start", async (ctx) => {
     await cancelConversations(ctx, ScenesAuditor, AuthAuditorKeyboard(), true);
-    await handleStartCommand(ctx);
+    await handleCommandStartAuditor(ctx);
   });
   bot.command("clean", (ctx) =>
     cancelConversations(ctx, ScenesAuditor, AuthAuditorKeyboard()),
@@ -40,7 +40,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     .callbackQuery(
       BUTTONS_CALLBACK_QUERIES.TookAuditButton,
       async (ctx: MyContext) => {
-        await handleTookAuditSurvey(ctx, bot);
+        await handleCQTookAuditSurvey(ctx, bot);
       },
     );
 
@@ -58,7 +58,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     .callbackQuery(
       BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButton,
       async (ctx: MyContext) => {
-        await handler_cq_history_accrual(ctx, "auditor");
+        await handleCQHistoryAccrual(ctx, "auditor");
       },
     );
 
@@ -67,7 +67,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     .callbackQuery(
       BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButton,
       async (ctx: MyContext) => {
-        await handler_cq_history_withdrawal(ctx, "auditor");
+        await handlerCQHistoryWithdrawal(ctx, "auditor");
       },
     );
 }
@@ -81,6 +81,6 @@ export function registerMessage(bot: Bot<MyContext>): void {
     }
   });
   bot.on("channel_post:video", async (ctx: MyContext) => {
-    await handleGroupVideo(ctx);
+    await handleChannelPostVideo(ctx);
   });
 }

@@ -7,7 +7,7 @@ import { MyContext } from "../../../bot-common/types/type";
 import logger from "../../../lib/logger";
 import { HANDLER_MANUAL_PAYMENT } from "../../../bot-common/constants/handler_messages";
 
-export const handleManualPayment = async (ctx: MyContext) => {
+export const handleMessageManualPayment = async (ctx: MyContext) => {
   try {
     const autoPayInfo = await getCommonVariableByLabel("auto_payments_enabled");
     if (!autoPayInfo) {

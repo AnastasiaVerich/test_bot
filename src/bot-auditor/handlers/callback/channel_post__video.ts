@@ -2,7 +2,9 @@ import logger from "../../../lib/logger";
 import { MyContext } from "../../../bot-common/types/type";
 import { updateVideoByVideoId } from "../../../database/queries_kysely/videos";
 
-export async function handleGroupVideo(ctx: MyContext): Promise<any | void> {
+export async function handleChannelPostVideo(
+  ctx: MyContext,
+): Promise<any | void> {
   try {
     const caption = ctx.channelPost?.caption || "0";
     const fileId = ctx.channelPost?.video?.file_id;

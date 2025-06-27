@@ -5,7 +5,7 @@ import { HANDLER_RECHECK_THIS_SURVEY } from "../../../bot-common/constants/handl
 import { AuthOperatorKeyboard } from "../../../bot-common/keyboards/keyboard";
 import { ScenesOperator } from "../../scenes";
 
-export async function handleRecheckThisSurvey(ctx: MyContext): Promise<void> {
+export async function handleCQRecheckThisSurvey(ctx: MyContext): Promise<void> {
   try {
     const callbackData = ctx.callbackQuery?.data; // Получаем данные callback-запроса
     if (!callbackData) {

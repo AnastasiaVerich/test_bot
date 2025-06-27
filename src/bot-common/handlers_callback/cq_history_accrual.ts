@@ -10,7 +10,7 @@ import { formatTimestamp } from "../../lib/date";
 import { AccrualHistoryMenuInlineKeyboard } from "../keyboards/inlineKeyboard";
 import logger from "../../lib/logger";
 
-export async function handler_cq_history_accrual(
+export async function handleCQHistoryAccrual(
   ctx: MyContext,
   role: entitiesType,
 ): Promise<Message.TextMessage | void> {

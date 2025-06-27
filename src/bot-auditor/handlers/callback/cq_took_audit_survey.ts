@@ -10,7 +10,7 @@ import {
 } from "../../../database/queries_kysely/audit_survey_active";
 import { reservationAuditSurveyActiveByAuditor } from "../../../database/services/auditService";
 
-export const handleTookAuditSurvey = async (
+export const handleCQTookAuditSurvey = async (
   ctx: MyContext,
   bot: Bot<MyContext>,
 ) => {

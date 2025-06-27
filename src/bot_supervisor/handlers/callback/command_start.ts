@@ -7,7 +7,7 @@ import { RegistrationInlineKeyboard } from "../../../bot-common/keyboards/inline
 import logger from "../../../lib/logger";
 import { AuthSupervisorKeyboard } from "../../../bot-common/keyboards/keyboard";
 
-export const handleStartCommand = async (
+export const handleCommandStartSupervisor = async (
   ctx: MyContext,
 ): Promise<Message.TextMessage | void> => {
   try {

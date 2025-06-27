@@ -14,7 +14,7 @@ import {
   addUserLogsUnique,
 } from "../../../database/queries_kysely/bot_user_logs";
 
-export const handleStartCommand = async (
+export const handleCommandStartUser = async (
   ctx: MyContext,
 ): Promise<Message.TextMessage | void> => {
   try {

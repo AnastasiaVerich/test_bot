@@ -10,7 +10,7 @@ import { formatTimestamp } from "../../lib/date";
 import logger from "../../lib/logger";
 import { WithdrawalHistoryMenuInlineKeyboard } from "../keyboards/inlineKeyboard";
 
-export async function handler_cq_history_withdrawal(
+export async function handlerCQHistoryWithdrawal(
   ctx: MyContext,
   role: entitiesType,
 ): Promise<Message.TextMessage | void> {

@@ -5,7 +5,9 @@ import logger from "../../../lib/logger";
 import { AuthSupervisorKeyboard } from "../../../bot-common/keyboards/keyboard";
 import { ScenesSupervisor } from "../../scenes";
 
-export async function handlePendingPaymentInfo(ctx: MyContext): Promise<void> {
+export async function handleCQPendingPaymentInfo(
+  ctx: MyContext,
+): Promise<void> {
   try {
     const callbackData = ctx.callbackQuery?.data; // Получаем данные callback-запроса
     if (!callbackData) {

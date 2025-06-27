@@ -6,7 +6,7 @@ import { CreateInlineKeyboard } from "../../../bot-common/keyboards/inlineKeyboa
 import { BUTTONS_CALLBACK_QUERIES } from "../../../bot-common/constants/buttons";
 import { getAllRecheckSurveyByOperatorId } from "../../../database/queries_kysely/recheck_survey";
 
-export const recheckSurveysHandler = async (ctx: MyContext) => {
+export const handleRecheckSurveys = async (ctx: MyContext) => {
   try {
     const operator_id = await getUserId(ctx);
     if (!operator_id) return;

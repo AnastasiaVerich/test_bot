@@ -6,7 +6,7 @@ import logger from "../../../lib/logger";
 import { HANDLER_CANCEL_SURVEY } from "../../../bot-common/constants/handler_callback_queries";
 import { AuthOperatorKeyboard } from "../../../bot-common/keyboards/keyboard";
 
-export async function handleCancelSurvey(ctx: MyContext): Promise<void> {
+export async function handleCQCancelSurvey(ctx: MyContext): Promise<void> {
   try {
     const callbackData = ctx.callbackQuery?.data; // Получаем данные callback-запроса
     if (!callbackData) {

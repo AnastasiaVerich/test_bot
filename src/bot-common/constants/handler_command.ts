@@ -1,7 +1,3 @@
-export const COMMAND_CHAT_ID = {
-  SOME_ERROR: "Бот временно недоступен!",
-};
-
 export const COMMAND_OPERATOR_START = {
   WELCOME_NEW_OPERATOR:
     "Добро пожаловать в <b>Green apple!</b>  \n" +

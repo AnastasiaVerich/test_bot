@@ -7,7 +7,7 @@ import { getUserAccount } from "../../../bot-common/utils/getUserTgAccount";
 import { AuthOperatorKeyboard } from "../../../bot-common/keyboards/keyboard";
 import { getOperatorByIdPhoneOrTg } from "../../../database/queries_kysely/operators";
 
-export const handleStartCommand = async (
+export const handleCommandStartOperator = async (
   ctx: MyContext,
 ): Promise<Message.TextMessage | void> => {
   try {

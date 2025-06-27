@@ -7,7 +7,7 @@ import { getUserAccount } from "../../../bot-common/utils/getUserTgAccount";
 import { getAuditorByIdPhoneOrTg } from "../../../database/queries_kysely/auditors";
 import { RegistrationInlineKeyboard } from "../../../bot-common/keyboards/inlineKeyboard";
 
-export const handleStartCommand = async (
+export const handleCommandStartAuditor = async (
   ctx: MyContext,
 ): Promise<Message.TextMessage | void> => {
   try {

@@ -1,27 +1,26 @@
 import { Bot } from "grammy";
-import { handleStartCommand } from "./callback/command_start";
+import { handleCommandStartOperator } from "./callback/command_start";
 import { ScenesOperator } from "../scenes";
-import { handleChatidCommand } from "./callback/command_chatid";
-import { handleTookSurvey } from "./callback/handle_took_survey";
+import { handleCQTookSurvey } from "./callback/cq_handle_took_survey";
 import {
   BUTTONS_CALLBACK_QUERIES,
   BUTTONS_KEYBOARD,
 } from "../../bot-common/constants/buttons";
 import { MyContext } from "../../bot-common/types/type";
-import { newSurveysHandler } from "./callback/mess_new_surveys";
-import { currentSurveysHandler } from "./callback/mess_current_surveys";
+import { handleMessageNewSurveys } from "./callback/message_new_surveys";
+import { handleMessageCurrentSurveys } from "./callback/message_current_surveys";
 import { createCallbackRegex } from "../../utils/callBackRegex";
-import { handleFinishSurvey } from "./callback/cq_finish_survey";
-import { handleCancelSurvey } from "./callback/cq_cancel_survey";
-import { handleUserWrote } from "./callback/cq_user_wrote";
+import { handleCQFinishSurvey } from "./callback/cq_finish_survey";
+import { handleCQCancelSurvey } from "./callback/cq_cancel_survey";
+import { handleCQUserWrote } from "./callback/cq_user_wrote";
 import { handleGetUserSurveyInfo } from "./callback/cq_get_user_survey_info";
 import { cancelConversations } from "../../bot-common/utils/cancelConversation";
 import { AuthOperatorKeyboard } from "../../bot-common/keyboards/keyboard";
-import { recheckSurveysHandler } from "./callback/mess_recheck_surveys";
-import { handleRecheckThisSurvey } from "./callback/cq_get_recheck_this_survey";
+import { handleRecheckSurveys } from "./callback/message_recheck_surveys";
+import { handleCQRecheckThisSurvey } from "./callback/cq_recheck_this_survey";
 import { handleMessageBalance } from "../../bot-common/handlers_callback/message__balance";
-import { handler_cq_history_withdrawal } from "../../bot-common/handlers_callback/cq_history_withdrawal";
-import { handler_cq_history_accrual } from "../../bot-common/handlers_callback/cq_history_accrual";
+import { handlerCQHistoryWithdrawal } from "../../bot-common/handlers_callback/cq_history_withdrawal";
+import { handleCQHistoryAccrual } from "../../bot-common/handlers_callback/cq_history_accrual";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.chatType("private").command("start", async (ctx) => {
@@ -31,16 +30,7 @@ export function registerCommands(bot: Bot<MyContext>): void {
       AuthOperatorKeyboard(),
       true,
     );
-    await handleStartCommand(ctx);
-  });
-  bot.command("chatid", async (ctx) => {
-    await cancelConversations(
-      ctx,
-      ScenesOperator,
-      AuthOperatorKeyboard(),
-      true,
-    );
-    await handleChatidCommand(ctx);
+    await handleCommandStartOperator(ctx);
   });
   bot.command("clean", (ctx) =>
     cancelConversations(ctx, ScenesOperator, AuthOperatorKeyboard()),
@@ -60,20 +50,20 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     .chatType("private")
     .callbackQuery(
       createCallbackRegex(BUTTONS_CALLBACK_QUERIES.FinishSurveyButton),
-      handleFinishSurvey,
+      handleCQFinishSurvey,
     );
   bot
     .chatType("private")
     .callbackQuery(
       createCallbackRegex(BUTTONS_CALLBACK_QUERIES.CancelSurveyButton),
-      handleCancelSurvey,
+      handleCQCancelSurvey,
     );
 
   bot
     .chatType("private")
     .callbackQuery(
       createCallbackRegex(BUTTONS_CALLBACK_QUERIES.ThisUserWrote),
-      handleUserWrote,
+      handleCQUserWrote,
     );
 
   bot
@@ -87,7 +77,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     .chatType("private")
     .callbackQuery(
       createCallbackRegex(BUTTONS_CALLBACK_QUERIES.ThisSurveyNeedRecheck),
-      handleRecheckThisSurvey,
+      handleCQRecheckThisSurvey,
     );
 
   bot
@@ -95,7 +85,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     .callbackQuery(
       BUTTONS_CALLBACK_QUERIES.TookButton,
       async (ctx: MyContext) => {
-        await handleTookSurvey(ctx, bot);
+        await handleCQTookSurvey(ctx, bot);
       },
     );
 
@@ -113,7 +103,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     .callbackQuery(
       BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButton,
       async (ctx: MyContext) => {
-        await handler_cq_history_accrual(ctx, "operator");
+        await handleCQHistoryAccrual(ctx, "operator");
       },
     );
 
@@ -122,7 +112,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     .callbackQuery(
       BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButton,
       async (ctx: MyContext) => {
-        await handler_cq_history_withdrawal(ctx, "operator");
+        await handlerCQHistoryWithdrawal(ctx, "operator");
       },
     );
 }
@@ -130,13 +120,13 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
 export function registerMessage(bot: Bot<MyContext>): void {
   bot.on("message:text", async (ctx) => {
     if (ctx.message.text === BUTTONS_KEYBOARD.NewSurveys) {
-      await newSurveysHandler(ctx);
+      await handleMessageNewSurveys(ctx);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.CurrentSurveys) {
-      await currentSurveysHandler(ctx);
+      await handleMessageCurrentSurveys(ctx);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.BalanceButton) {
       await handleMessageBalance(ctx, "operator");
     } else if (ctx.message.text === BUTTONS_KEYBOARD.RecheckSurveys) {
-      await recheckSurveysHandler(ctx);
+      await handleRecheckSurveys(ctx);
     }
   });
 }
