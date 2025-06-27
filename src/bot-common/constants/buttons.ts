@@ -12,7 +12,7 @@ export const BUTTONS_CALLBACK_QUERIES = {
   HistoryMoneyInputButtonText: "История зачисления",
 
   HistoryWithdrawalOfMoneyButton: "HISTORY_WITHDRAWAL_OF_MONEY",
-  HistoryWithdrawalOfMoneyButtonText: "История снятия",
+  HistoryWithdrawalOfMoneyButtonText: "История снятий",
 
   SourceTgWalletTonButton: "SOURCE_TG_WALLET_TON",
   SourceTgWalletTonButtonText: "Кошелек телеграм / TON",

@@ -15,13 +15,13 @@ import { handleFinishSurvey } from "./callback/cq_finish_survey";
 import { handleCancelSurvey } from "./callback/cq_cancel_survey";
 import { handleUserWrote } from "./callback/cq_user_wrote";
 import { handleGetUserSurveyInfo } from "./callback/cq_get_user_survey_info";
-import { handleBalance } from "./callback/cq_balance";
-import { handler_history_accrual } from "./callback/cq_history_accrual";
-import { handler_history_withdrawal } from "./callback/cq_history_withdrawal";
 import { cancelConversations } from "../../bot-common/utils/cancelConversation";
 import { AuthOperatorKeyboard } from "../../bot-common/keyboards/keyboard";
 import { recheckSurveysHandler } from "./callback/mess_recheck_surveys";
 import { handleRecheckThisSurvey } from "./callback/cq_get_recheck_this_survey";
+import { handleMessageBalance } from "../../bot-common/handlers_callback/message__balance";
+import { handler_cq_history_withdrawal } from "../../bot-common/handlers_callback/cq_history_withdrawal";
+import { handler_cq_history_accrual } from "../../bot-common/handlers_callback/cq_history_accrual";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.chatType("private").command("start", async (ctx) => {
@@ -113,7 +113,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     .callbackQuery(
       BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButton,
       async (ctx: MyContext) => {
-        await handler_history_accrual(ctx);
+        await handler_cq_history_accrual(ctx, "operator");
       },
     );
 
@@ -122,7 +122,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     .callbackQuery(
       BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButton,
       async (ctx: MyContext) => {
-        await handler_history_withdrawal(ctx);
+        await handler_cq_history_withdrawal(ctx, "operator");
       },
     );
 }
@@ -134,7 +134,7 @@ export function registerMessage(bot: Bot<MyContext>): void {
     } else if (ctx.message.text === BUTTONS_KEYBOARD.CurrentSurveys) {
       await currentSurveysHandler(ctx);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.BalanceButton) {
-      await handleBalance(ctx);
+      await handleMessageBalance(ctx, "operator");
     } else if (ctx.message.text === BUTTONS_KEYBOARD.RecheckSurveys) {
       await recheckSurveysHandler(ctx);
     }

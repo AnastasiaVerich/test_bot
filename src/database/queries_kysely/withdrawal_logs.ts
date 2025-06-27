@@ -53,6 +53,41 @@ export async function getAllWithdrawalLogByAuditorId(
   }
 }
 
+export async function getAllWithdrawalLogById(
+  params: {
+    user_id?: WithdrawalLogsType["user_id"];
+    auditor_id?: WithdrawalLogsType["auditor_id"];
+    operator_id?: WithdrawalLogsType["operator_id"];
+  },
+  trx: poolType = pool,
+): Promise<WithdrawalLogsType[]> {
+  try {
+    const { user_id = null, operator_id = null, auditor_id = null } = params;
+
+    const result = await trx
+      .selectFrom("withdrawal_logs")
+      .selectAll()
+      .where((eb) => {
+        const conditions = [];
+        if (user_id !== undefined) {
+          conditions.push(eb("user_id", "=", user_id));
+        }
+        if (operator_id !== undefined) {
+          conditions.push(eb("operator_id", "=", operator_id));
+        }
+        if (auditor_id !== undefined) {
+          conditions.push(eb("auditor_id", "=", auditor_id));
+        }
+        return eb.or(conditions);
+      })
+      .execute();
+
+    return result;
+  } catch (error) {
+    throw new Error("Error getAllWithdrawalLogByAuditorId: " + error);
+  }
+}
+
 export async function addWithdrawalLog(
   params: {
     auditor_id?: WithdrawalLogsType["auditor_id"];

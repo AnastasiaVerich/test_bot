@@ -3,7 +3,7 @@ export const HANDLER_BALANCE = {
   NO_PENDING_PAYMENT: "Нет ожидающих платежей",
   RUB: "РУБ",
   TON: "TON",
-  OR: "или",
+  OR: "≈",
   BALANCE: "На Вашем балансе",
   BALANCE_PENDING: "Ожидающие платежи",
   SOME_ERROR: "Бот временно недоступен",
@@ -11,7 +11,6 @@ export const HANDLER_BALANCE = {
 
 export const HANDLER_HISTORY_ACCRUAL = {
   NO_ACCRUAL: "Нет начислений",
-  NO_REFERRAL_ACCRUAL: "Нет начислений",
   RUB: "РУБ",
   BALANCE_ACCRUAL_HISTORY: "История начислений",
   BALANCE_ACCRUAL_REFERRAL_HISTORY: "История начислений по рефералкам",
@@ -20,7 +19,7 @@ export const HANDLER_HISTORY_ACCRUAL = {
 
 export const HANDLER_HISTORY_WITHDRAWAL = {
   NO_HISTORY_WITHDRAWAL: "Нет завершенных платежей",
-  BALANCE_HISTORY: "История операций",
+  BALANCE_HISTORY: "История снятий",
   SOME_ERROR: "Бот временно недоступен",
 };
 

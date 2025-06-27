@@ -8,12 +8,12 @@ import {
 } from "../../bot-common/constants/buttons";
 import { ScenesAuditor } from "../scenes";
 import { handleTookAuditSurvey } from "./callback/handle_took_audit_survey";
-import { handler_history_accrual } from "./callback/callback_queries_history_accrual";
-import { handler_history_withdrawal } from "./callback/callback_queries_history_withdrawal";
 import { cancelConversations } from "../../bot-common/utils/cancelConversation";
 import { AuthAuditorKeyboard } from "../../bot-common/keyboards/keyboard";
 import { handleGroupVideo } from "./callback/mess__group_video";
-import { handleBalance } from "./callback/mess__balance";
+import { handleMessageBalance } from "../../bot-common/handlers_callback/message__balance";
+import { handler_cq_history_withdrawal } from "../../bot-common/handlers_callback/cq_history_withdrawal";
+import { handler_cq_history_accrual } from "../../bot-common/handlers_callback/cq_history_accrual";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.chatType("private").command("start", async (ctx) => {
@@ -58,7 +58,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     .callbackQuery(
       BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButton,
       async (ctx: MyContext) => {
-        await handler_history_accrual(ctx);
+        await handler_cq_history_accrual(ctx, "auditor");
       },
     );
 
@@ -67,7 +67,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     .callbackQuery(
       BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButton,
       async (ctx: MyContext) => {
-        await handler_history_withdrawal(ctx);
+        await handler_cq_history_withdrawal(ctx, "auditor");
       },
     );
 }
@@ -77,7 +77,7 @@ export function registerMessage(bot: Bot<MyContext>): void {
     if (ctx.message.text === BUTTONS_KEYBOARD.CheckSurveyByAuditor) {
       await ctx.conversation.enter(ScenesAuditor.CheckSurveyScene);
     } else if (ctx.message.text === BUTTONS_KEYBOARD.BalanceButton) {
-      await handleBalance(ctx);
+      await handleMessageBalance(ctx, "auditor");
     }
   });
   bot.on("channel_post:video", async (ctx: MyContext) => {

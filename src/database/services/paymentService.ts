@@ -1,11 +1,21 @@
-import { PendingPaymentsType, UsersType } from "../db-types";
+import {
+  CommonVariablesType,
+  PendingPaymentsType,
+  ReferralBonusesType,
+  SurveyCompletionsType,
+  UsersType,
+  WithdrawalLogsType,
+} from "../db-types";
 import logger from "../../lib/logger";
 import {
   addPendingPayment,
   deletePendingPayment,
   getAllPendingPaymentById,
 } from "../queries_kysely/pending_payments";
-import { addWithdrawalLog } from "../queries_kysely/withdrawal_logs";
+import {
+  addWithdrawalLog,
+  getAllWithdrawalLogById,
+} from "../queries_kysely/withdrawal_logs";
 import { pool, poolType } from "../dbClient";
 import { entitiesType } from "../../bot-common/types/type";
 import {
@@ -17,6 +27,9 @@ import {
   updateOperatorByOperatorId,
 } from "../queries_kysely/operators";
 import { getUserBalance, updateUserByUserId } from "../queries_kysely/users";
+import { getCommonVariableByLabel } from "../queries_kysely/common_variables";
+import { getSurveyCompletionsById } from "../queries_kysely/survey_task_completions";
+import { getAllReferralByrReferrerIdAndStatus } from "../queries_kysely/referral_bonuses";
 
 export async function paymentIsCompleted(
   payment: PendingPaymentsType,
@@ -113,7 +126,82 @@ export async function hasPendingPayment(
   return pendingPayments.length > 0;
 }
 
-export async function getBalanceF(id: number, type: entitiesType) {
+export async function getAllPendingPayment(
+  id: number,
+  type: entitiesType,
+): Promise<PendingPaymentsType[]> {
+  let pendingPayments: PendingPaymentsType[] = [];
+  switch (type) {
+    case "auditor":
+      pendingPayments = await getAllPendingPaymentById({ auditor_id: id });
+
+      break;
+    case "operator":
+      pendingPayments = await getAllPendingPaymentById({ operator_id: id });
+
+      break;
+    case "user":
+      pendingPayments = await getAllPendingPaymentById({ user_id: id });
+      break;
+  }
+  return pendingPayments;
+}
+
+export async function getAllWithdrawalLog(
+  id: number,
+  type: entitiesType,
+): Promise<WithdrawalLogsType[]> {
+  let withdrawal_logs: WithdrawalLogsType[] = [];
+  switch (type) {
+    case "auditor":
+      withdrawal_logs = await getAllWithdrawalLogById({
+        auditor_id: id,
+      });
+
+      break;
+    case "operator":
+      withdrawal_logs = await getAllWithdrawalLogById({
+        operator_id: id,
+      });
+
+      break;
+    case "user":
+      withdrawal_logs = await getAllWithdrawalLogById({ user_id: id });
+      break;
+  }
+  return withdrawal_logs;
+}
+
+export async function getAllSurveyRewards(
+  id: number,
+  type: entitiesType,
+): Promise<SurveyCompletionsType[]> {
+  let surveys: SurveyCompletionsType[] = [];
+  switch (type) {
+    case "auditor":
+      surveys = [];
+
+      break;
+    case "operator":
+      surveys = await getSurveyCompletionsById({
+        operator_id: id,
+      });
+
+      break;
+    case "user":
+      surveys = await getSurveyCompletionsById({ user_id: id });
+      break;
+  }
+  return surveys;
+}
+
+export async function getAllReferralRewards(
+  user_id: number,
+): Promise<ReferralBonusesType[]> {
+  return getAllReferralByrReferrerIdAndStatus(user_id, "completed");
+}
+
+export async function getBalance(id: number, type: entitiesType) {
   let info;
   switch (type) {
     case "auditor":
@@ -268,5 +356,13 @@ export async function confirmWithdrawalMoney(params: {
     });
   } catch (error) {
     throw new Error("Error in confirmWithdrawalMoney: " + error);
+  }
+}
+
+export async function getCurse(): Promise<CommonVariablesType | null> {
+  try {
+    return await getCommonVariableByLabel("ton_rub_price");
+  } catch (error) {
+    throw new Error("Error in getCurse: " + error);
   }
 }

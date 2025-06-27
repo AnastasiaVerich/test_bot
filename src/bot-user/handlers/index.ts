@@ -1,11 +1,8 @@
 import { Bot } from "grammy";
 import { ScenesUser } from "../scenes";
-import { handleBalance } from "./callback/callback_queries_balance";
 import { handleStartCommand } from "./callback/command_start";
 import { authMiddleware } from "../middleware/authMiddleware";
 import { blacklistMiddleware } from "../middleware/blacklistMiddleware";
-import { handler_history_withdrawal } from "./callback/callback_queries_history_withdrawal";
-import { handler_history_accrual } from "./callback/callback_queries_history_accrual";
 import { checkInitMiddleware } from "../middleware/checkInitMiddleware";
 import {
   BUTTONS_CALLBACK_QUERIES,
@@ -21,6 +18,9 @@ import { COMMAND_USER_HELP } from "../../bot-common/constants/handler_command";
 import { handler_help_btns } from "./callback/callback_queries_help_btns";
 import { cancelConversations } from "../../bot-common/utils/cancelConversation";
 import { AuthUserKeyboard } from "../../bot-common/keyboards/keyboard";
+import { handleMessageBalance } from "../../bot-common/handlers_callback/message__balance";
+import { handler_cq_history_withdrawal } from "../../bot-common/handlers_callback/cq_history_withdrawal";
+import { handler_cq_history_accrual } from "../../bot-common/handlers_callback/cq_history_accrual";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.command("start", async (ctx) => {
@@ -62,7 +62,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButton,
     authMiddleware,
     async (ctx: MyContext) => {
-      await handler_history_accrual(ctx);
+      await handler_cq_history_accrual(ctx, "user");
     },
   );
 
@@ -70,7 +70,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
     BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButton,
     authMiddleware,
     async (ctx: MyContext) => {
-      await handler_history_withdrawal(ctx);
+      await handler_cq_history_withdrawal(ctx, "user");
     },
   );
 
@@ -138,7 +138,7 @@ export function registerMessage(bot: Bot<MyContext>): void {
       } else if (ctx.message.text === BUTTONS_KEYBOARD.InviteButton) {
         await ctx.conversation.enter(ScenesUser.InviteScene);
       } else if (ctx.message.text === BUTTONS_KEYBOARD.BalanceButton) {
-        await handleBalance(ctx);
+        await handleMessageBalance(ctx, "user");
       }
     },
   );

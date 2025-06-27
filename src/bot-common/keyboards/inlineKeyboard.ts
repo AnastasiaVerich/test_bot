@@ -44,6 +44,30 @@ export const BalanceMenuInlineKeyboard = (): InlineKeyboard =>
       BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButton,
     );
 
+export const WithdrawalHistoryMenuInlineKeyboard = (): InlineKeyboard =>
+  new InlineKeyboard()
+    .text(
+      BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButtonText,
+      BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButton,
+    )
+    .row()
+    .text(
+      BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButtonText,
+      BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButton,
+    );
+
+export const AccrualHistoryMenuInlineKeyboard = (): InlineKeyboard =>
+  new InlineKeyboard()
+    .text(
+      BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButtonText,
+      BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButton,
+    )
+    .row()
+    .text(
+      BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButtonText,
+      BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButton,
+    );
+
 export const HelpInlineKeyboard = (): InlineKeyboard => {
   return new InlineKeyboard()
     .text(

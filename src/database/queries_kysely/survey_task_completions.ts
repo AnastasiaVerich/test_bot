@@ -1,6 +1,37 @@
 import { pool, poolType } from "../dbClient";
 import { SurveyCompletionsType } from "../db-types";
 
+export async function getSurveyCompletionsById(
+  params: {
+    user_id?: SurveyCompletionsType["user_id"];
+    operator_id?: SurveyCompletionsType["operator_id"];
+  },
+  trx: poolType = pool,
+): Promise<SurveyCompletionsType[]> {
+  try {
+    const { user_id = null, operator_id = null } = params;
+
+    return await trx
+      .selectFrom("survey_task_completions")
+      .selectAll()
+      .where((eb) => {
+        const conditions = [];
+        if (user_id !== undefined) {
+          conditions.push(eb("user_id", "=", user_id));
+        }
+        if (operator_id !== undefined) {
+          conditions.push(eb("operator_id", "=", operator_id));
+        }
+
+        return eb.or(conditions);
+      })
+      .orderBy("completed_at", "desc")
+      .execute();
+  } catch (error) {
+    throw new Error("Error getSurveyCompletionsByd: " + error);
+  }
+}
+
 export async function getSurveyCompletionsByUserId(
   userId: SurveyCompletionsType["user_id"],
   trx: poolType = pool,

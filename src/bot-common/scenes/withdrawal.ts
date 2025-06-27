@@ -18,7 +18,7 @@ import { BUTTONS_KEYBOARD } from "../constants/buttons";
 import { ConfirmCancelKeyboard, EmptyKeyboard } from "../keyboards/keyboard";
 import {
   confirmWithdrawalMoney,
-  getBalanceF,
+  getBalance,
   hasPendingPayment,
 } from "../../database/services/paymentService";
 
@@ -82,9 +82,7 @@ export async function withdrawalScene(
     }
 
     // Проверка баланса пользователя
-    const balance = await conversation.external(() =>
-      getBalanceF(userId, type),
-    );
+    const balance = await conversation.external(() => getBalance(userId, type));
 
     if (!balance) {
       if (addLogs) {
