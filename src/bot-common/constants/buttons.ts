@@ -54,7 +54,7 @@ export const BUTTONS_KEYBOARD = {
 
   NewSurveys: "Новые опросы",
   CurrentSurveys: "Текущее опросы",
-  RecheckSurveys: "Перепроверка опросов",
+  RecheckSurveys: "Перезаполнение опросов",
 
   AddAdvertisingCampaign: "Добавить рекламную компанию",
   GetUsersLogs: "Логи пользователей",
