@@ -226,6 +226,7 @@ export interface WithdrawalLogsEntity {
   auditor_id: Generated<number | null>; // ID аудитора
   operator_id: Generated<number | null>; // ID оператора
   amount: number; // сумма
+  amount_rub: number; // сумма
   wallet: string; // кошелек
 
   withdrawn_at: Generated<string>; //дата и время снятия
@@ -247,6 +248,7 @@ export interface PendingPaymentsEntity {
   operator_id: Generated<number | null>; // ID оператора
   auditor_id: Generated<number | null>; // ID аудитора
   amount: number; // Сумма платежа
+  amount_rub: number; // Сумма платежа
   attempts: Generated<number>; // Количество попыток проведения платежа
   wallet: string; // Кошелек
 

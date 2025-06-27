@@ -55,6 +55,7 @@ export async function paymentIsCompleted(
             userId: payment.user_id,
             amount: payment.amount,
             wallet: payment.wallet,
+            amount_rub: payment.amount_rub,
           },
           trx,
         );
@@ -64,6 +65,7 @@ export async function paymentIsCompleted(
             operatorId: payment.operator_id,
             amount: payment.amount,
             wallet: payment.wallet,
+            amount_rub: payment.amount_rub,
           },
           trx,
         );
@@ -73,6 +75,7 @@ export async function paymentIsCompleted(
             auditor_id: payment.auditor_id,
             amount: payment.amount,
             wallet: payment.wallet,
+            amount_rub: payment.amount_rub,
           },
           trx,
         );
@@ -137,6 +140,7 @@ export async function addPendingPaymentF(
   params: {
     amount: PendingPaymentsType["amount"];
     wallet: PendingPaymentsType["wallet"];
+    amount_rub: PendingPaymentsType["amount_rub"];
   },
   trx: poolType = pool,
 ) {
@@ -148,6 +152,7 @@ export async function addPendingPaymentF(
           auditor_id: id,
           amount: params.amount,
           wallet: params.wallet,
+          amount_rub: params.amount_rub,
         },
         trx,
       );
@@ -159,6 +164,7 @@ export async function addPendingPaymentF(
           operator_id: id,
           amount: params.amount,
           wallet: params.wallet,
+          amount_rub: params.amount_rub,
         },
         trx,
       );
@@ -170,6 +176,7 @@ export async function addPendingPaymentF(
           user_id: id,
           amount: params.amount,
           wallet: params.wallet,
+          amount_rub: params.amount_rub,
         },
         trx,
       );
@@ -242,6 +249,7 @@ export async function confirmWithdrawalMoney(params: {
         {
           amount: amountTON,
           wallet: wallet,
+          amount_rub: amountRub,
         },
         trx,
       );

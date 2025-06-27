@@ -30,7 +30,6 @@ export async function withdrawalScene(
   addLogs?: typeof addUserLogs,
 ): Promise<Message.TextMessage | void> {
   try {
-    console.log(123);
     const userId = await conversation.external(() => getUserId(ctx));
     if (!userId) return;
     if (addLogs) {

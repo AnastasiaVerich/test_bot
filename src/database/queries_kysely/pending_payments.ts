@@ -22,6 +22,7 @@ export async function addPendingPayment(
     auditor_id?: PendingPaymentsType["auditor_id"];
     operator_id?: PendingPaymentsType["operator_id"];
     amount: PendingPaymentsType["amount"];
+    amount_rub: PendingPaymentsType["amount_rub"];
     wallet: PendingPaymentsType["wallet"];
   },
   trx: poolType = pool,
@@ -32,6 +33,7 @@ export async function addPendingPayment(
       operator_id = null,
       auditor_id = null,
       amount,
+      amount_rub,
       wallet,
     } = params;
 
@@ -41,6 +43,7 @@ export async function addPendingPayment(
         user_id: user_id,
         operator_id: operator_id,
         auditor_id: auditor_id,
+        amount_rub: amount_rub,
         amount,
         wallet,
       })

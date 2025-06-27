@@ -125,11 +125,11 @@ export async function getUserRegistrationMetrics(): Promise<
 export async function getUserMoneyLogs(): Promise<MoneyMetrics[] | undefined> {
   try {
     const queryText = `WITH 
-    -- Сумма выводов (в рублях, с учетом курса 230)
+    -- Сумма выводов
     withdrawal_totals AS (
         SELECT 
             user_id,
-            COALESCE(SUM(amount * 230), 0) AS total_withdrawn_rub
+            COALESCE(SUM(amount_rub), 0) AS total_withdrawn_rub
         FROM withdrawal_logs
         WHERE user_id IS NOT NULL
         GROUP BY user_id

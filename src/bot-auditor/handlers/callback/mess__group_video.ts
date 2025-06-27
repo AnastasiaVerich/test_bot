@@ -6,8 +6,7 @@ export async function handleGroupVideo(ctx: MyContext): Promise<any | void> {
   try {
     const caption = ctx.channelPost?.caption || "0";
     const fileId = ctx.channelPost?.video?.file_id;
-    console.log("Подпись:", caption);
-    console.log("File ID (видео):", fileId);
+
     await updateVideoByVideoId(Number(caption), {
       file_id_auditor: fileId,
     });

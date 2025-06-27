@@ -60,6 +60,7 @@ export async function addWithdrawalLog(
     operatorId?: WithdrawalLogsType["operator_id"];
     amount: WithdrawalLogsType["amount"];
     wallet: WithdrawalLogsType["wallet"];
+    amount_rub: WithdrawalLogsType["amount_rub"];
   },
   trx: poolType = pool,
 ): Promise<WithdrawalLogsType["withdrawal_id"] | null> {
@@ -70,6 +71,7 @@ export async function addWithdrawalLog(
       auditor_id = null,
       amount,
       wallet,
+      amount_rub,
     } = params;
 
     const result = await trx
@@ -79,6 +81,7 @@ export async function addWithdrawalLog(
         auditor_id: auditor_id,
         amount: amount,
         operator_id: operatorId,
+        amount_rub: amount_rub,
         wallet,
         withdrawn_at: sql`CURRENT_TIMESTAMP`,
       })

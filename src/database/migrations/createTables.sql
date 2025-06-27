@@ -332,6 +332,7 @@ CREATE TABLE withdrawal_logs (
     auditor_id BIGINT DEFAULT NULL,
     amount DECIMAL(10, 2) NOT NULL,    -- Сумма снятия
     wallet  VARCHAR(100) NOT NULL,    -- На какой кошелек
+    amount_rub DECIMAL(10, 2) DEFAULT NULL,
 
     withdrawn_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
@@ -367,6 +368,7 @@ CREATE TABLE pending_payments (
     amount DECIMAL(10, 2) NOT NULL,
     attempts INT DEFAULT 0 NOT NULL,
     wallet TEXT NOT NULL,
+    amount_rub DECIMAL(10, 2) DEFAULT NULL,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 

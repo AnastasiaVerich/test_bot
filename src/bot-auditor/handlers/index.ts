@@ -81,7 +81,6 @@ export function registerMessage(bot: Bot<MyContext>): void {
     }
   });
   bot.on("channel_post:video", async (ctx: MyContext) => {
-    console.log(1212211);
     await handleGroupVideo(ctx);
   });
 }
