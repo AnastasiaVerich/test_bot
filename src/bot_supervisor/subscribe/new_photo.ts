@@ -39,14 +39,14 @@ async function processRecord(
         file_id_supervisor: fileId,
       });
       if (!res) {
-        logger.error(
+        /*logger.error(
           `Не удалось обновить messageId для записи photo_id:${photo_id}`,
-        );
+        );*/
       }
     } else {
-      logger.error(
+      /* logger.error(
         `Не удалось отправить сообщение для записи  photo_id:${photo_id}`,
-      );
+      );*/
     }
   } catch (error) {
     logger.error(`Ошибка при обработке записи ${photo_id}:`, error);
