@@ -29,12 +29,24 @@ export const BUTTONS_CALLBACK_QUERIES = {
   TookAuditButton: "TookAuditButton",
   TookAuditButtonText: "Провести аудит",
 
+  // Меню логов
   GetUsersLogsButton: "GetUsersLogsButton",
   GetUsersLogsButtonText: "Логи пользователей",
 
   GetMoneyLogsButton: "GetMoneyLogsButton",
   GetMoneyLogsButtonText: "Логи движения денег",
 
+  // Меню верификации
+  CheckThisUserVerifyButton: "CheckThisUserVerifyButton",
+  CheckThisUserVerifyButtonText: "Проверить пользователя",
+
+  CheckAllSameFaceUsersButton: "CheckAllSameFaceUsers",
+  CheckAllSameFaceUsersButtonText: "Проверить похожих пользователей",
+
+  CheckNotVerifyUsersButton: "CheckAllSameFaceUsers",
+  CheckNotVerifyUsersButtonText: "Проверить не верификационных пользователей",
+
+  // Меню платежей
   SwitchPaymentButton: "SwitchPaymentButton",
   SwitchPaymentButtonText: "Переключатель автоматического проведения платежей",
 
@@ -76,6 +88,7 @@ export const BUTTONS_KEYBOARD = {
 
   GetLogsMenu: "Логи",
   PaymentsMenu: "Платежи",
+  VerificationUsersMenu: "Верификация пользователей",
   AddAdvertisingCampaign: "Добавить рекламную компанию",
   AddNewSurveys: "Добавить опросы",
   AddNewOperators: "Добавить оператора",

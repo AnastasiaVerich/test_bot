@@ -31,6 +31,7 @@ CREATE TABLE users (
     skip_photo_verification BOOLEAN DEFAULT FALSE NOT NULL,
     last_tg_account VARCHAR(255) DEFAULT NULL,
     last_user_location VARCHAR(255) DEFAULT NULL,
+    is_verification BOOLEAN NOT NULL DEFAULT FALSE,
 
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -56,7 +57,12 @@ GRANT USAGE, SELECT, UPDATE ON SEQUENCE face_embeddings_face_embedding_id_seq TO
 CREATE TABLE photos (
     photo_id BIGSERIAL PRIMARY KEY,
     user_id BIGINT,
-    image BYTEA NOT NULL,
+    file_id_operator VARCHAR(255) NOT NULL, -- Telegram file_id для отправки фото обратно
+    file_id_auditor VARCHAR(255) NOT NULL, -- Telegram file_id для отправки фото обратно
+    file_id_supervisor VARCHAR(255) NOT NULL, -- Telegram file_id для отправки фото обратно
+    is_send BOOLEAN NOT NULL DEFAULT FALSE,
+
+    image BYTEA,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
@@ -422,12 +428,16 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
--- Триггер на таблицу survey_active
+-- Триггер
 CREATE TRIGGER survey_active_trigger
 AFTER INSERT ON survey_active
 FOR EACH ROW
 EXECUTE FUNCTION notify_survey_active();
+
+
+
+
+
 
 -- Функция для отправки в канал АУДИТОРОВ нового опроса
 CREATE OR REPLACE FUNCTION notify_audit_survey_active() RETURNS TRIGGER AS $$
@@ -438,8 +448,7 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
--- Триггер на таблицу survey_active
+-- Триггер
 CREATE TRIGGER audit_survey_active_trigger
 AFTER INSERT ON audit_survey_active
 FOR EACH ROW
@@ -456,8 +465,7 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
--- Триггер на таблицу survey_active
+-- Триггер
 CREATE OR REPLACE TRIGGER operator_assigned_trigger
 AFTER UPDATE OF operator_id ON survey_active
 FOR EACH ROW
@@ -476,8 +484,7 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
--- Триггер на таблицу recheck_survey
+-- Триггер
 CREATE OR REPLACE TRIGGER recheck_operator_assigned_trigger
 AFTER INSERT OR UPDATE OF operator_id, is_operator_notified ON recheck_survey
 FOR EACH ROW
@@ -497,8 +504,7 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
--- Триггер на таблицу survey_active
+-- Триггер
 CREATE OR REPLACE TRIGGER reservation_ended_trigger
 AFTER UPDATE OF is_reservation_end ON survey_active
 FOR EACH ROW
@@ -516,10 +522,31 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
--- Создаем триггер на таблицу users
+-- Тригер
 CREATE OR REPLACE TRIGGER finish_survey_trigger
 AFTER UPDATE OF notify_reason ON users
 FOR EACH ROW
 WHEN (NEW.notify_reason = 'finish_survey' AND OLD.notify_reason IS DISTINCT FROM NEW.notify_reason)
 EXECUTE FUNCTION notify_finish_survey();
+
+
+
+
+-- Создаем функцию-триггер, которая реагирует на новые фото в бд
+CREATE OR REPLACE FUNCTION notify_photo_added() RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.is_send IS FALSE THEN
+    PERFORM pg_notify('photo_added', json_build_object(
+    'photo_id', NEW.photo_id,
+    'user_id', NEW.user_id
+    )::text);
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+-- Тригер
+CREATE OR REPLACE TRIGGER photo_added_trigger
+AFTER INSERT ON photos
+FOR EACH ROW
+WHEN (NEW.is_send IS FALSE)
+EXECUTE FUNCTION notify_photo_added();

@@ -115,12 +115,33 @@ export const TookSurveyInlineKeyboard = (): InlineKeyboard => {
     BUTTONS_CALLBACK_QUERIES.TookButton,
   );
 };
+
 export const TookAuditSurveyInlineKeyboard = (): InlineKeyboard => {
   return new InlineKeyboard().text(
     BUTTONS_CALLBACK_QUERIES.TookAuditButtonText,
     BUTTONS_CALLBACK_QUERIES.TookAuditButton,
   );
 };
+
+export const VerificationUsersMenuKeyboard = (): InlineKeyboard => {
+  return new InlineKeyboard()
+    .text(
+      BUTTONS_CALLBACK_QUERIES.CheckThisUserVerifyButtonText,
+      BUTTONS_CALLBACK_QUERIES.CheckThisUserVerifyButton,
+    )
+    .row()
+    .text(
+      BUTTONS_CALLBACK_QUERIES.CheckAllSameFaceUsersButtonText,
+      BUTTONS_CALLBACK_QUERIES.CheckAllSameFaceUsersButton,
+    )
+    .row()
+    .text(
+      BUTTONS_CALLBACK_QUERIES.CheckNotVerifyUsersButtonText,
+      BUTTONS_CALLBACK_QUERIES.CheckNotVerifyUsersButton,
+    )
+    .row();
+};
+
 export const LogsInlineKeyboard = (): InlineKeyboard => {
   return new InlineKeyboard()
     .text(
@@ -134,6 +155,7 @@ export const LogsInlineKeyboard = (): InlineKeyboard => {
     )
     .row();
 };
+
 export const PaymentsInlineKeyboard = (): InlineKeyboard => {
   return new InlineKeyboard()
     .text(

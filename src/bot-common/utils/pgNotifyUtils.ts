@@ -1,5 +1,5 @@
 import { Client } from "pg";
-import { Bot, InlineKeyboard, Keyboard } from "grammy";
+import { Bot, InlineKeyboard, InputFile, Keyboard } from "grammy";
 import { MyContext } from "../types/type";
 import { pgConfig } from "../../database/dbClient";
 import logger from "../../lib/logger";
@@ -35,6 +35,33 @@ export async function sendMessageWithRetry(
         reply_markup: keyboard,
       });
       return result.message_id;
+    } catch (error) {
+      logger.info(`Попытка ${attempt} не удалась: ${error}`);
+      if (attempt === maxAttempts) {
+        return null;
+      }
+      await sleep(1000);
+      attempt++;
+    }
+  }
+  return null;
+}
+
+export async function sendPhotoMessageWithRetry(
+  bot: Bot<MyContext>,
+  message: string,
+  chatId: number | string,
+  file: InputFile,
+  maxAttempts = 3,
+): Promise<string | null> {
+  let attempt = 1;
+  while (attempt <= maxAttempts) {
+    try {
+      const result = await bot.api.sendPhoto(chatId, file, {
+        caption: message,
+        parse_mode: "HTML",
+      });
+      return result?.photo?.[0]?.file_id ?? null;
     } catch (error) {
       logger.info(`Попытка ${attempt} не удалась: ${error}`);
       if (attempt === maxAttempts) {

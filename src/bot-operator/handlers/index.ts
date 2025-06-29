@@ -21,6 +21,7 @@ import { handleCQRecheckThisSurvey } from "./callback/cq_recheck_this_survey";
 import { handleMessageBalance } from "../../bot-common/handlers_callback/message__balance";
 import { handlerCQHistoryWithdrawal } from "../../bot-common/handlers_callback/cq_history_withdrawal";
 import { handleCQHistoryAccrual } from "../../bot-common/handlers_callback/cq_history_accrual";
+import { handleChannelPostPhoto } from "../../bot-common/handlers_callback/channel_post__photo";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.chatType("private").command("start", async (ctx) => {
@@ -128,6 +129,10 @@ export function registerMessage(bot: Bot<MyContext>): void {
     } else if (ctx.message.text === BUTTONS_KEYBOARD.RecheckSurveys) {
       await handleRecheckSurveys(ctx);
     }
+  });
+
+  bot.on("channel_post:photo", async (ctx: MyContext) => {
+    await handleChannelPostPhoto(ctx, "operator");
   });
 }
 //ОБЯЗАТЕЛЬНО ДЛЯ БОТА СДЛЕАТЬ НАСТРОЙКУ Group Privacy

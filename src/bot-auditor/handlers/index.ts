@@ -10,10 +10,11 @@ import { ScenesAuditor } from "../scenes";
 import { handleCQTookAuditSurvey } from "./callback/cq_took_audit_survey";
 import { cancelConversations } from "../../bot-common/utils/cancelConversation";
 import { AuthAuditorKeyboard } from "../../bot-common/keyboards/keyboard";
-import { handleChannelPostVideo } from "./callback/channel_post__video";
 import { handleMessageBalance } from "../../bot-common/handlers_callback/message__balance";
 import { handlerCQHistoryWithdrawal } from "../../bot-common/handlers_callback/cq_history_withdrawal";
 import { handleCQHistoryAccrual } from "../../bot-common/handlers_callback/cq_history_accrual";
+import { handleChannelPostVideo } from "../../bot-common/handlers_callback/channel_post__video";
+import { handleChannelPostPhoto } from "../../bot-common/handlers_callback/channel_post__photo";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.chatType("private").command("start", async (ctx) => {
@@ -81,6 +82,9 @@ export function registerMessage(bot: Bot<MyContext>): void {
     }
   });
   bot.on("channel_post:video", async (ctx: MyContext) => {
-    await handleChannelPostVideo(ctx);
+    await handleChannelPostVideo(ctx, "auditor");
+  });
+  bot.on("channel_post:photo", async (ctx: MyContext) => {
+    await handleChannelPostPhoto(ctx, "auditor");
   });
 }

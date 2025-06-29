@@ -98,22 +98,17 @@ export async function addUserLogsUnique(
   }
 }
 
-export async function getAllUserLogsByEvent(
-  params: {
-    user_id: BotUserLogsType["user_id"];
-    event_type: EventLogType;
-  },
+export async function getAllUserSamePhotoLogsByUserId(
+  user_id: BotUserLogsType["user_id"],
   trx: poolType = pool,
 ): Promise<BotUserLogsType[]> {
   try {
-    const { user_id, event_type } = params;
-
     const logs = await trx
       .selectFrom("bot_user_logs")
       .selectAll()
       .where("user_id", "=", user_id)
-      .where("event_type", "=", event_type)
-      .orderBy("logged_at", "desc") // Сортировка по времени, последние логи первыми
+      .where("event_type", "=", "registration")
+      .where("step", "=", "photo_user_exist_face")
       .execute();
 
     return logs;

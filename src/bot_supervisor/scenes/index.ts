@@ -8,9 +8,11 @@ import { makeAPayment } from "./make_a_payment";
 import { addNewOperatorsScene } from "./add_new_operators";
 import { simpleRegistrationScene } from "../../bot-common/scenes/simpleRegistration";
 import { AuthSupervisorKeyboard } from "../../bot-common/keyboards/keyboard";
+import { thisUserVerify } from "./this_user_verify";
 
 export enum ScenesSupervisor {
   RegisterScene = "RegisterScene", // eslint-disable-line no-unused-vars
+  ThisUserVerifyScene = "ThisUserVerifyScene", // eslint-disable-line no-unused-vars
   AddAdvertisingCampaignScene = "AddAdvertisingCampaignScene", // eslint-disable-line no-unused-vars
   AddNewSurveys = "AddNewSurveys", // eslint-disable-line no-unused-vars
   SwitchPaymentType = "SwitchPaymentType", // eslint-disable-line no-unused-vars
@@ -52,6 +54,12 @@ export function registerScenes(bot: Bot<MyContext>): void {
   bot.use(
     createConversation(addNewOperatorsScene, {
       id: ScenesSupervisor.AddNewOperators,
+    }),
+  );
+
+  bot.use(
+    createConversation(thisUserVerify, {
+      id: ScenesSupervisor.ThisUserVerifyScene,
     }),
   );
 }

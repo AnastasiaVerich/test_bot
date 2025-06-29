@@ -26,6 +26,7 @@ export interface UsersEntity {
   skip_photo_verification: Generated<boolean>; // Пропуск фотоконтроля
   last_tg_account: Generated<string | null>; // -- Последняя информация о тг-аккаунте
   last_user_location: Generated<string | null>; // -- Пропуск информация о локации юзера
+  is_verification: Generated<boolean>; // -- Пропуск информация о локации юзера
 
   created_at: Generated<string>; // Дата регистрации
 }
@@ -43,7 +44,11 @@ export interface FaceEmbeddingsEntity {
 export interface PhotosEntity {
   photo_id: Generated<number>;
   user_id: number; // id пользователя, которому принадлежит фото
-  image: Buffer; // Хранения изображения в формате BYTEA
+  file_id_operator: string | null; //telegram file_id для отправки видео обратно, если в том же боте
+  file_id_auditor: string | null; //telegram file_id для отправки видео обратно, если в том же боте
+  file_id_supervisor: string | null; //telegram file_id для отправки видео обратно, если в том же боте
+  image: Buffer | null; // Хранения изображения в формате BYTEA
+  is_send: Generated<boolean>; // Отправлено ли фото в чат
 
   created_at: Generated<string>; // Дата создания фото
 }

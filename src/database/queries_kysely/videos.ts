@@ -1,4 +1,3 @@
-import { sql } from "kysely";
 import { pool, poolType } from "../dbClient";
 import { VideosType } from "../db-types";
 
@@ -26,6 +25,7 @@ export async function addVideo(
     throw new Error("Error addVideo: " + error);
   }
 }
+
 export async function updateVideoByVideoId(
   video_id: VideosType["video_id"],
   params: {
@@ -79,18 +79,5 @@ export async function getVideoByVideoId(
     return result ?? null;
   } catch (error) {
     throw new Error("Error getVideoByVideoId: " + error);
-  }
-}
-
-export async function deleteOldVideos(trx: poolType = pool): Promise<void> {
-  try {
-    const param =
-      sql`CURRENT_TIMESTAMP - INTERVAL '30 days'` as unknown as string;
-    await trx
-      .deleteFrom("videos")
-      .where("created_at", "<", param)
-      .executeTakeFirst();
-  } catch (error) {
-    throw new Error("Error deleteOldVideos: " + error);
   }
 }

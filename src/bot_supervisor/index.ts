@@ -13,6 +13,7 @@ import { MyContext } from "../bot-common/types/type";
 import { errorMiddleware } from "../bot-common/middleware/errorMiddleware";
 import { registerScenes } from "./scenes";
 import { PsqlConversationAdapter } from "../services/psqlConversationAdapter";
+import { subscribeSupervisor_newPhotoAdded } from "./subscribe/new_photo";
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ async function bootstrap() {
     registerMessage(bot); //ТАКОМ
     registerCallbackQueries(bot); //ПОРЯДКЕ
 
+    void subscribeSupervisor_newPhotoAdded(bot);
     // Обработчик ошибок
     bot.catch((err) => {
       logger.info("Ошибка в боте:", err);

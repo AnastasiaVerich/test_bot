@@ -79,6 +79,8 @@ export const AuthSupervisorKeyboard = (): Keyboard =>
     .row()
     .text(BUTTONS_KEYBOARD.PaymentsMenu)
     .row()
+    .text(BUTTONS_KEYBOARD.VerificationUsersMenu)
+    .row()
     .text(BUTTONS_KEYBOARD.AddAdvertisingCampaign)
     .row()
     .text(BUTTONS_KEYBOARD.AddNewSurveys)
