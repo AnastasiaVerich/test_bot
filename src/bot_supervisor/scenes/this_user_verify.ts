@@ -161,7 +161,7 @@ export const thisUserVerify = async (
               );
             }
           }
-          return ctx.reply(VERIFY_USERS_SCENE.SUCCESS_BLOCK);
+          await ctx.reply(VERIFY_USERS_SCENE.SUCCESS_BLOCK);
         }
       }
     }
