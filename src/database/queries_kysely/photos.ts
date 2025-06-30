@@ -139,7 +139,7 @@ export async function resetImageOfOldPhotos(
 ): Promise<void> {
   try {
     const param =
-      sql`CURRENT_TIMESTAMP - INTERVAL '7 days'` as unknown as string;
+      sql`CURRENT_TIMESTAMP - INTERVAL '1 days'` as unknown as string;
     await trx
       .updateTable("photos")
       .set({ image: null })
