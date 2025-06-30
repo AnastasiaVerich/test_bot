@@ -1,16 +1,32 @@
 import winston from "winston";
+import DailyRotateFile from "winston-daily-rotate-file";
 import { NODE_ENV } from "../config/env";
 
 // Настройка логгера
 const logger = winston.createLogger({
-  level: "info", // Уровень логирования: debug, info, warn, error
+  level: "info",
   format: winston.format.combine(
-    winston.format.timestamp(), // Добавление времени
-    winston.format.json(), // Формат JSON
+    winston.format.timestamp(),
+    winston.format.json(),
   ),
   transports: [
-    new winston.transports.File({ filename: "error.log", level: "error" }), // Логи ошибок
-    new winston.transports.File({ filename: "combined.log" }), // Все логи
+    // Транспорт для ошибок с ротацией
+    new DailyRotateFile({
+      filename: "logs/error-%DATE%.log",
+      level: "error",
+      datePattern: "YYYY-MM-DD",
+      maxSize: "20m", // Максимальный размер файла — 20 МБ
+      maxFiles: "14d", // Хранить логи за последние 14 дней
+      zippedArchive: true, // Сжимать старые логи в архив
+    }),
+    // Транспорт для всех логов с ротацией
+    new DailyRotateFile({
+      filename: "logs/combined-%DATE%.log",
+      datePattern: "YYYY-MM-DD",
+      maxSize: "20m", // Максимальный размер файла — 20 МБ
+      maxFiles: "14d", // Хранить логи за последние 14 дней
+      zippedArchive: true, // Сжимать старые логи в архив
+    }),
   ],
 });
 
