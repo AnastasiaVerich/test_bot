@@ -128,6 +128,7 @@ export async function getPhotoByUserId(
       .selectFrom("photos")
       .selectAll()
       .where("user_id", "=", user_id)
+      .orderBy("created_at", "asc")
       .execute();
   } catch (error) {
     throw new Error("Error getPhotoByUserId: " + error);

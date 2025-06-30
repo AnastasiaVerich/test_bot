@@ -132,18 +132,6 @@ export const thisUserVerify = async (
           }),
         );
         isBlock = true;
-      } else {
-        const isUpdate = await conversation.external(() =>
-          updateUserByUserId(user_id, {
-            is_supervisor_check: true,
-          }),
-        );
-        if (!isUpdate) {
-          throw new Error("isUpdate error");
-        }
-        return ctx.reply(VERIFY_USERS_SCENE.CHECK_SUCCESS, {
-          reply_markup: AuthSupervisorKeyboard(),
-        });
       }
     }
 
@@ -177,6 +165,17 @@ export const thisUserVerify = async (
         }
       }
     }
+    const isUpdate = await conversation.external(() =>
+      updateUserByUserId(user_id, {
+        is_supervisor_check: true,
+      }),
+    );
+    if (!isUpdate) {
+      throw new Error("isUpdate error");
+    }
+    await ctx.reply(VERIFY_USERS_SCENE.CHECK_SUCCESS, {
+      reply_markup: AuthSupervisorKeyboard(),
+    });
     return ctx.reply(VERIFY_USERS_SCENE.FINISH, {
       reply_markup: AuthSupervisorKeyboard(),
     });
