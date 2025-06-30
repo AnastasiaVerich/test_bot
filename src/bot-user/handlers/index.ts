@@ -52,6 +52,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
 
   bot.callbackQuery(
     BUTTONS_CALLBACK_QUERIES.WithdrawalOfMoneyButton,
+    blacklistMiddleware,
     authMiddleware,
     async (ctx: MyContext) => {
       await ctx.conversation.enter(ScenesUser.WithdrawalScene);
@@ -60,6 +61,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
 
   bot.callbackQuery(
     BUTTONS_CALLBACK_QUERIES.HistoryMoneyInputButton,
+    blacklistMiddleware,
     authMiddleware,
     async (ctx: MyContext) => {
       await handleCQHistoryAccrual(ctx, "user");
@@ -68,6 +70,7 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
 
   bot.callbackQuery(
     BUTTONS_CALLBACK_QUERIES.HistoryWithdrawalOfMoneyButton,
+    blacklistMiddleware,
     authMiddleware,
     async (ctx: MyContext) => {
       await handlerCQHistoryWithdrawal(ctx, "user");

@@ -14,6 +14,7 @@ import {
   RecheckSurveyEntity,
   ReferralBonusesEntity,
   RegionSettingsEntity,
+  SimilarUsersEntity,
   SupervisorEntity,
   SurveyActiveEntity,
   SurveyCompletionsEntity,
@@ -56,3 +57,4 @@ export type AuditorSurveyActiveType =
   UnwrapGeneratedEntity<AuditorSurveyActiveEntity>;
 export type AuditorSurveyTaskCompletionsType =
   UnwrapGeneratedEntity<AuditorSurveyTaskCompletionsEntity>;
+export type SimilarUserstType = UnwrapGeneratedEntity<SimilarUsersEntity>;

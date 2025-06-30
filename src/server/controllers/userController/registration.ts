@@ -12,6 +12,7 @@ import {
 import { getOperatorByIdPhoneOrTg } from "../../../database/queries_kysely/operators";
 import { addUser, getUser } from "../../../database/queries_kysely/users";
 import { addPhoto } from "../../../database/queries_kysely/photos";
+import { addSimilarUser } from "../../../database/queries_kysely/similar_users";
 
 // Интерфейс для тела запроса на регистрацию
 interface RegistrationRequestBody {
@@ -108,6 +109,7 @@ export const registration = async (
         );
         if (distance < 0.45) {
           // Пороговое значение для сравнения
+          await addSimilarUser(userId, row.user_id);
           matches.push({ user_id: row.user_id, distance });
         }
       }

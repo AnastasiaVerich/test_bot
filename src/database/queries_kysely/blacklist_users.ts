@@ -38,3 +38,60 @@ export async function isUserInBlacklist(
     throw new Error("Error isUserInBlacklist: " + error);
   }
 }
+
+export async function addUserInBlacklist(
+  params: {
+    account_id?: BlacklistUsersType["account_id"];
+    phone?: BlacklistUsersType["phone"];
+    reason?: BlacklistUsersType["reason"];
+  },
+  trx: poolType = pool,
+): Promise<BlacklistUsersType["blacklist_id"] | null> {
+  try {
+    const { account_id, phone, reason } = params;
+
+    if (
+      account_id === undefined &&
+      phone === undefined &&
+      reason === undefined
+    ) {
+      throw new Error(
+        `At least one ( ${Object.keys(params).join(", ")} ) must be provided.`,
+      );
+    }
+
+    // Проверяем, существует ли запись с таким account_id или phone
+    const existing = await trx
+      .selectFrom("blacklist_users")
+      .select("blacklist_id")
+      .where((eb) =>
+        eb.or([
+          account_id !== undefined
+            ? eb("account_id", "=", account_id)
+            : eb.val(true),
+          phone !== undefined ? eb("phone", "=", phone) : eb.val(true),
+        ]),
+      )
+      .executeTakeFirst();
+
+    if (existing) {
+      // Если запись уже существует, возвращаем ее blacklist_id
+      return existing.blacklist_id;
+    }
+
+    // Если записи нет, выполняем вставку
+    const result = await trx
+      .insertInto("blacklist_users")
+      .values({
+        account_id: account_id ?? null,
+        phone: phone ?? null,
+        reason: reason ?? null,
+      })
+      .returning("blacklist_id")
+      .executeTakeFirst();
+
+    return result?.blacklist_id ?? null;
+  } catch (error) {
+    throw new Error("Error addUserInBlacklist: " + error);
+  }
+}

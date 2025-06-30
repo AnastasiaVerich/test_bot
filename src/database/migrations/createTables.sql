@@ -403,18 +403,25 @@ GRANT ALL PRIVILEGES ON TABLE referral_bonuses TO admin_vadim;
 -- Таблица видео прохождения опросов
 CREATE TABLE videos (
     video_id BIGSERIAL PRIMARY KEY,
-    file_id_operator VARCHAR(255) NOT NULL, -- Telegram file_id для отправки видео обратно
-    file_id_auditor VARCHAR(255) NOT NULL, -- Telegram file_id для отправки видео обратно
-    file_id_supervisor VARCHAR(255) NOT NULL, -- Telegram file_id для отправки видео обратно
-    video_data BYTEA, -- Видеофайл в бинарном формате
-    file_name VARCHAR(255), -- Имя файла (опционально)
-    mime_type VARCHAR(100), -- Тип файла (например, video/mp4)
+    file_id_operator VARCHAR(255) NOT NULL,
+    file_id_auditor VARCHAR(255) NOT NULL,
+    file_id_supervisor VARCHAR(255) NOT NULL,
+    video_data BYTEA,
+    file_name VARCHAR(255),
+    mime_type VARCHAR(100),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 );
 
 GRANT ALL PRIVILEGES ON TABLE videos TO admin_vadim;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE videos_video_id_seq TO admin_vadim;
 
+CREATE TABLE similar_users (
+    user_id BIGINT NOT NULL,          -- ID основного пользователя
+    similar_user_id BIGINT NOT NULL,  -- ID похожего пользователя
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Время создания связи
+    PRIMARY KEY (user_id, similar_user_id) -- Уникальность пары
+);
+GRANT ALL PRIVILEGES ON TABLE similar_users TO admin_vadim;
 
 
 

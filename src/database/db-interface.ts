@@ -283,6 +283,12 @@ export interface VideosEntity {
   created_at: Generated<string>; // Дата создания
 }
 
+export interface SimilarUsersEntity {
+  user_id: number; // ID основного пользователя
+  similar_user_id: number; // ID похожего пользователя
+  created_at: Generated<string>;
+}
+
 export interface Database {
   blacklist_users: BlacklistUsersEntity;
   users: UsersEntity;
@@ -307,4 +313,5 @@ export interface Database {
   advertising_campaigns: AdvertisingCampaignsEntity;
   bot_user_logs: BotUserLogsEntity;
   videos: VideosEntity;
+  similar_users: SimilarUsersEntity;
 }
