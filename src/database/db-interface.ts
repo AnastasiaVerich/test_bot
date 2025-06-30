@@ -26,7 +26,7 @@ export interface UsersEntity {
   skip_photo_verification: Generated<boolean>; // Пропуск фотоконтроля
   last_tg_account: Generated<string | null>; // -- Последняя информация о тг-аккаунте
   last_user_location: Generated<string | null>; // -- Пропуск информация о локации юзера
-  is_verification: Generated<boolean>; // -- Пропуск информация о локации юзера
+  is_supervisor_check: Generated<boolean>; // -- Пропуск информация о локации юзера
 
   created_at: Generated<string>; // Дата регистрации
 }

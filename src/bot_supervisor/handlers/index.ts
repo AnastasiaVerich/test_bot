@@ -154,7 +154,7 @@ export function registerMessage(bot: Bot<MyContext>): void {
         reply_markup: PaymentsInlineKeyboard(),
       });
     } else if (ctx.message.text === BUTTONS_KEYBOARD.VerificationUsersMenu) {
-      await ctx.reply("Меню верификации пользователей", {
+      await ctx.reply("Меню проверки пользователей", {
         reply_markup: VerificationUsersMenuKeyboard(),
       });
     }

@@ -128,20 +128,20 @@ export const thisUserVerify = async (
           addUserInBlacklist({
             account_id: user_id,
             phone: user.phone,
-            reason: "Не прошел верификацию руководителем",
+            reason: "Не прошел проверку руководителем",
           }),
         );
         isBlock = true;
       } else {
         const isUpdate = await conversation.external(() =>
           updateUserByUserId(user_id, {
-            is_verification: true,
+            is_supervisor_check: true,
           }),
         );
         if (!isUpdate) {
           throw new Error("isUpdate error");
         }
-        return ctx.reply(VERIFY_USERS_SCENE.VERIFY_SUCCESS, {
+        return ctx.reply(VERIFY_USERS_SCENE.CHECK_SUCCESS, {
           reply_markup: AuthSupervisorKeyboard(),
         });
       }

@@ -100,7 +100,7 @@ export async function updateUserByUserId(
     last_tg_account?: UsersType["last_tg_account"];
     add_balance?: UsersType["balance"];
     interval_survey_lock_until?: UsersType["survey_lock_until"];
-    is_verification?: UsersType["is_verification"];
+    is_supervisor_check?: UsersType["is_supervisor_check"];
   },
   trx: poolType = pool,
 ): Promise<UsersType["user_id"] | null> {
@@ -112,7 +112,7 @@ export async function updateUserByUserId(
       interval_survey_lock_until,
       last_user_location,
       last_tg_account,
-      is_verification,
+      is_supervisor_check,
     } = params;
 
     if (
@@ -121,7 +121,7 @@ export async function updateUserByUserId(
       add_balance === undefined &&
       interval_survey_lock_until === undefined &&
       last_user_location === undefined &&
-      is_verification === undefined &&
+      is_supervisor_check === undefined &&
       last_tg_account === undefined
     ) {
       throw new Error(
@@ -140,8 +140,8 @@ export async function updateUserByUserId(
     if (last_tg_account !== undefined) {
       set.last_tg_account = last_tg_account;
     }
-    if (is_verification !== undefined) {
-      set.is_verification = is_verification;
+    if (is_supervisor_check !== undefined) {
+      set.is_supervisor_check = is_supervisor_check;
     }
     if (last_init === "update") {
       set.last_init = sql<Date>`NOW()` as unknown as string;

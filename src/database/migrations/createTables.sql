@@ -31,7 +31,7 @@ CREATE TABLE users (
     skip_photo_verification BOOLEAN DEFAULT FALSE NOT NULL,
     last_tg_account VARCHAR(255) DEFAULT NULL,
     last_user_location VARCHAR(255) DEFAULT NULL,
-    is_verification BOOLEAN NOT NULL DEFAULT FALSE,
+    is_supervisor_check BOOLEAN NOT NULL DEFAULT FALSE,
 
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP

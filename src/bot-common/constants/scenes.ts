@@ -384,7 +384,7 @@ export const VERIFY_USERS_SCENE = {
   SIMILAR_USERS_PHOTO: "Фотографии похожего пользователя: {user_id} ⬇️⬇️⬇️",
   SIMILAR_USERS_PHOTO_NOT_FOUND:
     "Фотографии для пользователя {user_id} не найдены",
-  VERIFY_SUCCESS: `Пользователь отмечен как проверенный`,
+  CHECK_SUCCESS: `Пользователь отмечен как проверенный`,
   SUCCESS_BLOCK: `Пользователи заблокированы`,
   FINISH: `Проверка окончена.`,
   SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.VerificationUsersMenu}'.`,
