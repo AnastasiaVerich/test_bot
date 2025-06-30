@@ -367,3 +367,25 @@ export const MAKE_A_PAYMENT_SCENES = {
   CANCELLED: "Отменено.",
   SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_CALLBACK_QUERIES.ManualPaymentButtonText}'.`,
 };
+
+export const VERIFY_USERS_SCENE = {
+  USER_NOT_REGISTER: "Пользователь не зарегистрирован",
+  USER_IS_BLOCK: "Пользователь заблокирован",
+  ASK_BLOCK: "Заблокировать пользователя {user_id}?",
+
+  ENTER_ID: "Введите ID пользователя",
+  ENTER_ID_OTHERWISE: "Пожалуйста, введите ID пользователя",
+  ENTER_ID_NOT_VALID: "Вы ввели невалидный ID",
+
+  ASK_BLOCK_SIMILAR_USERS:
+    "Заблокировать указанных выше похожих пользователей?",
+  PHOTO_NOT_FOUND: "Фотографии не найдены",
+  USERS_PHOTO: "Фотографии при регистрации: {user_id} ⬇️⬇️⬇️",
+  SIMILAR_USERS_PHOTO: "Фотографии похожего пользователя: {user_id} ⬇️⬇️⬇️",
+  SIMILAR_USERS_PHOTO_NOT_FOUND:
+    "Фотографии для пользователя {user_id} не найдены",
+  VERIFY_SUCCESS: `Пользователь отмечен как проверенный`,
+  SUCCESS_BLOCK: `Пользователи заблокированы`,
+  FINISH: `Проверка окончена.`,
+  SOME_ERROR: `Произошла ошибка. Начните заново, нажав на кнопку '${BUTTONS_KEYBOARD.VerificationUsersMenu}'.`,
+};
