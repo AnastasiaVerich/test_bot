@@ -23,8 +23,8 @@ import {
 } from "../../bot-common/keyboards/inlineKeyboard";
 import { handleChannelPostVideo } from "../../bot-common/handlers_callback/channel_post__video";
 import { handleChannelPostPhoto } from "../../bot-common/handlers_callback/channel_post__photo";
-import { handleCQCheckAllSameUsers } from "./callback/cq_check_all_same_face_users";
-import { handleCQCheckNotVerifyUsers } from "./callback/cq_not_verify_users";
+import { handleCQListAllSameUsers } from "./callback/cq_list_all_same_face_users";
+import { handleCQListNotVerifyUsers } from "./callback/cq_list_not_verify_users";
 
 export function registerCommands(bot: Bot<MyContext>): void {
   bot.command("start", async (ctx) => {
@@ -63,17 +63,17 @@ export function registerCallbackQueries(bot: Bot<MyContext>): void {
   bot
     .chatType("private")
     .callbackQuery(
-      BUTTONS_CALLBACK_QUERIES.CheckAllSameFaceUsersButton,
+      BUTTONS_CALLBACK_QUERIES.ListAllSameFaceUsersButton,
       async (ctx: MyContext) => {
-        await handleCQCheckAllSameUsers(ctx);
+        await handleCQListAllSameUsers(ctx);
       },
     );
   bot
     .chatType("private")
     .callbackQuery(
-      BUTTONS_CALLBACK_QUERIES.CheckNotVerifyUsersButton,
+      BUTTONS_CALLBACK_QUERIES.ListNotVerifyUsersButton,
       async (ctx: MyContext) => {
-        await handleCQCheckNotVerifyUsers(ctx);
+        await handleCQListNotVerifyUsers(ctx);
       },
     );
 

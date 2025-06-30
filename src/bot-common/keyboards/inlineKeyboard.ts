@@ -131,13 +131,13 @@ export const VerificationUsersMenuKeyboard = (): InlineKeyboard => {
     )
     .row()
     .text(
-      BUTTONS_CALLBACK_QUERIES.CheckAllSameFaceUsersButtonText,
-      BUTTONS_CALLBACK_QUERIES.CheckAllSameFaceUsersButton,
+      BUTTONS_CALLBACK_QUERIES.ListAllSameFaceUsersButtonText,
+      BUTTONS_CALLBACK_QUERIES.ListAllSameFaceUsersButton,
     )
     .row()
     .text(
-      BUTTONS_CALLBACK_QUERIES.CheckNotVerifyUsersButtonText,
-      BUTTONS_CALLBACK_QUERIES.CheckNotVerifyUsersButton,
+      BUTTONS_CALLBACK_QUERIES.ListNotVerifyUsersButtonText,
+      BUTTONS_CALLBACK_QUERIES.ListNotVerifyUsersButton,
     )
     .row();
 };

@@ -197,3 +197,17 @@ export async function getAllUsersWhereNotifyFinishSurvey(
     throw new Error("Error getAllUsersWhereNotifyFinishSurvey: " + error);
   }
 }
+
+export async function getUsersWithNoSupervisorCheck(
+  trx: poolType = pool,
+): Promise<UsersType[]> {
+  try {
+    return await trx
+      .selectFrom("users")
+      .selectAll()
+      .where("is_supervisor_check", "=", false)
+      .execute();
+  } catch (error) {
+    throw new Error("Error getUsersWithNoSupervisorCheck: " + error);
+  }
+}

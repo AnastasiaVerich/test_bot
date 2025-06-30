@@ -40,11 +40,11 @@ export const BUTTONS_CALLBACK_QUERIES = {
   CheckThisUserVerifyButton: "CheckThisUserVerifyButton",
   CheckThisUserVerifyButtonText: "Проверить конкретного пользователя",
 
-  CheckAllSameFaceUsersButton: "CheckAllSameFaceUsers",
-  CheckAllSameFaceUsersButtonText: "Проверить всех похожих пользователей",
+  ListAllSameFaceUsersButton: "ListAllSameFaceUsersButton",
+  ListAllSameFaceUsersButtonText: "Список непроверенных похожих пользователей",
 
-  CheckNotVerifyUsersButton: "CheckAllSameFaceUsers",
-  CheckNotVerifyUsersButtonText: "Проверить всех непроверенных пользователей",
+  ListNotVerifyUsersButton: "ListNotVerifyUsersButton",
+  ListNotVerifyUsersButtonText: "Список непроверенных пользователей",
 
   // Меню платежей
   SwitchPaymentButton: "SwitchPaymentButton",

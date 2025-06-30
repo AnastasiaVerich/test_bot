@@ -1,6 +1,7 @@
-import { PhotosType } from "../db-types";
+import { PhotosType, UsersType } from "../db-types";
 import { getPhotoByUserId } from "../queries_kysely/photos";
 import { getSimilarUser } from "../queries_kysely/similar_users";
+import { pool, poolType } from "../dbClient";
 
 type ResultVerifyInfo = {
   users_photo: PhotosType[];
@@ -30,5 +31,21 @@ export async function getSimilarUsersPhotoByUserId(
   } catch (error) {
     console.log(error);
     throw new Error("Error getVerifyPhotosByUserId: " + error);
+  }
+}
+
+export async function getSimilarUsersWithNoSupervisorCheck(
+  trx: poolType = pool,
+): Promise<{ user_id: UsersType["user_id"] }[]> {
+  try {
+    return await trx
+      .selectFrom("similar_users as su")
+      .innerJoin("users as u", "su.user_id", "u.user_id")
+      .select("su.user_id")
+      .distinct()
+      .where("u.is_supervisor_check", "=", false)
+      .execute();
+  } catch (error) {
+    throw new Error("Error getSimilarUsersWithNoSupervisorCheck: " + error);
   }
 }
