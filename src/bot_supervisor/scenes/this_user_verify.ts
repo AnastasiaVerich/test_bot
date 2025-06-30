@@ -165,17 +165,30 @@ export const thisUserVerify = async (
         }
       }
     }
-    const isUpdate = await conversation.external(() =>
-      updateUserByUserId(user_id, {
-        is_supervisor_check: true,
-      }),
-    );
-    if (!isUpdate) {
-      throw new Error("isUpdate error");
-    }
-    await ctx.reply(VERIFY_USERS_SCENE.CHECK_SUCCESS, {
-      reply_markup: AuthSupervisorKeyboard(),
+
+    const isCheck = await yesOrNotStep(conversation, ctx, {
+      question: VERIFY_USERS_SCENE.ASK_USER_CHECK.replace(
+        "{user_id}",
+        user_id.toString(),
+      ),
     });
+    if (isCheck === null) {
+      throw new Error("isUnique error");
+    }
+    if (isCheck === BUTTONS_KEYBOARD.YesButton) {
+      const isUpdate = await conversation.external(() =>
+        updateUserByUserId(user_id, {
+          is_supervisor_check: true,
+        }),
+      );
+      if (!isUpdate) {
+        throw new Error("isUpdate error");
+      }
+      await ctx.reply(VERIFY_USERS_SCENE.CHECK_SUCCESS, {
+        reply_markup: AuthSupervisorKeyboard(),
+      });
+    }
+
     return ctx.reply(VERIFY_USERS_SCENE.FINISH, {
       reply_markup: AuthSupervisorKeyboard(),
     });

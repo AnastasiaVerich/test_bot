@@ -372,6 +372,7 @@ export const VERIFY_USERS_SCENE = {
   USER_NOT_REGISTER: "Пользователь не зарегистрирован",
   USER_IS_BLOCK: "Пользователь заблокирован",
   ASK_BLOCK: "Заблокировать пользователя {user_id}?",
+  ASK_USER_CHECK: "Отметить, что пользователя {user_id} проверил руководитель?",
 
   ENTER_ID: "Введите ID пользователя",
   ENTER_ID_OTHERWISE: "Пожалуйста, введите ID пользователя",
