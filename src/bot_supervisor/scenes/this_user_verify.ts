@@ -20,14 +20,17 @@ export const thisUserVerify = async (
       return;
     }
     const all = await getVerifyPhotosByUserId(user_id);
+    if (!all.isRegister) {
+      return ctx.reply("Пользователь не зарегистрирован");
+    }
     const mediaGroup: any[] = [];
-    const sameMediaGroup: any[] = [];
+    const sameMediaGroups: { [key: number]: any[] } = {};
     for (const el of all.photo_users) {
       if (el.file_id_supervisor) {
         mediaGroup.push({
           type: "photo",
           media: el.file_id_supervisor,
-          caption: "Лично фото пользователя",
+          caption: `Фотографии при регистрации: ${user_id}`,
         });
       }
     }
@@ -35,10 +38,13 @@ export const thisUserVerify = async (
     for (const el2 of all.same_users_photo) {
       for (const el of el2) {
         if (el.file_id_supervisor) {
-          sameMediaGroup.push({
+          if (!sameMediaGroups[el.user_id]) {
+            sameMediaGroups[el.user_id] = [];
+          }
+          sameMediaGroups[el.user_id].push({
             type: "photo",
             media: el.file_id_supervisor,
-            caption: "Фото на кого похож",
+            caption: `Фотографии другого пользователя ${el.user_id}`,
           });
         }
       }
@@ -55,15 +61,17 @@ export const thisUserVerify = async (
       await ctx.reply("Фотографии не найдены");
     }
     // Если есть фотографии, отправляем их пулом
-    if (sameMediaGroup.length > 0) {
-      // Telegram API ограничивает mediaGroup до 10 элементов за раз
-      const chunkSize = 10;
-      for (let i = 0; i < sameMediaGroup.length; i += chunkSize) {
-        const chunk = sameMediaGroup.slice(i, i + chunkSize);
-        await ctx.replyWithMediaGroup(chunk);
+    for (const userId in sameMediaGroups) {
+      const group = sameMediaGroups[userId];
+      if (group.length > 0) {
+        const chunkSize = 10;
+        for (let i = 0; i < group.length; i += chunkSize) {
+          const chunk = group.slice(i, i + chunkSize);
+          await ctx.replyWithMediaGroup(chunk);
+        }
+      } else {
+        await ctx.reply(`Фотографии для пользователя ${userId} не найдены`);
       }
-    } else {
-      await ctx.reply("Фотографии не найдены");
     }
   } catch (error) {
     logger.error("Error in handleCQThisUserVerify: " + error);
