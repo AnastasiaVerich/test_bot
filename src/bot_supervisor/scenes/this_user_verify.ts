@@ -50,7 +50,7 @@ export const thisUserVerify = async (
 
     // Отправляем фотографии основного пользователя
     if (mediaGroup.length > 0) {
-      await ctx.reply(`Фотографии при регистрации: ${user_id}`);
+      await ctx.reply(`⬇️ Фотографии при регистрации: ${user_id} ⬇️`);
       const chunkSize = 10;
       for (let i = 0; i < mediaGroup.length; i += chunkSize) {
         const chunk = mediaGroup.slice(i, i + chunkSize);
@@ -64,7 +64,7 @@ export const thisUserVerify = async (
     for (const userId in sameMediaGroups) {
       const group = sameMediaGroups[userId];
       if (group.length > 0) {
-        await ctx.reply(`Фотографии другого пользователя ${userId}`);
+        await ctx.reply(`⬇️ Фотографии похожего пользователя: ${userId} ⬇️`);
         const chunkSize = 10;
         for (let i = 0; i < group.length; i += chunkSize) {
           const chunk = group.slice(i, i + chunkSize);
