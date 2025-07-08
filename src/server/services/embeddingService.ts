@@ -10,18 +10,14 @@ export async function detectFaces(imageBuffer: Buffer): Promise<
     >
   | []
 > {
-  console.log(11);
-
   // Преобразуем изображение в тензор с помощью TensorFlow.js
   const tensor: tf.Tensor3D | tf.Tensor4D = tf.node.decodeImage(imageBuffer);
-  console.log(12);
 
   // Получаем все лица с их маркерами и дескрипторами
   const detections = await faceapi
     .detectAllFaces(tensor as unknown as faceapi.TNetInput)
     .withFaceLandmarks()
     .withFaceDescriptors();
-  console.log(13);
 
   return detections;
 }
