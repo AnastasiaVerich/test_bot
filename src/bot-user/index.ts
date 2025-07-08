@@ -50,6 +50,7 @@ async function bootstrap() {
     // Запуск бота
     await bot.start().then((res) => {});
   } catch (err) {
+    console.log(err);
     logger.info("Ошибка в bootstrap:", err);
   }
 }

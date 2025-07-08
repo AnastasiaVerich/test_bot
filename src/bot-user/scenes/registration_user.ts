@@ -272,11 +272,13 @@ async function photoStep(
       );
       if (message_web_app_data.message?.web_app_data) {
         const data = JSON.parse(message_web_app_data.message.web_app_data.data);
+        console.log(data);
         dataAll = data;
         result = data.text;
       }
     }
 
+    console.log(result);
     switch (result) {
       case "user_exist_number":
       case "user_exist_id":

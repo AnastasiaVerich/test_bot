@@ -173,15 +173,12 @@ export async function surveyScene(
     );
 
     if (!survey_id) {
-      await ctx.reply(SURVEY_USER_SCENE.SOME_ERROR, {
-        reply_markup: AuthUserKeyboard(),
-      });
       await conversation.external(() =>
         addUserLogs({
           user_id: userId,
           event_type: "survey",
           step: "failed",
-          event_data: JSON.stringify("survey_id not defined"),
+          event_data: JSON.stringify("survey_id is null"),
         }),
       );
 
@@ -346,7 +343,7 @@ async function stepSearchSurvey(
       await ctx.reply(SURVEY_USER_SCENE.SURVEY_NOT_FOUND, {
         reply_markup: AuthUserKeyboard(),
       });
-      return;
+      return null;
     }
 
     return survey.survey_id;

@@ -33,6 +33,7 @@ export const registration = async (
   try {
     const client = await db.connect(); // Получение соединения с базой данных
     try {
+      console.log(1);
       await client.query("BEGIN"); // Начинаем транзакцию
 
       const { userPhone, isSavePhoto } = req.body;
@@ -54,10 +55,12 @@ export const registration = async (
         });
       }
 
+      console.log(12312);
       // Сохраняем фото, если флаг `isSavePhoto` равен '1'
       if (isSavePhoto === "1") {
         await addPhoto(userId, req.file.buffer);
       }
+      console.log(2);
 
       // Проверяем существование пользователя по номеру телефона и ID
       const isHasSomeNumberUser = await getUser({ phone: userPhone });
@@ -70,6 +73,7 @@ export const registration = async (
         operator_id: userId,
         phone: userPhone,
       });
+      console.log(3);
 
       // Если пользователь с таким номером телефона уже существует
       if (isHasSomeNumberUser) {
@@ -85,9 +89,11 @@ export const registration = async (
       if (isBlockUser || isOperator) {
         return res.status(200).send({ status: 0, text: "user_is_block" });
       }
+      console.log(4);
 
       // Определение лиц на изображении
       const detections = await detectFaces(req.file.buffer);
+      console.log(5);
 
       // Если лицо не найдено
       if (detections.length === 0) {
@@ -133,6 +139,7 @@ export const registration = async (
       await client.query("COMMIT"); // Фиксируем транзакцию
       return res.status(200).send({ status: 1, text: "success" });
     } catch (error) {
+      console.log(error);
       logger.error("Error registration 2: " + error);
       await client.query("ROLLBACK"); // Откатываем транзакцию в случае ошибки
       return res.status(500).send({ status: 2, text: "server_error" });
@@ -140,6 +147,7 @@ export const registration = async (
       client.release(); // Освобождаем клиента
     }
   } catch (error) {
+    console.log(error);
     logger.error("Error registration 1: " + error);
     return res.status(500).send({ status: 2, text: "server_error" });
   }
